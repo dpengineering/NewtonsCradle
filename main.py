@@ -3,6 +3,7 @@
 # //                     IMPORT STATEMENTS                      //
 # ////////////////////////////////////////////////////////////////
 
+
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -11,6 +12,7 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 from kivy.clock import Clock
+
 
 
 # ////////////////////////////////////////////////////////////////
@@ -26,6 +28,7 @@ class MyApp(App):
 
 Builder.load_file('main.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (BLACK)
+
 
 
 #////////////////////////////////////////////////////////////////
@@ -83,6 +86,7 @@ class YStepper(Stepper):
         self.stepper.getStepper().goUntilPress(0, direc, s)
         self.stepper.getStepper().setAsHome()
    
+   
         
 # ////////////////////////////////////////////////////////////////
 # //                      GLOBAL VARIABLES                      //
@@ -101,12 +105,12 @@ y2 = YStepper(3)
 # ////////////////////////////////////////////////////////////////
 
 #values are random
-global diameter = 1000     
-global distToBalls = 3000  #distance between the homing position and where the edge of the first ball is
-global distUp = 1000
-global distBack = 2000
-global xSpeed = 1000
-global ySpeed = 1500
+diameter = 1000     
+distToBalls = 3000  #distance between the homing position and where the edge of the first ball is
+distUp = 1000
+distBack = 2000
+xSpeed = 1000
+ySpeed = 1500
 
 def quitAll():
     y1.getStepper().free()
@@ -127,8 +131,8 @@ def home(speed):
     
 def scoop(numRight, numLeft):
     #moving to x pos
-    global distRight = distToBalls + (diameter * numRight)
-    global distLeft = distToBalls + (diameter * numLeft)
+    distRight = distToBalls + (diameter * numRight)
+    distLeft = distToBalls + (diameter * numLeft)
     x1.move(1, distLeft)
     x2.move(0, distRight)
     #scooping
@@ -156,6 +160,8 @@ def scoop(numRight, numLeft):
 #~ def correctLeft(numLeft):
     #~ if(numRight > 5)
         #~ error = 5 - numLeft
+     
+       
         
 # ////////////////////////////////////////////////////////////////
 # //        DEFINE MAINSCREEN CLASS THAT KIVY RECOGNIZES        //
@@ -166,17 +172,13 @@ def scoop(numRight, numLeft):
 # //   SHOULD REFERENCE MAIN FUNCTIONS WITHIN THESE FUNCTIONS   //
 # //      SHOULD NOT INTERACT DIRECTLY WITH THE HARDWARE        //
 # ////////////////////////////////////////////////////////////////
-
-class InstructionScene(Screen):
-    pass
     
 class MainScreen(Screen):
     def exitProgram(self):
                 quitAll()
 
-
 sm.add_widget(MainScreen(name = 'main'))
-sm.add_widget(InstructionScene(name = 'instruction'))
+
 
 
 # ////////////////////////////////////////////////////////////////
