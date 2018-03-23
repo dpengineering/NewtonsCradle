@@ -13,6 +13,21 @@ from kivy.graphics import *
 from kivy.clock import Clock
 
 
+# ////////////////////////////////////////////////////////////////
+# //            DECLARE APP CLASS AND SCREENMANAGER             //
+# //                     LOAD KIVY FILE                         //
+# ////////////////////////////////////////////////////////////////
+
+sm = ScreenManager()
+
+class MyApp(App):
+    def build(self):
+        return sm
+
+Builder.load_file('main.kv')
+Window.clearcolor = (0.1, 0.1, 0.1, 1) # (BLACK)
+
+
 #////////////////////////////////////////////////////////////////
 #//                     CUSTOM CLASS SETUP                     //
 #////////////////////////////////////////////////////////////////
@@ -29,61 +44,143 @@ class Stepper(Slush.Motor):
 
     def getStepper(self):
         return self
-
-    def home(self):
-        self.goUntilPress(1, 1, 200)
-        self.setAsHome()
         
 class XStepper(Stepper):
 
-    def __init__(self, port1, port2):
-        self.stepper1 = Stepper(port1)
-        self.stepper2 = Stepper(port2)
+    def __init__(self, port):
+        self.stepper = Stepper(port)
 
-    def move1(direc, pos):
-        self.stepper1.goToDir(direc, pos)
-    
-    def move2(direc, pos):
-        self.stepper2.goToDir(direc, pos)
+    def move(direc, pos):
+        self.stepper.getStepper().goToDir(direc, pos)
         
-    def test(self, dir1, s1, dir2, s2):
-        self.stepper1.getStepper().goUntilPress(0, dir1, s1)
-        self.stepper2.getStepper().goUntilPress(0, dir2, s2)
-
-    def getStepper2():
-        return self.stepper2
+    def setSpeed(self, speed):
+        self.stepper.getStepper().setMaxSpeed(speed)
+        
+    def test(self, dir1, s1):
+        self.stepper.getStepper().goUntilPress(0, dir1, s1)
         
     # For homing, the port of the limit switch does not matter, for the pi(?) 
     # associates the motor port to a corresponding limit switch port on its own
-    def home1(self, direc, s):
-        self.stepper1.getStepper().goUntilPress(0, direc, s)
-        
-    def home2(self, direc, s):
-        self.stepper2.getStepper().goUntilPress(0, direc, s)
+    def home(self, direc, s):
+        self.stepper.getStepper().goUntilPress(0, direc, s)
+        self.stepper.getStepper().setAsHome()
         
 class YStepper(Stepper):
 
-    def __init__(self, port1, port2):
-        self.stepper1 = Stepper(port1)
-        self.stepper2 = Stepper(port2)
+    def __init__(self, port):
+        self.stepper = Stepper(port)
 
-    def move1(direc, pos):
-        self.stepper1.goToDir(direc, pos)
+    def move(direc, pos):
+        self.stepper.goToDir(direc, pos)
     
-    def move2(direc, pos):
-        self.stepper2.goToDir(direc, pos)
+    def setSpeed(self, speed):
+        self.stepper.getStepper().setMaxSpeed(speed)
         
-    def test(self, dir1, s1, dir2, s2):
-        self.stepper1.getStepper().goUntilPress(0, dir1, s1)
-        self.stepper2.getStepper().goUntilPress(0, dir2, s2)
+    def test(self, dir1, s1):
+        self.stepper.getStepper().goUntilPress(0, dir1, s1)
+        
+    def home(self, direc, s):
+        self.stepper.getStepper().goUntilPress(0, direc, s)
+        self.stepper.getStepper().setAsHome()
+   
+        
+# ////////////////////////////////////////////////////////////////
+# //                      GLOBAL VARIABLES                      //
+# //                         CONSTANTS                          //
+# ////////////////////////////////////////////////////////////////
 
-    def getStepper2():
-        return self.stepper2
+x1 = XStepper(0)
+x2 = XStepper(1)
+y1 = YStepper(2)
+y1 = YStepper(3)
+
+
+# ////////////////////////////////////////////////////////////////
+# //                       MAIN FUNCTIONS                       //
+# //             SHOULD INTERACT DIRECTLY WITH HARDWARE         //
+# ////////////////////////////////////////////////////////////////
+
+#values are random
+global diameter = 1000     
+global distToBalls = 3000  #distance between the homing position and where the edge of the first ball is
+global distUp = 1000
+global distBack = 2000
+global xSpeed = 1000
+global ySpeed = 1500
+
+def quitAll():
+    y1.getStepper().free()
+    y2.getStepper().free()
+    x1.getStepper().free()
+    x2.getStepper().free()
+    quit()
+    
+def home(speed):
+    x1.home(0, speed)
+    x2.home(1, speed)
+    y1.home(0, speed)
+    y2.home(0, speed)
+    x1.setSpeed(xSpeed)
+    x2.setSpeed(xSpeed)
+    y1.setSpeed(ySpeed)
+    y2.setSpeed(ySpeed)
+    
+def scoop(numRight, numLeft):
+    #moving to x pos
+    global distRight = distToBalls + (diameter * numRight)
+    global distLeft = distToBalls + (diameter * numLeft)
+    x1.move(1, distLeft)
+    x2.move(0, distRight)
+    #scooping
+    y1.move(1, distUp)
+    y2.move(1, distUp)
+    #moveing back
+    x1.move(0, distBack)
+    x2.move(1, distBack)
+    #letting go
+    y1.move(0, distUp)
+    y2.move(0, distUp)
+    home(5000)
+
+##### UI might do this instead #####
+#~ def checkVals(numRight, numLeft):
+    #~ if(numRight > 5):
+        #~ correctRight(numRight)
+    #~ if(numLeft > 5):
+        #~ correctLeft(numLeft)
+
+#~ def correctRight(numRight):
+    #~ if(numRight > 5)
+        #~ error = 5 - numRight
         
-    # For homing, the port of the limit switch does not matter, for the pi(?) 
-    # associates the motor port to a corresponding limit switch port on its own
-    def home1(self, direc, s):
-        self.stepper1.getStepper().goUntilPress(0, direc, s)
+#~ def correctLeft(numLeft):
+    #~ if(numRight > 5)
+        #~ error = 5 - numLeft
         
-    def home2(self, direc, s):
-        self.stepper2.getStepper().goUntilPress(0, direc, s)
+# ////////////////////////////////////////////////////////////////
+# //        DEFINE MAINSCREEN CLASS THAT KIVY RECOGNIZES        //
+# //                                                            //
+# //   KIVY UI CAN INTERACT DIRECTLY W/ THE FUNCTIONS DEFINED   //
+# //     CORRESPONDS TO BUTTON/SLIDER/WIDGET "on_release"       //
+# //                                                            //
+# //   SHOULD REFERENCE MAIN FUNCTIONS WITHIN THESE FUNCTIONS   //
+# //      SHOULD NOT INTERACT DIRECTLY WITH THE HARDWARE        //
+# ////////////////////////////////////////////////////////////////
+
+class InstructionScene(Screen):
+    pass
+    
+class MainScreen(Screen):
+    def exitProgram(self):
+                quitAll()
+
+
+sm.add_widget(MainScreen(name = 'main'))
+sm.add_widget(InstructionScene(name = 'instruction'))
+
+
+# ////////////////////////////////////////////////////////////////
+# //                          RUN APP                           //
+# ////////////////////////////////////////////////////////////////
+
+#MyApp().run()
