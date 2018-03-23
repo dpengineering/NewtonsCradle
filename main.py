@@ -92,7 +92,7 @@ class YStepper(Stepper):
 x1 = XStepper(0)
 x2 = XStepper(1)
 y1 = YStepper(2)
-y1 = YStepper(3)
+y2 = YStepper(3)
 
 
 # ////////////////////////////////////////////////////////////////
