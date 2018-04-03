@@ -1,10 +1,105 @@
-<MainScene>:    #start scene with a button and label
+<MainScreen>:    #start scene with a button and label
     name: 'main'
     FloatLayout:
         size_hint: None, None  #Needed to be able to define define height and width of widgets
+        ################# TITLE #################
         Label:
             center_x: root.center_x
             center_y: root.center_y * 14/8
-            text: 'Newtons Cradle Controls'
+            text: 'Newtons Cradle'
             color: 0,0,0,1
             font_size: 80
+            
+        ################# SCOOP LABELS #################    
+        Label:
+            center_x: root.center_x * 5/8
+            center_y: root.center_y * 13/10
+            text: 'Left Scooper'
+            color: 0,255,255,.65
+            font_size: 80
+        Label:
+            center_x: root.center_x * 11/8
+            center_y: root.center_y * 13/10
+            text: 'Right Scooper'
+            color: 0,255,255,.65
+            font_size: 80
+            
+        ################# UPDATING NUMBER LABELS #################    
+        Label:
+            center_x: root.center_x * 41/64
+            center_y: root.center_y  
+            text: 'Balls'
+            color: 0,255,255,.65
+            font_size: 70
+        Label:
+            center_x: root.center_x * 33/64
+            center_y: root.center_y 
+            text: root.numBallsLeftLab
+            color: 0,255,255,.65
+            font_size: 70
+        Label:
+            center_x: root.center_x * 91/64
+            center_y: root.center_y  
+            text: 'Balls'
+            color: 0,255,255,.65
+            font_size: 70
+        Label:
+            center_x: root.center_x * 83/64
+            center_y: root.center_y 
+            text: root.numBallsRightLab
+            color: 0,255,255,.65
+            font_size: 70
+            
+        ################# CHANGE NUMBER LABEL #################    
+        Button:
+            size_hint: None,None
+            text: '-'
+            font_size: 40
+            size: 60, 60
+            background_color: .1,.1,1,1
+            center: 500, 400
+            on_release: root.numLeftSub()
+        Button:
+            size_hint: None,None
+            text: '+'
+            font_size: 40
+            size: 60, 60
+            background_color: .1,.1,1,1
+            center: 650, 400
+            on_release: root.numLeftAdd()
+        Button:
+            size_hint: None,None
+            text: '-'
+            font_size: 40
+            size: 60, 60
+            background_color: .1,.1,1,1
+            center: 1250, 400
+            on_release: root.numRightSub()
+        Button:
+            size_hint: None,None
+            text: '+'
+            font_size: 40
+            size: 60, 60
+            background_color: .1,.1,1,1
+            center: 1400, 400
+            on_release: root.numRightAdd()
+            
+        ################# EXECUTE #################    
+        Button:
+            size_hint: None,None
+            text: 'SCOOP!'
+            font_size: 50
+            size: 200, 75
+            background_color: .6, 0, 0, 1
+            center: 950, 250
+            on_release: root.scooop()
+            
+        ################# QUIT #################    
+        Button:
+            size_hint: None,None
+            text: 'Quit'
+            font_size: 50
+            size: 200, 75
+            background_color: 0,0,0,.3
+            center: 150, 100
+            on_release: root.exitProgram()

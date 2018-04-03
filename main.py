@@ -11,23 +11,8 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
-from kivy.clock import Clock
-
-
-
-# ////////////////////////////////////////////////////////////////
-# //            DECLARE APP CLASS AND SCREENMANAGER             //
-# //                     LOAD KIVY FILE                         //
-# ////////////////////////////////////////////////////////////////
-
-sm = ScreenManager()
-
-class MyApp(App):
-    def build(self):
-        return sm
-
-Builder.load_file('main.kv')
-Window.clearcolor = (0.1, 0.1, 0.1, 1) # (BLACK)
+from kivy.properties import StringProperty
+#from kivy.clock import Clock
 
 
 
@@ -146,21 +131,17 @@ def scoop(numRight, numLeft):
     y2.move(0, distUp)
     home(5000)
 
-##### UI might do this instead #####
-#~ def checkVals(numRight, numLeft):
-    #~ if(numRight > 5):
-        #~ correctRight(numRight)
-    #~ if(numLeft > 5):
-        #~ correctLeft(numLeft)
 
-#~ def correctRight(numRight):
-    #~ if(numRight > 5)
-        #~ error = 5 - numRight
-        
-#~ def correctLeft(numLeft):
-    #~ if(numRight > 5)
-        #~ error = 5 - numLeft
-     
+
+# ////////////////////////////////////////////////////////////////
+# //            DECLARE APP CLASS AND SCREENMANAGER             //
+# //                     LOAD KIVY FILE                         //
+# ////////////////////////////////////////////////////////////////
+
+
+
+Builder.load_file('main.kv')
+Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
         
 # ////////////////////////////////////////////////////////////////
@@ -174,10 +155,47 @@ def scoop(numRight, numLeft):
 # ////////////////////////////////////////////////////////////////
     
 class MainScreen(Screen):
+    numBallsLeft = 0
+    numBallsLeftLab = StringProperty(str(numBallsLeft))
+    numBallsRight = 0
+    numBallsRightLab = StringProperty(str(numBallsRight))
+    
     def exitProgram(self):
                 quitAll()
+    
+    def numLeftAdd(self):
+        MainScreen.numBallsLeft = MainScreen.numBallsLeft + 1
+        if(MainScreen.numBallsLeft > 5):
+            MainScreen.numBallsLeft = 5
+        if(MainScreen.numBallsLeft > (5 - MainScreen.numBallsRight)):
+            MainScreen.numBallsRight = MainScreen.numBallsRight - 1
+        self.numBallsLeftLab = str(MainScreen.numBallsLeft)
+        self.numBallsRightLab = str(MainScreen.numBallsRight)
+        
+    def numLeftSub(self):
+        MainScreen.numBallsLeft = MainScreen.numBallsLeft - 1
+        if(MainScreen.numBallsLeft < 0):
+            MainScreen.numBallsLeft = 0
+        self.numBallsLeftLab = str(MainScreen.numBallsLeft)
+        
+    def numRightAdd(self):
+        MainScreen.numBallsRight = MainScreen.numBallsRight + 1
+        if(MainScreen.numBallsRight > 5):
+            MainScreen.numBallsRight = 5
+        if(MainScreen.numBallsRight > (5 - MainScreen.numBallsLeft)):
+            MainScreen.numBallsLeft = MainScreen.numBallsLeft - 1
+        self.numBallsRightLab = str(MainScreen.numBallsRight)
+        self.numBallsLeftLab = str(MainScreen.numBallsLeft)
+        
+    def numRightSub(self):
+        MainScreen.numBallsRight = MainScreen.numBallsRight - 1
+        if(MainScreen.numBallsRight < 0):
+            MainScreen.numBallsRight = 0
+        self.numBallsRightLab = str(MainScreen.numBallsRight)
+        
+    def scooop(self):
+        scoop(numBallsLeft, numBallsRight)
 
-sm.add_widget(MainScreen(name = 'main'))
 
 
 
@@ -185,4 +203,11 @@ sm.add_widget(MainScreen(name = 'main'))
 # //                          RUN APP                           //
 # ////////////////////////////////////////////////////////////////
 
-#MyApp().run()
+
+sm = ScreenManager()
+sm.add_widget(MainScreen(name = 'main'))
+class MyApp(App):
+    def build(self):
+        return sm
+
+MyApp().run()
