@@ -38,7 +38,7 @@ class XStepper(Stepper):
     def __init__(self, port):
         self.stepper = Stepper(port)
 
-    def move(direc, pos):
+    def move(self, direc, pos):
         self.stepper.getStepper().goToDir(direc, pos)
         
     def setSpeed(self, speed):
@@ -58,7 +58,7 @@ class YStepper(Stepper):
     def __init__(self, port):
         self.stepper = Stepper(port)
 
-    def move(direc, pos):
+    def move(self, direc, pos):
         self.stepper.goToDir(direc, pos)
     
     def setSpeed(self, speed):
@@ -194,7 +194,7 @@ class MainScreen(Screen):
         self.numBallsRightLab = str(MainScreen.numBallsRight)
         
     def scooop(self):
-        scoop(numBallsLeft, numBallsRight)
+        scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
 
 
 
