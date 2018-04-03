@@ -207,4 +207,5 @@ sm.add_widget(MainScreen(name = 'main'))
 # //                          RUN APP                           //
 # ////////////////////////////////////////////////////////////////
 
+home(1000)
 MyApp().run()
