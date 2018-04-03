@@ -138,7 +138,11 @@ def scoop(numRight, numLeft):
 # //                     LOAD KIVY FILE                         //
 # ////////////////////////////////////////////////////////////////
 
+sm = ScreenManager()
 
+class MyApp(App):
+    def build(self):
+        return sm
 
 Builder.load_file('main.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
@@ -196,18 +200,11 @@ class MainScreen(Screen):
     def scooop(self):
         scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
 
-
+sm.add_widget(MainScreen(name = 'main'))
 
 
 # ////////////////////////////////////////////////////////////////
 # //                          RUN APP                           //
 # ////////////////////////////////////////////////////////////////
-
-
-sm = ScreenManager()
-sm.add_widget(MainScreen(name = 'main'))
-class MyApp(App):
-    def build(self):
-        return sm
 
 MyApp().run()
