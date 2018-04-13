@@ -169,9 +169,9 @@ class MainScreen(Screen):
     
     def numLeftAdd(self):
         MainScreen.numBallsLeft = MainScreen.numBallsLeft + 1
-        if(MainScreen.numBallsLeft > 5):
-            MainScreen.numBallsLeft = 5
-        if(MainScreen.numBallsLeft > (5 - MainScreen.numBallsRight)):
+        if(MainScreen.numBallsLeft > 4):
+            MainScreen.numBallsLeft = 4
+        if(MainScreen.numBallsLeft > (4 - MainScreen.numBallsRight)):
             MainScreen.numBallsRight = MainScreen.numBallsRight - 1
         self.numBallsLeftLab = str(MainScreen.numBallsLeft)
         self.numBallsRightLab = str(MainScreen.numBallsRight)
@@ -184,9 +184,9 @@ class MainScreen(Screen):
         
     def numRightAdd(self):
         MainScreen.numBallsRight = MainScreen.numBallsRight + 1
-        if(MainScreen.numBallsRight > 5):
-            MainScreen.numBallsRight = 5
-        if(MainScreen.numBallsRight > (5 - MainScreen.numBallsLeft)):
+        if(MainScreen.numBallsRight > 4):
+            MainScreen.numBallsRight = 4
+        if(MainScreen.numBallsRight > (4 - MainScreen.numBallsLeft)):
             MainScreen.numBallsLeft = MainScreen.numBallsLeft - 1
         self.numBallsRightLab = str(MainScreen.numBallsRight)
         self.numBallsLeftLab = str(MainScreen.numBallsLeft)
@@ -197,7 +197,7 @@ class MainScreen(Screen):
             MainScreen.numBallsRight = 0
         self.numBallsRightLab = str(MainScreen.numBallsRight)
         
-    def scooop(self):
+    def scoopCallback(self):
         scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
 
 sm.add_widget(MainScreen(name = 'main'))
@@ -208,8 +208,6 @@ sm.add_widget(MainScreen(name = 'main'))
 # ////////////////////////////////////////////////////////////////
 
 home()
-scoop(4, 0)
-scoop(4, 1)
 
+MyApp().run()
 quitAll()
-#MyApp().run()
