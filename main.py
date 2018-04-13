@@ -50,6 +50,7 @@ class XStepper(Stepper):
     # For homing, the port of the limit switch does not matter, for the pi(?) 
     # associates the motor port to a corresponding limit switch port on its own
     def home(self, direc, s):
+        self.stepper.move(-20000)
         self.stepper.getStepper().goUntilPress(0, direc, s)
         self.stepper.getStepper().setAsHome()
         
@@ -68,6 +69,7 @@ class YStepper(Stepper):
         self.stepper.getStepper().goUntilPress(0, dir1, s1)
         
     def home(self, direc, s):
+        self.stepper.goTo( 200 * (-direc))
         self.stepper.getStepper().goUntilPress(0, direc, s)
         self.stepper.getStepper().setAsHome()
    
@@ -98,17 +100,17 @@ xSpeed = 1000
 ySpeed = 1500
 
 def quitAll():
-    y1.getStepper().free()
-    y2.getStepper().free()
-    x1.getStepper().free()
-    x2.getStepper().free()
+    y1.free()
+    y2.free()
+    x1.free()
+    x2.free()
     quit()
     
 def home(speed):
     x1.home(0, speed)
-    x2.home(1, speed)
-    y1.home(0, speed)
-    y2.home(0, speed)
+    x2.home(0, speed)
+    #y1.home(0, speed)
+    #y2.home(0, speed)
     x1.setSpeed(xSpeed)
     x2.setSpeed(xSpeed)
     y1.setSpeed(ySpeed)
@@ -208,4 +210,5 @@ sm.add_widget(MainScreen(name = 'main'))
 # ////////////////////////////////////////////////////////////////
 
 home(1000)
-MyApp().run()
+
+#MyApp().run()
