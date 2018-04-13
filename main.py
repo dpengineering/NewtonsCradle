@@ -14,125 +14,123 @@ from kivy.graphics import *
 from kivy.properties import StringProperty
 #from kivy.clock import Clock
 
+import Stepper
 
+distUp = 3 * 25.4
+distBack = 4 * 25.4
 
-#////////////////////////////////////////////////////////////////
-#//                     CUSTOM CLASS SETUP                     //
-#////////////////////////////////////////////////////////////////
+startPosition = 3.25 * 25.4
+ballDiameter = 2.25 * 25.4     
 
-import Slush
-b = Slush.sBoard()
+liftSpeed = 30
+lowerSpeed = 120
 
-class Stepper(Slush.Motor):
+rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = liftSpeed)
+rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = 30)
 
-    def __init__(self, port, runCurrent=20, accelCurrent=20, deaccelCurrent=20, holdCurrent=20):
-        super().__init__(port)
-        self.resetDev()
-        self.setCurrent(runCurrent, accelCurrent, deaccelCurrent, holdCurrent)
-
-    def getStepper(self):
-        return self
-        
-class XStepper(Stepper):
-
-    def __init__(self, port):
-        self.stepper = Stepper(port)
-
-    def move(self, direc, pos):
-        self.stepper.getStepper().goToDir(direc, pos)
-        
-    def setSpeed(self, speed):
-        self.stepper.getStepper().setMaxSpeed(speed)
-        
-    def test(self, dir1, s1):
-        self.stepper.getStepper().goUntilPress(0, dir1, s1)
-        
-    # For homing, the port of the limit switch does not matter, for the pi(?) 
-    # associates the motor port to a corresponding limit switch port on its own
-    def home(self, direc, s):
-        self.stepper.move(-20000)
-        self.stepper.getStepper().goUntilPress(0, direc, s)
-        self.stepper.getStepper().setAsHome()
-        
-class YStepper(Stepper):
-
-    def __init__(self, port):
-        self.stepper = Stepper(port)
-
-    def move(self, direc, pos):
-        self.stepper.goToDir(direc, pos)
-    
-    def setSpeed(self, speed):
-        self.stepper.getStepper().setMaxSpeed(speed)
-        
-    def test(self, dir1, s1):
-        self.stepper.getStepper().goUntilPress(0, dir1, s1)
-        
-    def home(self, direc, s):
-        self.stepper.goTo( 200 * (-direc))
-        self.stepper.getStepper().goUntilPress(0, direc, s)
-        self.stepper.getStepper().setAsHome()
+leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = liftSpeed)
+leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = 30)
    
-   
-        
-# ////////////////////////////////////////////////////////////////
-# //                      GLOBAL VARIABLES                      //
-# //                         CONSTANTS                          //
-# ////////////////////////////////////////////////////////////////
-
-x1 = XStepper(0)
-x2 = XStepper(1)
-y1 = YStepper(2)
-y2 = YStepper(3)
-
 
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
 # //             SHOULD INTERACT DIRECTLY WITH HARDWARE         //
 # ////////////////////////////////////////////////////////////////
 
-#values are random
-diameter = 1000     
-distToBalls = 3000  #distance between the homing position and where the edge of the first ball is
-distUp = 1000
-distBack = 2000
-xSpeed = 1000
-ySpeed = 1500
+
 
 def quitAll():
-    y1.free()
-    y2.free()
-    x1.free()
-    x2.free()
+    rightHorizontalStepper.free()
+    rightVerticalStepper.free()
+    leftVerticalStepper.free()
+    leftHorizontalStepper.free()
     quit()
     
-def home(speed):
-    x1.home(0, speed)
-    x2.home(0, speed)
-    #y1.home(0, speed)
-    #y2.home(0, speed)
-    x1.setSpeed(xSpeed)
-    x2.setSpeed(xSpeed)
-    y1.setSpeed(ySpeed)
-    y2.setSpeed(ySpeed)
+def home():
+
+    leftVerticalStepper.home(0)   
+    rightVerticalStepper.home(0)
+    
+    leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
+    rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
+        
+    leftIsHome = False
+    rightIsHome = False
+    while not leftIsHome or not rightIsHome:
+        if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
+            leftHorizontalStepper.hardStop()
+            leftHorizontalStepper.setAsHome()
+            leftIsHome = True
+        if not rightIsHome and rightHorizontalStepper.readSwitch() == True:
+            rightHorizontalStepper.hardStop()
+            rightHorizontalStepper.setAsHome()
+            rightIsHome = True
+   
+    leftHorizontalStepper.startGoToPosition(startPosition)
+    rightHorizontalStepper.startGoToPosition(startPosition)
+    
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
+
+    
+    
+    
+    
     
 def scoop(numRight, numLeft):
+    
+    if numRight + numLeft > 4:
+        print("Collision detected")
+        return
+        
     #moving to x pos
-    distRight = distToBalls + (diameter * numRight)
-    distLeft = distToBalls + (diameter * numLeft)
-    x1.move(1, distLeft)
-    x2.move(0, distRight)
+    distRight = ballDiameter * numRight
+    distLeft = ballDiameter * numLeft
+    
+    if (numLeft != 0): 
+        leftHorizontalStepper.startRelativeMove(distLeft)
+    if (numRight != 0): 
+        rightHorizontalStepper.startRelativeMove(distRight)
+    
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
+        
     #scooping
-    y1.move(1, distUp)
-    y2.move(1, distUp)
-    #moveing back
-    x1.move(0, distBack)
-    x2.move(1, distBack)
-    #letting go
-    y1.move(0, distUp)
-    y2.move(0, distUp)
-    home(5000)
+    
+    if (numLeft != 0): 
+       leftVerticalStepper.setSpeed(liftSpeed)
+       leftVerticalStepper.startRelativeMove(distUp)
 
+    if (numRight != 0): 
+        rightVerticalStepper.setSpeed(liftSpeed)
+        rightVerticalStepper.startRelativeMove(distUp)
+       
+    while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
+        continue
+        
+    #moving back
+    if (numLeft != 0): 
+        leftHorizontalStepper.startRelativeMove(-1 * distBack)
+    if (numRight != 0): 
+        rightHorizontalStepper.startRelativeMove(-1 * distBack)
+    
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
+        
+    #letting go
+    leftVerticalStepper.setSpeed(lowerSpeed)
+    rightVerticalStepper.setSpeed(lowerSpeed)
+    leftVerticalStepper.startGoToPosition(0)
+    rightVerticalStepper.startGoToPosition(0)
+    
+    while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
+        continue
+
+    leftHorizontalStepper.startGoToPosition(startPosition)
+    rightHorizontalStepper.startGoToPosition(startPosition)
+    
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
 
 
 # ////////////////////////////////////////////////////////////////
@@ -209,6 +207,9 @@ sm.add_widget(MainScreen(name = 'main'))
 # //                          RUN APP                           //
 # ////////////////////////////////////////////////////////////////
 
-home(1000)
+home()
+scoop(4, 0)
+scoop(4, 1)
 
+quitAll()
 #MyApp().run()
