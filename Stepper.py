@@ -3,9 +3,8 @@ b = Slush.sBoard()
 
 
 class Stepper(Slush.Motor):
-    #~ b = Slush.sBoard()
     
-    #Stepper constructor, if no setCurrent params are given defaults to 20
+    #Stepper constructor, if no parameter is specified they will default to given values
     def __init__(self, **kwargs):
         super().__init__(kwargs.get("port", 0))
         self.resetDev()
