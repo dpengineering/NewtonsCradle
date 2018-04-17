@@ -12,24 +12,27 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 from kivy.properties import StringProperty
-#from kivy.clock import Clock
+from kivy.clock import Clock
 
 import Stepper
 
-distUp = 3 * 25.4
+distUp = 2 * 25.4
 distBack = 4 * 25.4
+stopDistLeft = 2.25 * 25.4
+stopDistRight = 2.5 * 25.4
 
-startPosition = 3.25 * 25.4
+rightStartPosition = 1.75 * 25.4
+leftStartPosition = 2.1* 25.4
 ballDiameter = 2.25 * 25.4     
 
 liftSpeed = 30
 lowerSpeed = 120
 
-rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = liftSpeed)
-rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = 30)
+rightHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = liftSpeed)
+rightVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = 30)
 
-leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = liftSpeed)
-leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = 30)
+leftHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = liftSpeed)
+leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = 30)
    
 
 # ////////////////////////////////////////////////////////////////
@@ -38,7 +41,7 @@ leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = 30)
 # ////////////////////////////////////////////////////////////////
 
 
-
+ 
 def quitAll():
     rightHorizontalStepper.free()
     rightVerticalStepper.free()
@@ -66,14 +69,15 @@ def home():
             rightHorizontalStepper.setAsHome()
             rightIsHome = True
    
-    leftHorizontalStepper.startGoToPosition(startPosition)
-    rightHorizontalStepper.startGoToPosition(startPosition)
+    leftHorizontalStepper.startGoToPosition(leftStartPosition)
+    rightHorizontalStepper.startGoToPosition(rightStartPosition)
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
 
     
-    
+#~ def move_thread():
+	#~ Thread(target=partial(polygon, sides)).start()
     
     
     
@@ -126,11 +130,55 @@ def scoop(numRight, numLeft):
     while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
         continue
 
-    leftHorizontalStepper.startGoToPosition(startPosition)
-    rightHorizontalStepper.startGoToPosition(startPosition)
+    leftHorizontalStepper.startGoToPosition(leftStartPosition)
+    rightHorizontalStepper.startGoToPosition(rightStartPosition)
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
+        
+        
+def moveUpandIn():
+    
+    #home
+    
+    leftVerticalStepper.home(0)   
+    rightVerticalStepper.home(0)
+    
+    leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
+    rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
+        
+    leftIsHome = False
+    rightIsHome = False
+    while not leftIsHome or not rightIsHome:
+        if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
+            leftHorizontalStepper.hardStop()
+            leftHorizontalStepper.setAsHome()
+            leftIsHome = True
+        if not rightIsHome and rightHorizontalStepper.readSwitch() == True:
+            rightHorizontalStepper.hardStop()
+            rightHorizontalStepper.setAsHome()
+            rightIsHome = True
+    
+    #move up
+    
+    leftVerticalStepper.setSpeed(liftSpeed)
+    leftVerticalStepper.startRelativeMove(distUp)
+
+    rightVerticalStepper.setSpeed(liftSpeed)
+    rightVerticalStepper.startRelativeMove(distUp)
+       
+    while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
+        continue
+        
+    #moving in
+    
+    leftHorizontalStepper.startRelativeMove(1 * stopDistLeft)
+
+    rightHorizontalStepper.startRelativeMove(1 * stopDistRight)
+    
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
+        
 
 
 # ////////////////////////////////////////////////////////////////
@@ -199,6 +247,11 @@ class MainScreen(Screen):
         
     def scoopCallback(self):
         scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
+        
+    def stopBalls(self):
+        moveUpandIn()
+        home()
+		
 
 sm.add_widget(MainScreen(name = 'main'))
 
