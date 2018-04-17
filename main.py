@@ -1,9 +1,6 @@
-
 # ////////////////////////////////////////////////////////////////
 # //                     IMPORT STATEMENTS                      //
 # ////////////////////////////////////////////////////////////////
-
-
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -39,8 +36,6 @@ leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = 30)
 # //                       MAIN FUNCTIONS                       //
 # //             SHOULD INTERACT DIRECTLY WITH HARDWARE         //
 # ////////////////////////////////////////////////////////////////
-
-
  
 def quitAll():
     rightHorizontalStepper.free()
@@ -99,8 +94,7 @@ def scoop(numRight, numLeft):
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
         
-    #scooping
-    
+    #scooping  
     if (numLeft != 0): 
        leftVerticalStepper.setSpeed(liftSpeed)
        leftVerticalStepper.startRelativeMove(distUp)
@@ -138,48 +132,50 @@ def scoop(numRight, numLeft):
         
         
 def moveUpandIn():
+    #bring the vertical steppers down
+    leftVerticalStepper.startGoToPosition(0)   
+    rightVerticalStepper.startGoToPosition(0)
     
-    #home
+    while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
+        continue
     
-    leftVerticalStepper.home(0)   
-    rightVerticalStepper.home(0)
-    
-    leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
-    rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
-        
-    leftIsHome = False
-    rightIsHome = False
-    while not leftIsHome or not rightIsHome:
-        if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
-            leftHorizontalStepper.hardStop()
-            leftHorizontalStepper.setAsHome()
-            leftIsHome = True
-        if not rightIsHome and rightHorizontalStepper.readSwitch() == True:
-            rightHorizontalStepper.hardStop()
-            rightHorizontalStepper.setAsHome()
-            rightIsHome = True
-    
-    #move up
-    
+    #move the horizontal steppers back to the home position
+    leftHorizontalStepper.startGoToPosition(0)
+    rightHorizontalStepper.startGoToPosition(0)
+       
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
+       
+    #move the vertical steppers up    
     leftVerticalStepper.setSpeed(liftSpeed)
-    leftVerticalStepper.startRelativeMove(distUp)
-
     rightVerticalStepper.setSpeed(liftSpeed)
+    
+    leftVerticalStepper.startRelativeMove(distUp)
     rightVerticalStepper.startRelativeMove(distUp)
        
     while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
         continue
         
-    #moving in
-    
+    #move the horizontal steppers in to the middle
     leftHorizontalStepper.startRelativeMove(1 * stopDistLeft)
-
     rightHorizontalStepper.startRelativeMove(1 * stopDistRight)
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
-        
-
+    
+    #bring the vertical steppers down
+    leftVerticalStepper.startGoToPosition(0)   
+    rightVerticalStepper.startGoToPosition(0)
+    
+    while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
+        continue
+    
+    #bring the horizontal steppers back to their starting position
+    leftHorizontalStepper.startGoToPosition(leftStartPosition)
+    rightHorizontalStepper.startGoToPosition(rightStartPosition)
+    
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
 
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
@@ -250,7 +246,6 @@ class MainScreen(Screen):
         
     def stopBalls(self):
         moveUpandIn()
-        home()
 		
 
 sm.add_widget(MainScreen(name = 'main'))

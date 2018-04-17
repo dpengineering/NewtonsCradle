@@ -28,6 +28,7 @@ class Stepper(Slush.Motor):
         
         while self.readSwitch() == False:
             continue
+            
         self.hardStop()
         self.setAsHome()
 
