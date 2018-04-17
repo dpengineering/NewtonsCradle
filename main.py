@@ -10,6 +10,9 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 from kivy.properties import StringProperty
 from kivy.clock import Clock
+from kivy.animation import Animation
+from functools import partial
+from threading import Thread
 
 import Stepper
 
@@ -22,14 +25,15 @@ rightStartPosition = 1.75 * 25.4
 leftStartPosition = 2.1* 25.4
 ballDiameter = 2.25 * 25.4     
 
-liftSpeed = 30
+liftSpeed = 40
 lowerSpeed = 120
+horizontalSpeed = 40
 
-rightHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = liftSpeed)
-rightVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = 30)
+rightHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
+rightVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)
 
-leftHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = liftSpeed)
-leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = 30)
+leftHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
+leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
    
 
 # ////////////////////////////////////////////////////////////////
@@ -72,7 +76,7 @@ def home():
 
     
 #~ def move_thread():
-	#~ Thread(target=partial(polygon, sides)).start()
+    #~ Thread(target=partial(polygon, sides)).start()
     
     
     
@@ -111,7 +115,6 @@ def scoop(numRight, numLeft):
         leftHorizontalStepper.startRelativeMove(-1 * distBack)
     if (numRight != 0): 
         rightHorizontalStepper.startRelativeMove(-1 * distBack)
-    
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
         
@@ -131,7 +134,7 @@ def scoop(numRight, numLeft):
         continue
         
         
-def moveUpandIn():
+def stopBalls():
     #bring the vertical steppers down
     leftVerticalStepper.startGoToPosition(0)   
     rightVerticalStepper.startGoToPosition(0)
@@ -176,6 +179,25 @@ def moveUpandIn():
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
+        
+    transitionBack('main')
+
+
+def pause(text, sec, originalScene):
+    sm.transition.direction = 'left'
+    sm.current = 'pauseScene'
+    sm.current_screen.ids.pauseText.text = text
+    #~ Clock.schedule_once(partial(transitionBack, originalScene), sec)
+    load = Animation(size = (10, 10), duration = 0) + Animation(size = (150, 10), duration = sec)
+    load.start(sm.current_screen.ids.progressBar)
+
+def transitionBack(originalScene, *largs):
+    sm.transition.direction = 'right'
+    sm.current = originalScene
+    
+    
+def stop_balls_thread(*largs):
+    Thread(target = stopBalls).start()
 
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
@@ -189,6 +211,7 @@ class MyApp(App):
         return sm
 
 Builder.load_file('main.kv')
+Builder.load_file('PauseScene.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
         
@@ -244,17 +267,23 @@ class MainScreen(Screen):
     def scoopCallback(self):
         scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
         
-    def stopBalls(self):
-        moveUpandIn()
-		
+    def stopBallsCallback(self):
+        pause('Stopping all of the balls', 5, 'main')
+        Clock.schedule_once(stop_balls_thread, 0)
+
+
+        
+class PauseScene(Screen):
+    pass
 
 sm.add_widget(MainScreen(name = 'main'))
-
+sm.add_widget(PauseScene(name = 'pauseScene'))
 
 # ////////////////////////////////////////////////////////////////
 # //                          RUN APP                           //
 # ////////////////////////////////////////////////////////////////
 
+#home all of the hardware
 home()
 
 MyApp().run()
