@@ -42,37 +42,33 @@ leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpe
 # ////////////////////////////////////////////////////////////////
  
 def quitAll():
-    rightHorizontalStepper.free()
-    rightVerticalStepper.free()
-    leftVerticalStepper.free()
-    leftHorizontalStepper.free()
+    #~ rightHorizontalStepper.free()
+    #~ rightVerticalStepper.free()
+    #~ leftVerticalStepper.free()
+    #~ leftHorizontalStepper.free()
+    print("tried quitting")
     quit()
     
-def home():
+#~ def home():
 
-    leftVerticalStepper.home(0)   
-    rightVerticalStepper.home(0)
+    #~ leftVerticalStepper.home(0)   
+    #~ rightVerticalStepper.home(0)
     
-    leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
-    rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
+    #~ leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
+    #~ rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
         
-    leftIsHome = False
-    rightIsHome = False
-    while not leftIsHome or not rightIsHome:
-        if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
-            leftHorizontalStepper.hardStop()
-            leftHorizontalStepper.setAsHome()
-            leftIsHome = True
-        if not rightIsHome and rightHorizontalStepper.readSwitch() == True:
-            rightHorizontalStepper.hardStop()
-            rightHorizontalStepper.setAsHome()
-            rightIsHome = True
-   
-    leftHorizontalStepper.startGoToPosition(leftStartPosition)
-    rightHorizontalStepper.startGoToPosition(rightStartPosition)
-    
-    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
-        continue
+    #~ leftIsHome = False
+    #~ rightIsHome = False
+    #~ while not leftIsHome or not rightIsHome:
+        #~ if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
+            #~ leftHorizontalStepper.hardStop()
+            #~ leftHorizontalStepper.setAsHome()
+            #~ leftIsHome = True
+        #~ if not rightIsHome and rightHorizontalStepper.readSwitch() == True:
+            #~ rightHorizontalStepper.hardStop()
+            #~ rightHorizontalStepper.setAsHome()
+            #~ rightIsHome = True
+
 
     
 #~ def move_thread():
@@ -132,7 +128,8 @@ def scoop(numRight, numLeft):
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
-        
+    
+    transitionBack('main')
         
 def stopBalls():
     #bring the vertical steppers down
@@ -187,7 +184,6 @@ def pause(text, sec, originalScene):
     sm.transition.direction = 'left'
     sm.current = 'pauseScene'
     sm.current_screen.ids.pauseText.text = text
-    #~ Clock.schedule_once(partial(transitionBack, originalScene), sec)
     load = Animation(size = (10, 10), duration = 0) + Animation(size = (150, 10), duration = sec)
     load.start(sm.current_screen.ids.progressBar)
 
@@ -198,6 +194,10 @@ def transitionBack(originalScene, *largs):
     
 def stop_balls_thread(*largs):
     Thread(target = stopBalls).start()
+    
+def scoopBallsThread(numBalls, *largs):
+	print("tried threading")
+	Thread(target= partial(scoop, MainScreen.numBallsLeft, MainScreen.numBallsRight)).start()
 
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
@@ -232,7 +232,7 @@ class MainScreen(Screen):
     numBallsRightLab = StringProperty(str(numBallsRight))
     
     def exitProgram(self):
-                quitAll()
+        quitAll()
     
     def numLeftAdd(self):
         MainScreen.numBallsLeft = MainScreen.numBallsLeft + 1
@@ -265,7 +265,9 @@ class MainScreen(Screen):
         self.numBallsRightLab = str(MainScreen.numBallsRight)
         
     def scoopCallback(self):
-        scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
+
+        pause('Scooping', 5, 'main')
+        Clock.schedule_once(scoopBallsThread, 0)
         
     def stopBallsCallback(self):
         pause('Stopping all of the balls', 5, 'main')
@@ -284,7 +286,7 @@ sm.add_widget(PauseScene(name = 'pauseScene'))
 # ////////////////////////////////////////////////////////////////
 
 #home all of the hardware
-home()
+#home()
 
 MyApp().run()
-quitAll()
+#quitAll()
