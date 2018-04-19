@@ -198,6 +198,10 @@ def stop_balls_thread(*largs):
 def scoopBallsThread(numBalls, *largs):
 	print("tried threading")
 	Thread(target= partial(scoop, MainScreen.numBallsLeft, MainScreen.numBallsRight)).start()
+    
+
+
+
 
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
@@ -273,7 +277,8 @@ class MainScreen(Screen):
         pause('Stopping all of the balls', 5, 'main')
         Clock.schedule_once(stop_balls_thread, 0)
 
-
+    def leftScooperSliderChange(value):
+        print(str(value))
         
 class PauseScene(Screen):
     pass
@@ -286,7 +291,7 @@ sm.add_widget(PauseScene(name = 'pauseScene'))
 # ////////////////////////////////////////////////////////////////
 
 #home all of the hardware
-home()
+#home()
 
 MyApp().run()
 quitAll()
