@@ -42,37 +42,37 @@ leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpe
 # ////////////////////////////////////////////////////////////////
  
 def quitAll():
-    #~ rightHorizontalStepper.free()
-    #~ rightVerticalStepper.free()
-    #~ leftVerticalStepper.free()
-    #~ leftHorizontalStepper.free()
+    rightHorizontalStepper.free()
+    rightVerticalStepper.free()
+    leftVerticalStepper.free()
+    leftHorizontalStepper.free()
     print("tried quitting")
     quit()
     
-#~ def home():
+def home():
 
-    #~ leftVerticalStepper.home(0)   
-    #~ rightVerticalStepper.home(0)
+    leftVerticalStepper.home(0)   
+    rightVerticalStepper.home(0)
     
-    #~ leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
-    #~ rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
+    leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
+    rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
         
-    #~ leftIsHome = False
-    #~ rightIsHome = False
-    #~ while not leftIsHome or not rightIsHome:
-        #~ if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
-            #~ leftHorizontalStepper.hardStop()
-            #~ leftHorizontalStepper.setAsHome()
-            #~ leftIsHome = True
-        #~ if not rightIsHome and rightHorizontalStepper.readSwitch() == True:
-            #~ rightHorizontalStepper.hardStop()
-            #~ rightHorizontalStepper.setAsHome()
-            #~ rightIsHome = True
+    leftIsHome = False
+    rightIsHome = False
+    while not leftIsHome or not rightIsHome:
+        if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
+            leftHorizontalStepper.hardStop()
+            leftHorizontalStepper.setAsHome()
+            leftIsHome = True
+        if not rightIsHome and rightHorizontalStepper.readSwitch() == True:
+            rightHorizontalStepper.hardStop()
+            rightHorizontalStepper.setAsHome()
+            rightIsHome = True
 
 
     
-#~ def move_thread():
-    #~ Thread(target=partial(polygon, sides)).start()
+def move_thread():
+    Thread(target=partial(polygon, sides)).start()
     
     
     
@@ -286,7 +286,7 @@ sm.add_widget(PauseScene(name = 'pauseScene'))
 # ////////////////////////////////////////////////////////////////
 
 #home all of the hardware
-#home()
+home()
 
 MyApp().run()
-#quitAll()
+quitAll()
