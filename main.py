@@ -38,7 +38,6 @@ leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpe
 
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
-# //             SHOULD INTERACT DIRECTLY WITH HARDWARE         //
 # ////////////////////////////////////////////////////////////////
  
 def quitAll():
@@ -68,6 +67,12 @@ def home():
             rightHorizontalStepper.hardStop()
             rightHorizontalStepper.setAsHome()
             rightIsHome = True
+            
+    leftHorizontalStepper.startGoToPosition(leftStartPosition)
+    rightHorizontalStepper.startGoToPosition(rightStartPosition)
+    
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
     
 def scoop(numRight, numLeft):
     
@@ -184,14 +189,14 @@ def transitionBack(originalScene, *largs):
     sm.transition.direction = 'right'
     sm.current = originalScene
     
-    
 def stop_balls_thread(*largs):
     Thread(target = stopBalls).start()
     
-def scoopBallsThread(*largs):
-	Thread(target= partial(scoop, MainScreen.numBallsLeft, MainScreen.numBallsRight)).start()
-    
+def scoop_balls_thread(*largs):
+	#Thread(target= partial(scoop, MainScreen.numBallsLeft, MainScreen.numBallsRight)).start()
+    scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
 
+    
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
 # //                     LOAD KIVY FILE                         //
@@ -207,15 +212,8 @@ Builder.load_file('main.kv')
 Builder.load_file('PauseScene.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
-        
 # ////////////////////////////////////////////////////////////////
-# //        DEFINE MAINSCREEN CLASS THAT KIVY RECOGNIZES        //
-# //                                                            //
-# //   KIVY UI CAN INTERACT DIRECTLY W/ THE FUNCTIONS DEFINED   //
-# //     CORRESPONDS TO BUTTON/SLIDER/WIDGET "on_release"       //
-# //                                                            //
-# //   SHOULD REFERENCE MAIN FUNCTIONS WITHIN THESE FUNCTIONS   //
-# //      SHOULD NOT INTERACT DIRECTLY WITH THE HARDWARE        //
+# //        MainScreen Class                                    //
 # ////////////////////////////////////////////////////////////////
     
 class MainScreen(Screen):
@@ -226,16 +224,24 @@ class MainScreen(Screen):
     
     def exitProgram(self):
         quitAll()
-        
+    
     def stopBallsCallback(self):
         pause('Stopping the balls', 5, 'main')
         Clock.schedule_once(stop_balls_thread, 0)
+        self.resetAllWidgets()
     
     def scoopCallback(self):
-        #scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
-        scoopBallsThread()
-
-
+        pause('Scooping!', 5, 'main')
+        Clock.schedule_once(scoop_balls_thread, 0)
+        self.resetAllWidgets()
+    
+    def resetAllWidgets(self):
+        self.ids.rightScooperSlider.value = 5
+        self.ids.leftScooperSlider.value = 0
+            
+        self.ids.rightScooperLabel.text = "Control The Right Scooper"
+        self.ids.leftScooperLabel.text = "Control The Left Scooper"
+        
     def leftScooperSliderChange(self, value):
         if(value == 0):
             self.ids.leftScooperLabel.text = "0 Balls Left Side"
@@ -255,7 +261,6 @@ class MainScreen(Screen):
         else:
             self.ids.leftScooperLabel.text = "5 Balls Left Side"
             MainScreen.numBallsLeft = 5
-        
         
     def rightScooperSliderChange(self, value):
         #adjust for default vaue being maximum
@@ -282,7 +287,6 @@ class MainScreen(Screen):
         else:
             self.ids.rightScooperLabel.text = "5 Balls Right Side"
             MainScreen.numBallsRight = 5
-        
         
 class PauseScene(Screen):
     pass
