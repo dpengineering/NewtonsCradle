@@ -100,65 +100,31 @@
 			center_x: root.center_x + 400
 			center_y: root.center_y + 300
             
-        ################# CHANGE NUMBER LABEL #################    
-        Button:
-            size_hint: None,None
-            text: '-'
-            font_size: 40
-            size: 60, 60
-            background_color: .1,.1,1,1
-            center: 500, 400
-            on_release: root.numLeftSub()
-        Button:
-            size_hint: None,None
-            text: '+'
-            font_size: 40
-            size: 60, 60
-            background_color: .1,.1,1,1
-            center: 650, 400
-            on_release: root.numLeftAdd()
-        Button:
-            size_hint: None,None
-            text: '-'
-            font_size: 40
-            size: 60, 60
-            background_color: .1,.1,1,1
-            center: 1250, 400
-            on_release: root.numRightSub()
-        Button:
-            size_hint: None,None
-            text: '+'
-            font_size: 40
-            size: 60, 60
-            background_color: .1,.1,1,1
-            center: 1400, 400
-            on_release: root.numRightAdd()
-            
             
         ### BALL SLIDERS ###
 
-#		Slider: #RIGHT SCOOPER
-#			id: rightScoopSlider
-#			orientation: 'horizontal'
-#			min: 0
-#			max: 100
-#			value: 0
-#			step: 1
-#			x: root.width * 0.6
-#			y: root.height * 0.5
-#			size_hint_x: 7
-#			on_value: root.squareFrequencySliderAction(self.value)
+		Slider: #RIGHT SCOOPER
+			id: rightScoopSlider
+			orientation: 'horizontal'
+			min: 0
+			max: 4
+			value: 4
+			step: 1
+			x: root.width * 0.8
+			y: root.height * 0.5
+			size_hint_x: 10
+			on_value: root.rightScooperSliderChange(self.value)
 
 		Slider: #LEFT SCOOPER
 			id: leftScoopSlider
 			orientation: 'horizontal'
 			min: 0
-			max: 100
+			max: 4
 			value: 0
 			step: 1
-            x: root.center_x * 0.45
+            x: root.center_x * 0.8
 			y: root.center_y * 1.15
-			size_hint_x: 7
+			size_hint_x: 10
 			on_value: root.leftScooperSliderChange(self.value)
 			
         ################# EXECUTE #################    

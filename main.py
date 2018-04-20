@@ -7,7 +7,7 @@ from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
-from kivy.graphics import *
+from kivy.graphics import * 
 from kivy.properties import StringProperty
 from kivy.clock import Clock
 from kivy.animation import Animation
@@ -267,18 +267,28 @@ class MainScreen(Screen):
         if(MainScreen.numBallsRight < 0):
             MainScreen.numBallsRight = 0
         self.numBallsRightLab = str(MainScreen.numBallsRight)
+        ead, 0)
         
+    def stopBallsCallback(self):
+        pause('Stopping the balls', 5, 'main')
+        Clock.schedule_once(stop_balls_thread, 0)
+
+    def leftScooperSliderCha
     def scoopCallback(self):
 
         pause('Scooping', 5, 'main')
-        Clock.schedule_once(scoopBallsThread, 0)
+        Clock.schedule_once(scoopBallsThrnge(self, value):
+        if(value <= 25):
+            self.ids.leftScooperLabel.text = "25"
+        elif(value > 25 and value <= 50):
+            self.ids.leftScooperLabel.text = "50"
         
-    def stopBallsCallback(self):
-        pause('Stopping all of the balls', 5, 'main')
-        Clock.schedule_once(stop_balls_thread, 0)
-
-    def leftScooperSliderChange(value):
-        print(str(value))
+    def rightScooperSliderChange(self, value):
+        if(value <= 25):
+            self.ids.leftScooperLabel.text = "25"
+        elif(value > 25 and value <= 50):
+            self.ids.leftScooperLabel.text = "50"
+        
         
 class PauseScene(Screen):
     pass
