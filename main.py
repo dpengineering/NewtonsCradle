@@ -72,8 +72,6 @@ def home():
 def move_thread():
     Thread(target=partial(polygon, sides)).start()
     
-    
-    
 def scoop(numRight, numLeft):
     
     if numRight + numLeft > 4:
@@ -259,33 +257,65 @@ class MainScreen(Screen):
         
     def numRightSub(self):
         MainScreen.numBallsRight = MainScreen.numBallsRight - 1
+        MainScreen.numBallsRight = MainScreen.numBallsRight - 1
         if(MainScreen.numBallsRight < 0):
             MainScreen.numBallsRight = 0
         self.numBallsRightLab = str(MainScreen.numBallsRight)
-        ead, 0)
         
     def stopBallsCallback(self):
         pause('Stopping the balls', 5, 'main')
         Clock.schedule_once(stop_balls_thread, 0)
+    
+    def scoopCallback(self):
+        scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
+
 
     def leftScooperSliderChange(self, value):
-        pass
+        if(value == 0):
+            self.ids.leftScooperLabel.text = "0 Balls Left Side"
+            MainScreen.numBallsLeft = 0
+        elif(value > 0 and value <=1):
+            self.ids.leftScooperLabel.text = "1 Ball Left Side"
+            MainScreen.numBallsLeft = 1
+        elif(value > 1 and value <= 2):
+            self.ids.leftScooperLabel.text = "2 Balls Left Side"
+            MainScreen.numBallsLeft = 2
+        elif(value > 2 and value <= 3):
+            self.ids.leftScooperLabel.text = "3 Balls Left Side"
+            MainScreen.numBallsLeft = 3
+        elif(value >3 and value <= 4):
+            self.ids.leftScooperLabel.text = "4 Balls Left Side"
+            MainScreen.numBallsLeft = 4
+        else:
+            self.ids.leftScooperLabel.text = "5 Balls Left Side"
+            MainScreen.numBallsLeft = 5
+        
         
     def rightScooperSliderChange(self, value):
-        pass
-
-        pause('Scooping', 5, 'main')
-        Clock.schedule_once(scoopBallsThrnge(self, value):
-        if(value <= 25):
-            self.ids.leftScooperLabel.text = "25"
-        elif(value > 25 and value <= 50):
-            self.ids.leftScooperLabel.text = "50"
+        #adjust for default vaue being maximum
+        newValue = self.ids.rightScooperSlider.max - value
         
-    def rightScooperSliderChange(self, value):
-        if(value <= 25):
-            self.ids.leftScooperLabel.text = "25"
-        elif(value > 25 and value <= 50):
-            self.ids.leftScooperLabel.text = "50"
+        if(newValue == 0):
+            self.ids.rightScooperLabel.text = "0 Balls Right Side"
+            MainScreen.numBallsRight = 0
+        elif(newValue > 0 and newValue <=1):
+            self.ids.rightScooperLabel.text = "1 Ball Right Side"
+            self.ids.ballOne.color = (100, 100, 100, 0.66)
+            MainScreen.numBallsRight = 1
+        elif(newValue > 1 and newValue <= 2):
+            self.ids.rightScooperLabel.text = "2 Balls Right Side"
+            MainScreen.numBallsLeft = 3
+        elif(value > 3 and value <= 4):
+            MainScreen.numBallsRight = 2
+        elif(newValue >2 and newValue <= 3):
+            self.ids.rightScooperLabel.text = "3 Balls Right Side"
+            MainScreen.numBallsRight = 3
+        elif(newValue > 3 and newValue <= 4):
+            self.ids.rightScooperLabel.text = "4 Balls Right Side"
+            MainScreen.numBallsRight = 4
+        else:
+            self.ids.rightScooperLabel.text = "5 Balls Right Side"
+            MainScreen.numBallsRight = 5
         
         
 class PauseScene(Screen):
