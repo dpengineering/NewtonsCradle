@@ -21,13 +21,13 @@ distBack = 4 * 25.4
 stopDistLeft = 2.25 * 25.4
 stopDistRight = 2.5 * 25.4
 
-rightStartPosition = 1.75 * 25.4
-leftStartPosition = 2.1* 25.4
+rightStartPosition = 2.05 * 25.4
+leftStartPosition = 2.45* 25.4
 ballDiameter = 2.25 * 25.4     
 
 liftSpeed = 40
 lowerSpeed = 120
-horizontalSpeed = 40
+horizontalSpeed = 30
 
 rightHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 rightVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)

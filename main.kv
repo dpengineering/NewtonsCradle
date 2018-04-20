@@ -5,50 +5,100 @@
         ################# TITLE #################
         Label:
             center_x: root.center_x
-            center_y: root.center_y * 14/8
+            center_y: root.center_y + 500
             text: "Newton's Cradle"
             color: 0,0,0,1
             font_size: 80
             
         ################# SCOOP LABELS #################    
         Label:
-            center_x: root.center_x * 5/8
-            center_y: root.center_y * 13/10
+            id: leftScooperLabel
+            center_x: root.center_x * 0.8
+            center_y: root.center_y * 1.30
             text: 'Left Scooper'
             color: 0,255,255,.65
-            font_size: 80
-        Label:
-            center_x: root.center_x * 11/8
-            center_y: root.center_y * 13/10
-            text: 'Right Scooper'
-            color: 0,255,255,.65
-            font_size: 80
+            font_size: 65
+#        Label:
+#            id: righScooperLabel
+#            center_x: root.center_x * 0.07
+#            center_y: root.center_y * 13/10
+#            text: 'Right Scooper'
+#            color: 0,255,255,.65
+#           font_size: 80
             
         ################# UPDATING NUMBER LABELS #################    
-        Label:
-            center_x: root.center_x * 41/64
-            center_y: root.center_y  
-            text: 'Balls'
-            color: 0,255,255,.65
-            font_size: 70
-        Label:
-            center_x: root.center_x * 33/64
-            center_y: root.center_y 
-            text: root.numBallsLeftLab
-            color: 0,255,255,.65
-            font_size: 70
-        Label:
-            center_x: root.center_x * 91/64
-            center_y: root.center_y  
-            text: 'Balls'
-            color: 0,255,255,.65
-            font_size: 70
-        Label:
-            center_x: root.center_x * 83/64
-            center_y: root.center_y 
-            text: root.numBallsRightLab
-            color: 0,255,255,.65
-            font_size: 70
+#        Label:
+#            center_x: root.center_x * 41/64
+#            center_y: root.center_y  
+#            text: 'Balls'
+#            color: 0,255,255,.65
+#            font_size: 70
+#        Label:
+#            center_x: root.center_x * 33/64
+#            center_y: root.center_y 
+#            text: root.numBallsLeftLab
+#            color: 0,255,255,.65
+#            font_size: 70
+#        Label:
+#            center_x: root.center_x * 91/64
+#            center_y: root.center_y  
+#            text: 'Balls'
+#            color: 0,255,255,.65
+#            font_size: 70
+#        Label:
+#            center_x: root.center_x * 83/64
+#            center_y: root.center_y 
+#            text: root.numBallsRightLab
+#            color: 0,255,255,.65
+#            font_size: 70
+            
+        ################# BALLS #################          
+		
+		Image:
+			source: 'ball.png'
+			id: ballOne
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 200, 200
+			center_x: root.center_x - 400
+			center_y: root.center_y + 300
+		Image:
+			source: 'ball.png'
+			id: ballTwo
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 200, 200
+			center_x: root.center_x - 200
+			center_y: root.center_y + 300
+		Image:
+			source: 'ball.png'
+			id: ballThree
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 200, 200
+			center_x: root.center_x 
+			center_y: root.center_y + 300
+		Image:
+			source: 'ball.png'
+			id: ballFour
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 200, 200
+			center_x: root.center_x + 200
+			center_y: root.center_y + 300
+		Image:
+			source: 'ball.png'
+			id: ballFive
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 200, 200
+			center_x: root.center_x + 400
+			center_y: root.center_y + 300
             
         ################# CHANGE NUMBER LABEL #################    
         Button:
@@ -84,6 +134,33 @@
             center: 1400, 400
             on_release: root.numRightAdd()
             
+            
+        ### BALL SLIDERS ###
+
+#		Slider: #RIGHT SCOOPER
+#			id: rightScoopSlider
+#			orientation: 'horizontal'
+#			min: 0
+#			max: 100
+#			value: 0
+#			step: 1
+#			x: root.width * 0.6
+#			y: root.height * 0.5
+#			size_hint_x: 7
+#			on_value: root.squareFrequencySliderAction(self.value)
+
+		Slider: #LEFT SCOOPER
+			id: leftScoopSlider
+			orientation: 'horizontal'
+			min: 0
+			max: 100
+			value: 0
+			step: 1
+            x: root.center_x * 0.45
+			y: root.center_y * 1.15
+			size_hint_x: 7
+			on_value: root.leftScooperSliderChange(self.value)
+			
         ################# EXECUTE #################    
         Button:
             size_hint: None,None
