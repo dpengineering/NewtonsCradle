@@ -58,6 +58,7 @@ def home():
         
     leftIsHome = False
     rightIsHome = False
+    
     while not leftIsHome or not rightIsHome:
         if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
             leftHorizontalStepper.hardStop()
