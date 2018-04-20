@@ -46,7 +46,6 @@ def quitAll():
     rightVerticalStepper.free()
     leftVerticalStepper.free()
     leftHorizontalStepper.free()
-    print("tried quitting")
     quit()
     
 def home():
@@ -68,9 +67,6 @@ def home():
             rightHorizontalStepper.hardStop()
             rightHorizontalStepper.setAsHome()
             rightIsHome = True
-
-def move_thread():
-    Thread(target=partial(polygon, sides)).start()
     
 def scoop(numRight, numLeft):
     
@@ -191,8 +187,7 @@ def transitionBack(originalScene, *largs):
 def stop_balls_thread(*largs):
     Thread(target = stopBalls).start()
     
-def scoopBallsThread(numBalls, *largs):
-	print("tried threading")
+def scoopBallsThread(*largs):
 	Thread(target= partial(scoop, MainScreen.numBallsLeft, MainScreen.numBallsRight)).start()
     
 
@@ -230,44 +225,14 @@ class MainScreen(Screen):
     
     def exitProgram(self):
         quitAll()
-    
-    def numLeftAdd(self):
-        MainScreen.numBallsLeft = MainScreen.numBallsLeft + 1
-        if(MainScreen.numBallsLeft > 4):
-            MainScreen.numBallsLeft = 4
-        if(MainScreen.numBallsLeft > (4 - MainScreen.numBallsRight)):
-            MainScreen.numBallsRight = MainScreen.numBallsRight - 1
-        self.numBallsLeftLab = str(MainScreen.numBallsLeft)
-        self.numBallsRightLab = str(MainScreen.numBallsRight)
-        
-    def numLeftSub(self):
-        MainScreen.numBallsLeft = MainScreen.numBallsLeft - 1
-        if(MainScreen.numBallsLeft < 0):
-            MainScreen.numBallsLeft = 0
-        self.numBallsLeftLab = str(MainScreen.numBallsLeft)
-        
-    def numRightAdd(self):
-        MainScreen.numBallsRight = MainScreen.numBallsRight + 1
-        if(MainScreen.numBallsRight > 4):
-            MainScreen.numBallsRight = 4
-        if(MainScreen.numBallsRight > (4 - MainScreen.numBallsLeft)):
-            MainScreen.numBallsLeft = MainScreen.numBallsLeft - 1
-        self.numBallsRightLab = str(MainScreen.numBallsRight)
-        self.numBallsLeftLab = str(MainScreen.numBallsLeft)
-        
-    def numRightSub(self):
-        MainScreen.numBallsRight = MainScreen.numBallsRight - 1
-        MainScreen.numBallsRight = MainScreen.numBallsRight - 1
-        if(MainScreen.numBallsRight < 0):
-            MainScreen.numBallsRight = 0
-        self.numBallsRightLab = str(MainScreen.numBallsRight)
         
     def stopBallsCallback(self):
         pause('Stopping the balls', 5, 'main')
         Clock.schedule_once(stop_balls_thread, 0)
     
     def scoopCallback(self):
-        scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
+        #scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
+        scoopBallsThread()
 
 
     def leftScooperSliderChange(self, value):
@@ -283,7 +248,7 @@ class MainScreen(Screen):
         elif(value > 2 and value <= 3):
             self.ids.leftScooperLabel.text = "3 Balls Left Side"
             MainScreen.numBallsLeft = 3
-        elif(value >3 and value <= 4):
+        elif(value > 3 and value <= 4):
             self.ids.leftScooperLabel.text = "4 Balls Left Side"
             MainScreen.numBallsLeft = 4
         else:
@@ -329,7 +294,7 @@ sm.add_widget(PauseScene(name = 'pauseScene'))
 # ////////////////////////////////////////////////////////////////
 
 #home all of the hardware
-#home()
+home()
 
 MyApp().run()
 quitAll()
