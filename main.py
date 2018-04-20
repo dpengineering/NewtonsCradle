@@ -21,13 +21,13 @@ distBack = 4 * 25.4
 stopDistLeft = 2.25 * 25.4
 stopDistRight = 2.5 * 25.4
 
-rightStartPosition = 1.75 * 25.4
-leftStartPosition = 2.1* 25.4
+rightStartPosition = 2.05 * 25.4
+leftStartPosition = 2.45* 25.4
 ballDiameter = 2.25 * 25.4     
 
 liftSpeed = 40
 lowerSpeed = 120
-horizontalSpeed = 40
+horizontalSpeed = 30
 
 rightHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 rightVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)
@@ -69,8 +69,6 @@ def home():
             rightHorizontalStepper.setAsHome()
             rightIsHome = True
 
-
-    
 def move_thread():
     Thread(target=partial(polygon, sides)).start()
     
@@ -200,9 +198,6 @@ def scoopBallsThread(numBalls, *largs):
 	Thread(target= partial(scoop, MainScreen.numBallsLeft, MainScreen.numBallsRight)).start()
     
 
-
-
-
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
 # //                     LOAD KIVY FILE                         //
@@ -273,8 +268,11 @@ class MainScreen(Screen):
         pause('Stopping the balls', 5, 'main')
         Clock.schedule_once(stop_balls_thread, 0)
 
-    def leftScooperSliderCha
-    def scoopCallback(self):
+    def leftScooperSliderChange(self, value):
+        pass
+        
+    def rightScooperSliderChange(self, value):
+        pass
 
         pause('Scooping', 5, 'main')
         Clock.schedule_once(scoopBallsThrnge(self, value):

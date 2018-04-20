@@ -100,17 +100,16 @@
 			center_x: root.center_x + 400
 			center_y: root.center_y + 300
             
-            
         ### BALL SLIDERS ###
 
 		Slider: #RIGHT SCOOPER
 			id: rightScoopSlider
 			orientation: 'horizontal'
 			min: 0
-			max: 4
-			value: 4
+			max: 5
+			value: 5
 			step: 1
-			x: root.width * 0.8
+			x: root.width * 0.235
 			y: root.height * 0.5
 			size_hint_x: 10
 			on_value: root.rightScooperSliderChange(self.value)
@@ -119,11 +118,11 @@
 			id: leftScoopSlider
 			orientation: 'horizontal'
 			min: 0
-			max: 4
+			max: 5
 			value: 0
 			step: 1
-            x: root.center_x * 0.8
-			y: root.center_y * 1.15
+			x: root.width * 0.235
+			y: root.height * 0.4
 			size_hint_x: 10
 			on_value: root.leftScooperSliderChange(self.value)
 			
