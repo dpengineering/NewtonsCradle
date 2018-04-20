@@ -271,6 +271,11 @@ class MainScreen(Screen):
         pause('Stopping all of the balls', 5, 'main')
         Clock.schedule_once(stop_balls_thread, 0)
 
+    def leftScooperSliderChange(self, value):
+        pass
+        
+    def rightScooperSliderChange(self, value):
+        pass
 
         
 class PauseScene(Screen):

@@ -137,28 +137,28 @@
             
         ### BALL SLIDERS ###
 
-#		Slider: #RIGHT SCOOPER
-#			id: rightScoopSlider
-#			orientation: 'horizontal'
-#			min: 0
-#			max: 100
-#			value: 0
-#			step: 1
-#			x: root.width * 0.6
-#			y: root.height * 0.5
-#			size_hint_x: 7
-#			on_value: root.squareFrequencySliderAction(self.value)
+		Slider: #RIGHT SCOOPER
+			id: rightScoopSlider
+			orientation: 'horizontal'
+			min: 0
+			max: 5
+			value: 5
+			step: 1
+			x: root.width * 0.235
+			y: root.height * 0.5
+			size_hint_x: 10
+			on_value: root.rightScooperSliderChange(self.value)
 
 		Slider: #LEFT SCOOPER
 			id: leftScoopSlider
 			orientation: 'horizontal'
 			min: 0
-			max: 100
+			max: 5
 			value: 0
 			step: 1
-            x: root.center_x * 0.45
-			y: root.center_y * 1.15
-			size_hint_x: 7
+			x: root.width * 0.235
+			y: root.height * 0.4
+			size_hint_x: 10
 			on_value: root.leftScooperSliderChange(self.value)
 			
         ################# EXECUTE #################    
