@@ -16,24 +16,32 @@ from threading import Thread
 
 import Stepper
 
+# ////////////////////////////////////////////////////////////////
+# //                       MAIN VARIABLES                       //
+# ////////////////////////////////////////////////////////////////
+
 distUp = 2 * 25.4
 distBack = 4 * 25.4
 stopDistLeft = 2.25 * 25.4
 stopDistRight = 2.5 * 25.4
 
-rightStartPosition = 2.05 * 25.4
-leftStartPosition = 2.45* 25.4
-ballDiameter = 2.25 * 25.4     
+#2.05 * 25.4
+rightStartPosition = 3 * 25.4
+
+#2.45 * 25.4
+leftStartPosition = 3 * 25.4
+#2.25*25.4
+ballDiameter = 4 * 25.4     
 
 liftSpeed = 40
 lowerSpeed = 120
 horizontalSpeed = 30
 
-rightHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
-rightVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)
+rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
+rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
 
-leftHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
-leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
+leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
+leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)
 
 numBallsRight = 0
 numBallsLeft = 0
@@ -75,13 +83,14 @@ def home():
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
     
-def scoop(numRight, numLeft, *largs):
+def scoop():
     global numBallsLeft, numBallsRight
-    print("scoop called")
-    print(numRight)
-    print(numLeft)
-    print(numBallsRight)
-    print(numBallsLeft)
+    numRight = numBallsRight
+    numLeft = numBallsLeft
+    
+    print("numRight: " + str(numRight))
+    print("numLeft " + str(numLeft))
+    
     if numRight + numLeft > 4:
         print("Collision detected")
         return
@@ -115,6 +124,7 @@ def scoop(numRight, numLeft, *largs):
         leftHorizontalStepper.startGoToPosition(-1 * distBack)
     if (numRight != 0): 
         rightHorizontalStepper.startGoToPosition(-1 * distBack)
+        
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
         
@@ -183,6 +193,20 @@ def stopBalls():
         
     transitionBack('main')
 
+def checkForCollision():
+    global numBallsRight, numBallsLeft
+    
+    if(numBallsLeft > (5 - numBallsRight)):
+        numBallsRight = numBallsRight - 1
+        
+    if(numBallsRight > (5 - numBallsLeft)):
+            numBallsLeft = numBallsLeft - 1
+    
+def stop_balls_thread(*largs):
+    Thread(target = stopBalls).start()
+    
+def scoop_balls_thread(*largs):
+    Thread(target = scoop).start()
 
 def pause(text, sec, originalScene):
     sm.transition.direction = 'left'
@@ -195,16 +219,8 @@ def transitionBack(originalScene, *largs):
     sm.transition.direction = 'right'
     sm.current = originalScene
     
-def stop_balls_thread(*largs):
-    Thread(target = stopBalls).start()
-    
-def scoop_balls_thread(*largs):
-    global numBallsLeft, numBallsRight
-    Thread(target = partial(scoop, numBallsLeft, numBallsRight)).start()
-
 # ////////////////////////////////////////////////////////////////
-# //            DECLARE APP CLASS AND SCREENMANAGER             //
-# //                     LOAD KIVY FILE                         //
+# //                     KIVY FILE LOAD-INS                     //
 # ////////////////////////////////////////////////////////////////
 
 sm = ScreenManager()
@@ -233,14 +249,11 @@ class MainScreen(Screen):
     def stopBallsCallback(self):
         pause('Stopping the balls', 5, 'main')
         Clock.schedule_once(stop_balls_thread, 0)
-        self.resetAllWidgets()
     
     def scoopCallback(self):
         pause('Scooping!', 5, 'main')
         Clock.schedule_once(scoop_balls_thread, 0)
-        #self.resetAllWidgets()
     
-        
     def resetAllWidgets(self):
         self.ids.rightScooperSlider.value = self.ids.leftScooperSlider.value = 0
             
@@ -249,29 +262,15 @@ class MainScreen(Screen):
         
     def leftScooperSliderChange(self, value):
         global numBallsLeft
-        numBallsLeft = int(value) + 1
-        
-        if(self.value > 4):
- +         self.value = 4
- +        if(self.value > (4 - numBallsRight)):
-              self.rightScooperSlider.value = self.rightScooperSlider.value - 1
-          self.numBallsLeftLab = str(self.value)
-          self.numBallsRightLab = str(self.rightScooperSlider.value)
+        numBallsLeft = int(value)
         
         self.ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
         
     def rightScooperSliderChange(self, value):
         global numBallsRight
-        numBallsRight = int(value) + 1
+        numBallsRight = self.ids.rightScooperSlider.max - int(value)
         
-        if(self.value > 4):
- +         self.value = 4
- +        if(self.value > (4 - self.leftScooperSlider.value)):
-              self.leftScooperSlider.value = self.leftScooperSlider.value - 1
-          self.numBallsRightLab = str(self.value)
-          self.numBallsLeftLab = str(self.leftScooperSlider.value)
-          
-        self.ids.rightScooperLabel.text = str(abs(5 - int(numBallsRight))) + " Balls Right Side"
+        self.ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
         
 class PauseScene(Screen):
     pass
