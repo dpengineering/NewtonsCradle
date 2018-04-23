@@ -240,22 +240,38 @@ class MainScreen(Screen):
         Clock.schedule_once(scoop_balls_thread, 0)
         #self.resetAllWidgets()
     
+        
     def resetAllWidgets(self):
-        self.ids.rightScooperSlider.value = 5
-        self.ids.leftScooperSlider.value = 0
+        self.ids.rightScooperSlider.value = self.ids.leftScooperSlider.value = 0
             
         self.ids.rightScooperLabel.text = "Control The Right Scooper"
         self.ids.leftScooperLabel.text = "Control The Left Scooper"
         
     def leftScooperSliderChange(self, value):
         global numBallsLeft
-        numBallsLeft = int(value)
+        numBallsLeft = int(value) + 1
+        
+        if(self.value > 4):
+ +         self.value = 4
+ +        if(self.value > (4 - numBallsRight)):
+              self.rightScooperSlider.value = self.rightScooperSlider.value - 1
+          self.numBallsLeftLab = str(self.value)
+          self.numBallsRightLab = str(self.rightScooperSlider.value)
+        
         self.ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
         
     def rightScooperSliderChange(self, value):
         global numBallsRight
-        numBallsRight = int(value)
-        self.ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
+        numBallsRight = int(value) + 1
+        
+        if(self.value > 4):
+ +         self.value = 4
+ +        if(self.value > (4 - self.leftScooperSlider.value)):
+              self.leftScooperSlider.value = self.leftScooperSlider.value - 1
+          self.numBallsRightLab = str(self.value)
+          self.numBallsLeftLab = str(self.leftScooperSlider.value)
+          
+        self.ids.rightScooperLabel.text = str(abs(5 - int(numBallsRight))) + " Balls Right Side"
         
 class PauseScene(Screen):
     pass
