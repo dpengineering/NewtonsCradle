@@ -34,8 +34,10 @@ rightVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSp
 
 leftHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 leftVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
-   
 
+numBallsRight = 0
+numBallsLeft = 0
+   
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
 # ////////////////////////////////////////////////////////////////
@@ -48,7 +50,6 @@ def quitAll():
     quit()
     
 def home():
-
     leftVerticalStepper.home(0)   
     rightVerticalStepper.home(0)
     
@@ -74,8 +75,13 @@ def home():
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
     
-def scoop(numRight, numLeft):
-    
+def scoop(numRight, numLeft, *largs):
+    global numBallsLeft, numBallsRight
+    print("scoop called")
+    print(numRight)
+    print(numLeft)
+    print(numBallsRight)
+    print(numBallsLeft)
     if numRight + numLeft > 4:
         print("Collision detected")
         return
@@ -85,9 +91,9 @@ def scoop(numRight, numLeft):
     distLeft = ballDiameter * numLeft
     
     if (numLeft != 0): 
-        leftHorizontalStepper.startRelativeMove(distLeft)
+        leftHorizontalStepper.startGoToPosition(distLeft)
     if (numRight != 0): 
-        rightHorizontalStepper.startRelativeMove(distRight)
+        rightHorizontalStepper.startGoToPosition(distRight)
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
@@ -95,20 +101,20 @@ def scoop(numRight, numLeft):
     #scooping  
     if (numLeft != 0): 
        leftVerticalStepper.setSpeed(liftSpeed)
-       leftVerticalStepper.startRelativeMove(distUp)
+       leftVerticalStepper.startGoToPosition(distUp)
 
     if (numRight != 0): 
         rightVerticalStepper.setSpeed(liftSpeed)
-        rightVerticalStepper.startRelativeMove(distUp)
+        rightVerticalStepper.startGoToPosition(distUp)
        
     while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
         continue
         
     #moving back
     if (numLeft != 0): 
-        leftHorizontalStepper.startRelativeMove(-1 * distBack)
+        leftHorizontalStepper.startGoToPosition(-1 * distBack)
     if (numRight != 0): 
-        rightHorizontalStepper.startRelativeMove(-1 * distBack)
+        rightHorizontalStepper.startGoToPosition(-1 * distBack)
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
         
@@ -193,10 +199,9 @@ def stop_balls_thread(*largs):
     Thread(target = stopBalls).start()
     
 def scoop_balls_thread(*largs):
-	#Thread(target= partial(scoop, MainScreen.numBallsLeft, MainScreen.numBallsRight)).start()
-    scoop(MainScreen.numBallsLeft, MainScreen.numBallsRight)
+    global numBallsLeft, numBallsRight
+    Thread(target = partial(scoop, numBallsLeft, numBallsRight)).start()
 
-    
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
 # //                     LOAD KIVY FILE                         //
@@ -217,9 +222,9 @@ Window.clearcolor = (1, 1, 1, 1) # (WHITE)
 # ////////////////////////////////////////////////////////////////
     
 class MainScreen(Screen):
-    numBallsLeft = 0
+    global numBallsLeft
     numBallsLeftLab = StringProperty(str(numBallsLeft))
-    numBallsRight = 0
+    global numBallsRight
     numBallsRightLab = StringProperty(str(numBallsRight))
     
     def exitProgram(self):
@@ -233,7 +238,7 @@ class MainScreen(Screen):
     def scoopCallback(self):
         pause('Scooping!', 5, 'main')
         Clock.schedule_once(scoop_balls_thread, 0)
-        self.resetAllWidgets()
+        #self.resetAllWidgets()
     
     def resetAllWidgets(self):
         self.ids.rightScooperSlider.value = 5
@@ -243,50 +248,14 @@ class MainScreen(Screen):
         self.ids.leftScooperLabel.text = "Control The Left Scooper"
         
     def leftScooperSliderChange(self, value):
-        if(value == 0):
-            self.ids.leftScooperLabel.text = "0 Balls Left Side"
-            MainScreen.numBallsLeft = 0
-        elif(value > 0 and value <=1):
-            self.ids.leftScooperLabel.text = "1 Ball Left Side"
-            MainScreen.numBallsLeft = 1
-        elif(value > 1 and value <= 2):
-            self.ids.leftScooperLabel.text = "2 Balls Left Side"
-            MainScreen.numBallsLeft = 2
-        elif(value > 2 and value <= 3):
-            self.ids.leftScooperLabel.text = "3 Balls Left Side"
-            MainScreen.numBallsLeft = 3
-        elif(value > 3 and value <= 4):
-            self.ids.leftScooperLabel.text = "4 Balls Left Side"
-            MainScreen.numBallsLeft = 4
-        else:
-            self.ids.leftScooperLabel.text = "5 Balls Left Side"
-            MainScreen.numBallsLeft = 5
+        global numBallsLeft
+        numBallsLeft = int(value)
+        self.ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
         
     def rightScooperSliderChange(self, value):
-        #adjust for default vaue being maximum
-        newValue = self.ids.rightScooperSlider.max - value
-        
-        if(newValue == 0):
-            self.ids.rightScooperLabel.text = "0 Balls Right Side"
-            MainScreen.numBallsRight = 0
-        elif(newValue > 0 and newValue <=1):
-            self.ids.rightScooperLabel.text = "1 Ball Right Side"
-            self.ids.ballOne.color = (100, 100, 100, 0.66)
-            MainScreen.numBallsRight = 1
-        elif(newValue > 1 and newValue <= 2):
-            self.ids.rightScooperLabel.text = "2 Balls Right Side"
-            MainScreen.numBallsLeft = 3
-        elif(value > 3 and value <= 4):
-            MainScreen.numBallsRight = 2
-        elif(newValue >2 and newValue <= 3):
-            self.ids.rightScooperLabel.text = "3 Balls Right Side"
-            MainScreen.numBallsRight = 3
-        elif(newValue > 3 and newValue <= 4):
-            self.ids.rightScooperLabel.text = "4 Balls Right Side"
-            MainScreen.numBallsRight = 4
-        else:
-            self.ids.rightScooperLabel.text = "5 Balls Right Side"
-            MainScreen.numBallsRight = 5
+        global numBallsRight
+        numBallsRight = int(value)
+        self.ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
         
 class PauseScene(Screen):
     pass
