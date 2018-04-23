@@ -25,13 +25,11 @@ distBack = 4 * 25.4
 stopDistLeft = 2.25 * 25.4
 stopDistRight = 2.5 * 25.4
 
-#2.05 * 25.4
-rightStartPosition = 3 * 25.4
+rightStartPosition = 2.05 * 25.4
 
-#2.45 * 25.4
-leftStartPosition = 3 * 25.4
-#2.25*25.4
-ballDiameter = 4 * 25.4     
+leftStartPosition = 2.45 * 25.4
+
+ballDiameter = 2.25 * 25.4     
 
 liftSpeed = 40
 lowerSpeed = 120
@@ -100,9 +98,9 @@ def scoop():
     distLeft = ballDiameter * numLeft
     
     if (numLeft != 0): 
-        leftHorizontalStepper.startGoToPosition(distLeft)
+        leftHorizontalStepper.startRelativeMove(distLeft)
     if (numRight != 0): 
-        rightHorizontalStepper.startGoToPosition(distRight)
+        rightHorizontalStepper.startRelativeMove(distRight)
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
@@ -121,9 +119,9 @@ def scoop():
         
     #moving back
     if (numLeft != 0): 
-        leftHorizontalStepper.startGoToPosition(-1 * distBack)
+        leftHorizontalStepper.startRelativeMove(-1 * distBack)
     if (numRight != 0): 
-        rightHorizontalStepper.startGoToPosition(-1 * distBack)
+        rightHorizontalStepper.startRelativeMove(-1 * distBack)
         
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
@@ -137,8 +135,8 @@ def scoop():
     while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
         continue
 
-    leftHorizontalStepper.startGoToPosition(leftStartPosition)
-    rightHorizontalStepper.startGoToPosition(rightStartPosition)
+    leftHorizontalStepper.startRelativeMove(leftStartPosition)
+    rightHorizontalStepper.startRelativeMove(rightStartPosition)
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
