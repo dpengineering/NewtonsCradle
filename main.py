@@ -43,6 +43,8 @@ leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpe
 
 numBallsRight = 0
 numBallsLeft = 0
+
+noCollisionDetected = False
    
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
@@ -89,10 +91,9 @@ def scoop():
     print("numRight: " + str(numRight))
     print("numLeft " + str(numLeft))
     
-    if numRight + numLeft > 4:
-        print("Collision detected")
-        return
-        
+    while(not noCollisionDetected):
+        checkForCollision()
+    
     #moving to x pos
     distRight = ballDiameter * numRight
     distLeft = ballDiameter * numLeft
@@ -108,11 +109,11 @@ def scoop():
     #scooping  
     if (numLeft != 0): 
        leftVerticalStepper.setSpeed(liftSpeed)
-       leftVerticalStepper.startGoToPosition(distUp)
+       leftVerticalStepper.startRelativeMove(distUp)
 
     if (numRight != 0): 
         rightVerticalStepper.setSpeed(liftSpeed)
-        rightVerticalStepper.startGoToPosition(distUp)
+        rightVerticalStepper.startRelativeMove(distUp)
        
     while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
         continue
@@ -192,14 +193,22 @@ def stopBalls():
     transitionBack('main')
 
 def checkForCollision():
-    global numBallsRight, numBallsLeft
+    global numBallsRight, numBallsLeft, noCollisionDetected
     
-    if(numBallsLeft > (5 - numBallsRight)):
-        numBallsRight = numBallsRight - 1
+    if((numBallsLeft + numBallsRight) > 5):
         
-    if(numBallsRight > (5 - numBallsLeft)):
+        if(numBallsLeft > numBallsRight):
+            numBallsRight = numBallsRight - 1
+            checkForCollision()
+        
+        else:
             numBallsLeft = numBallsLeft - 1
+            checkForCollision()
+    else:
+        noCollisionDetected = True
     
+    #MainScreen.updateSliderLabels()
+        
 def stop_balls_thread(*largs):
     Thread(target = stopBalls).start()
     
@@ -263,11 +272,17 @@ class MainScreen(Screen):
         numBallsLeft = int(value)
         
         self.ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
+        checkForCollision()
         
     def rightScooperSliderChange(self, value):
         global numBallsRight
         numBallsRight = self.ids.rightScooperSlider.max - int(value)
         
+        self.ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
+        checkForCollision()
+        
+    def updateSliderLabels():
+        self.ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
         self.ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
         
 class PauseScene(Screen):
