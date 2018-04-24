@@ -85,6 +85,7 @@ def home():
     
 def scoop():
     global numBallsLeft, numBallsRight
+    global noCollisionDetected
     numRight = numBallsRight
     numLeft = numBallsLeft
     
@@ -92,17 +93,19 @@ def scoop():
     print("numLeft " + str(numLeft))
     
     while(not noCollisionDetected):
-        checkForCollision()
+        MainScreen.checkForCollision()
     
-    #moving to x pos
+    #moving to x posnumLeft
+    
     distRight = ballDiameter * numRight
     distLeft = ballDiameter * numLeft
     
     if (numLeft != 0): 
         leftHorizontalStepper.startRelativeMove(distLeft)
+    
     if (numRight != 0): 
         rightHorizontalStepper.startRelativeMove(distRight)
-    
+        
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
         
@@ -192,22 +195,7 @@ def stopBalls():
         
     transitionBack('main')
 
-def checkForCollision():
-    global numBallsRight, numBallsLeft, noCollisionDetected
-    
-    if((numBallsLeft + numBallsRight) > 5):
-        
-        if(numBallsLeft > numBallsRight):
-            numBallsRight = numBallsRight - 1
-            checkForCollision()
-        
-        else:
-            numBallsLeft = numBallsLeft - 1
-            checkForCollision()
-    else:
-        noCollisionDetected = True
-    
-    #MainScreen.updateSliderLabels()
+
         
 def stop_balls_thread(*largs):
     Thread(target = stopBalls).start()
@@ -237,6 +225,7 @@ class MyApp(App):
         return sm
 
 Builder.load_file('main.kv')
+Builder.load_file('Libraries/DPEAButton.kv')
 Builder.load_file('PauseScene.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
@@ -249,6 +238,7 @@ class MainScreen(Screen):
     numBallsLeftLab = StringProperty(str(numBallsLeft))
     global numBallsRight
     numBallsRightLab = StringProperty(str(numBallsRight))
+    global noCollisionDetected
     
     def exitProgram(self):
         quitAll()
@@ -272,18 +262,40 @@ class MainScreen(Screen):
         numBallsLeft = int(value)
         
         self.ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
-        checkForCollision()
+        self.checkForCollision()
         
     def rightScooperSliderChange(self, value):
         global numBallsRight
         numBallsRight = self.ids.rightScooperSlider.max - int(value)
         
         self.ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
-        checkForCollision()
+        self.checkForCollision()
+    
+    def checkForCollision(self):
+        global numBallsLeft, numBallsRight, noCollisionDetected  
+
+        if((numBallsLeft + numBallsRight) > 5):
+            if(numBallsLeft == numBallsRight):
+                numBallsLeft -= 1
+                self.checkForCollision()
+                
+            elif(numBallsLeft > numBallsRight):
+                numBallsRight -= 1
+                self.checkForCollision()
+            
+            else:
+                numBallsLeft -= 1
+                self.checkForCollision()
+        else:
+            noCollisionDetected = True
+        self.updateSliders()
+            
+    def updateSliders(self):
+        sm.get_screen('main').ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
+        sm.get_screen('main').ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
         
-    def updateSliderLabels():
-        self.ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
-        self.ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
+        sm.get_screen('main').ids.rightScooperSlider.value = int(numBallsRight)
+        sm.get_screen('main').ids.leftScooperSlider.value = int(numBallsLeft)
         
 class PauseScene(Screen):
     pass

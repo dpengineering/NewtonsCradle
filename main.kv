@@ -5,7 +5,7 @@
         ################# TITLE #################
         Label:
             center_x: root.center_x
-            center_y: root.center_y + 500
+            center_y: root.center_y + 470
             text: "Newton's Cradle"
             color: 0,0,0,1
             font_size: 80
@@ -101,30 +101,33 @@
 			on_value: root.leftScooperSliderChange(self.value)
 			
         ################# EXECUTE #################    
-        Button:
+        DPEAButton:
             size_hint: None,None
             text: 'SCOOP!'
             font_size: 50
-            size: 200, 75
+            size: 400, 150
             background_color: .6, 0, 0, 1
             center: 950, 250
             on_release: root.scoopCallback()
             
-        Button:
+        DPEAButton:
             size_hint: None,None
             text: 'STOP BALLS'
             font_size: 50
             size: 400, 150
             background_color: .6, 0, 0, 1
-            center: 1750, 100
+            center: 1650, 100
             on_release: root.stopBallsCallback()
             
         ################# QUIT #################    
-        Button:
+        DPEAButton:
+            size_hint: None,None                # Need to copy these three lines
+            background_color: 0, 0, 0, 0        # of code to get rid of grey corners
+            background_normal: ''               # and be able to set the size
             size_hint: None,None
             text: 'Quit'
             font_size: 50
-            size: 200, 75
-            background_color: 0,0,0,.3
+            size: 400, 150
+            color: 1,0,0,.3
             center: 150, 100
             on_release: root.exitProgram()
