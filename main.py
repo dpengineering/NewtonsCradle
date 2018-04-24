@@ -22,34 +22,32 @@ import Stepper
 
 distUp = 2 * 25.4
 distBack = 4 * 25.4
+
 stopDistLeft = 2.25 * 25.4
 stopDistRight = 2.5 * 25.4
 
-rightStartPosition = 2.05 * 25.4
-
-leftStartPosition = 2.45 * 25.4
+leftStartPosition = stopDistLeft  #2.45 * 25.4
+rightStartPosition = stopDistRight  #2.05 * 25.4
 
 ballDiameter = 2.25 * 25.4     
 
-liftSpeed = 40
 lowerSpeed = 120
+liftSpeed = 40
 horizontalSpeed = 30
-
-rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
 
 leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)
 
-numBallsRight = 0
-numBallsLeft = 0
-
-noCollisionDetected = False
+collisionDetected = True
    
+
+rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
+
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
 # ////////////////////////////////////////////////////////////////
- 
+
 def quitAll():
     rightHorizontalStepper.free()
     rightVerticalStepper.free()
@@ -60,10 +58,11 @@ def quitAll():
 def home():
     leftVerticalStepper.home(0)   
     rightVerticalStepper.home(0)
-    
     leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
     rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
         
+    
+    
     leftIsHome = False
     rightIsHome = False
     
@@ -84,27 +83,20 @@ def home():
         continue
     
 def scoop():
-    global numBallsLeft, numBallsRight
-    global noCollisionDetected
-    numRight = numBallsRight
-    numLeft = numBallsLeft
-    
-    print("numRight: " + str(numRight))
-    print("numLeft " + str(numLeft))
-    
-    while(not noCollisionDetected):
-        MainScreen.checkForCollision()
-    
+
     #moving to x posnumLeft
+    numLeft = sm.get_screen('main').numBallsLeft
+    numRight = sm.get_screen('main').numBallsRight
     
-    distRight = ballDiameter * numRight
-    distLeft = ballDiameter * numLeft
+    distLeft = leftStartPosition + ballDiameter * numLeft
+    distRight = rightStartPosition + ballDiameter * numRight
+    
     
     if (numLeft != 0): 
-        leftHorizontalStepper.startRelativeMove(distLeft)
+        leftHorizontalStepper.startGoToPosition(distLeft)
     
     if (numRight != 0): 
-        rightHorizontalStepper.startRelativeMove(distRight)
+        rightHorizontalStepper.startGoToPosition(distRight)
         
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
@@ -139,8 +131,8 @@ def scoop():
     while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
         continue
 
-    leftHorizontalStepper.startRelativeMove(leftStartPosition)
-    rightHorizontalStepper.startRelativeMove(rightStartPosition)
+    leftHorizontalStepper.startGoToPosition(leftStartPosition)
+    rightHorizontalStepper.startGoToPosition(rightStartPosition)
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
@@ -158,14 +150,14 @@ def stopBalls():
     #move the horizontal steppers back to the home position
     leftHorizontalStepper.startGoToPosition(0)
     rightHorizontalStepper.startGoToPosition(0)
+
        
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
        
     #move the vertical steppers up    
     leftVerticalStepper.setSpeed(liftSpeed)
-    rightVerticalStepper.setSpeed(liftSpeed)
-    
+    rightVerticalStepper.setSpeed(liftSpeed) 
     leftVerticalStepper.startRelativeMove(distUp)
     rightVerticalStepper.startRelativeMove(distUp)
        
@@ -234,11 +226,10 @@ Window.clearcolor = (1, 1, 1, 1) # (WHITE)
 # ////////////////////////////////////////////////////////////////
     
 class MainScreen(Screen):
-    global numBallsLeft
-    numBallsLeftLab = StringProperty(str(numBallsLeft))
-    global numBallsRight
-    numBallsRightLab = StringProperty(str(numBallsRight))
-    global noCollisionDetected
+    
+    numBallsRight = 0
+    numBallsLeft = 0
+
     
     def exitProgram(self):
         quitAll()
@@ -255,47 +246,28 @@ class MainScreen(Screen):
         self.ids.rightScooperSlider.value = self.ids.leftScooperSlider.value = 0
             
         self.ids.rightScooperLabel.text = "Control The Right Scooper"
-        self.ids.leftScooperLabel.text = "Control The Left Scooper"
+        self.ids.leftScooperLabelMainScreen.text = "Control The Left Scooper"
         
     def leftScooperSliderChange(self, value):
-        global numBallsLeft
-        numBallsLeft = int(value)
-        
-        self.ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
-        self.checkForCollision()
-        
-    def rightScooperSliderChange(self, value):
-        global numBallsRight
-        numBallsRight = self.ids.rightScooperSlider.max - int(value)
-        
-        self.ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
-        self.checkForCollision()
-    
-    def checkForCollision(self):
-        global numBallsLeft, numBallsRight, noCollisionDetected  
 
-        if((numBallsLeft + numBallsRight) > 5):
-            if(numBallsLeft == numBallsRight):
-                numBallsLeft -= 1
-                self.checkForCollision()
-                
-            elif(numBallsLeft > numBallsRight):
-                numBallsRight -= 1
-                self.checkForCollision()
+        self.numBallsLeft = int(value)
+    
+        if((self.numBallsLeft + self.numBallsRight) > 5):
+            self.numBallsRight = 5 - self.numBallsLeft
+            self.ids.rightScooperSlider.value = 5 - self.numBallsRight
             
-            else:
-                numBallsLeft -= 1
-                self.checkForCollision()
-        else:
-            noCollisionDetected = True
-        self.updateSliders()
-            
-    def updateSliders(self):
-        sm.get_screen('main').ids.leftScooperLabel.text = str(int(numBallsLeft)) + " Balls Left Side"
-        sm.get_screen('main').ids.rightScooperLabel.text = str(int(numBallsRight)) + " Balls Right Side"
+        self.ids.leftScooperLabel.text = str(int(self.numBallsLeft)) + " Balls Left Side" 
+         
+    def rightScooperSliderChange(self, value):
         
-        sm.get_screen('main').ids.rightScooperSlider.value = int(numBallsRight)
-        sm.get_screen('main').ids.leftScooperSlider.value = int(numBallsLeft)
+        self.numBallsRight = self.ids.rightScooperSlider.max - int(value)
+        if((self.numBallsLeft + self.numBallsRight) > 5):
+            self.numBallsLeft = 5 - self.numBallsRight
+            self.ids.leftScooperSlider.value = self.numBallsLeft
+        
+        self.ids.rightScooperLabel.text = str(int(self.numBallsRight)) + " Balls Right Side"
+
+
         
 class PauseScene(Screen):
     pass
