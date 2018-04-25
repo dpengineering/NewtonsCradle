@@ -60,8 +60,6 @@ def home():
     rightVerticalStepper.home(0)
     leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
     rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
-        
-    
     
     leftIsHome = False
     rightIsHome = False
@@ -137,6 +135,7 @@ def scoop():
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
     
+    resetAllWidgets()
     transitionBack('main')
         
 def stopBalls():
@@ -184,9 +183,8 @@ def stopBalls():
     
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
-        
+    
     transitionBack('main')
-
 
         
 def stop_balls_thread(*largs):
@@ -205,6 +203,13 @@ def pause(text, sec, originalScene):
 def transitionBack(originalScene, *largs):
     sm.transition.direction = 'right'
     sm.current = originalScene
+    
+def resetAllWidgets():
+    sm.get_screen('main').ids.rightScooperSlider.value = 4
+    sm.get_screen('main').ids.leftScooperSlider.value = 0
+            
+    sm.get_screen('main').ids.rightScooperLabel.text = "Control The Right Scooper"
+    sm.get_screen('main').ids.leftScooperLabel.text = "Control The Left Scooper"
     
 # ////////////////////////////////////////////////////////////////
 # //                     KIVY FILE LOAD-INS                     //
@@ -226,10 +231,8 @@ Window.clearcolor = (1, 1, 1, 1) # (WHITE)
 # ////////////////////////////////////////////////////////////////
     
 class MainScreen(Screen):
-    
     numBallsRight = 0
     numBallsLeft = 0
-
     
     def exitProgram(self):
         quitAll()
@@ -241,32 +244,24 @@ class MainScreen(Screen):
     def scoopCallback(self):
         pause('Scooping!', 5, 'main')
         Clock.schedule_once(scoop_balls_thread, 0)
-    
-    def resetAllWidgets(self):
-        self.ids.rightScooperSlider.value = self.ids.leftScooperSlider.value = 0
-            
-        self.ids.rightScooperLabel.text = "Control The Right Scooper"
-        self.ids.leftScooperLabelMainScreen.text = "Control The Left Scooper"
         
     def leftScooperSliderChange(self, value):
-
         self.numBallsLeft = int(value)
-    
-        if((self.numBallsLeft + self.numBallsRight) > 5):
-            self.numBallsRight = 5 - self.numBallsLeft
-            self.ids.rightScooperSlider.value = 5 - self.numBallsRight
-            
-        self.ids.leftScooperLabel.text = str(int(self.numBallsLeft)) + " Balls Left Side" 
-         
-    def rightScooperSliderChange(self, value):
         
+        if((self.numBallsLeft + self.numBallsRight) > 4):
+            self.numBallsLeft = 4 - self.numBallsRight
+            self.ids.leftScooperSlider.value = self.numBallsLeft
+        
+        self.ids.leftScooperLabel.text = str(int(self.numBallsLeft)) + " Balls Left Side" 
+
+    def rightScooperSliderChange(self, value):
         self.numBallsRight = self.ids.rightScooperSlider.max - int(value)
-        if((self.numBallsLeft + self.numBallsRight) > 5):
-            self.numBallsLeft = 5 - self.numBallsRight
+        
+        if((self.numBallsLeft + self.numBallsRight) > 4):
+            self.numBallsLeft = 4 - self.numBallsRight
             self.ids.leftScooperSlider.value = self.numBallsLeft
         
         self.ids.rightScooperLabel.text = str(int(self.numBallsRight)) + " Balls Right Side"
-
 
         
 class PauseScene(Screen):
