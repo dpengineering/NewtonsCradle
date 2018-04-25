@@ -5,7 +5,7 @@
         ################# TITLE #################
         Label:
             center_x: root.center_x
-            center_y: root.center_y + 470
+            center_y: root.center_y + 450
             text: "Newton's Cradle"
             color: 0,0,0,1
             font_size: 80
@@ -14,14 +14,14 @@
         Label:
             id: leftScooperLabel
             center_x: root.center_x
-            center_y: root.center_y * .75
+            center_y: root.center_y * .65
             text: 'Control Left Scooper'
             color: 0,255,255,.65
             font_size: 65
         Label:
             id: rightScooperLabel
             center_x: root.center_x 
-            center_y: root.center_y * 1.25
+            center_y: root.center_y * 1.15
             text: 'Control Right Scooper'
             color: 0,255,255,.65
             font_size: 65
@@ -36,7 +36,7 @@
 			size_hint: None, None
 			size: 200, 200
 			center_x: root.center_x - 400
-			center_y: root.center_y + 300
+			center_y: root.center_y + 250
 		Image:
 			source: 'ball.png'
 			id: ballTwo
@@ -45,7 +45,7 @@
 			size_hint: None, None
 			size: 200, 200
 			center_x: root.center_x - 200
-			center_y: root.center_y + 300
+			center_y: root.center_y + 250
 		Image:
 			source: 'ball.png'
 			id: ballThree
@@ -54,7 +54,7 @@
 			size_hint: None, None
 			size: 200, 200
 			center_x: root.center_x 
-			center_y: root.center_y + 300
+			center_y: root.center_y + 250
 		Image:
 			source: 'ball.png'
 			id: ballFour
@@ -63,7 +63,7 @@
 			size_hint: None, None
 			size: 200, 200
 			center_x: root.center_x + 200
-			center_y: root.center_y + 300
+			center_y: root.center_y + 250
 		Image:
 			source: 'ball.png'
 			id: ballFive
@@ -72,9 +72,9 @@
 			size_hint: None, None
 			size: 200, 200
 			center_x: root.center_x + 400
-			center_y: root.center_y + 300
+			center_y: root.center_y + 250
             
-        ### BALL SLIDERS ###
+        ################# BALL SLIDERS ##################
 
 		Slider: #RIGHT SCOOPER
 			id: rightScooperSlider
@@ -83,8 +83,8 @@
 			max: 4
 			value: 4
 			step: 1
-			x: root.width * 0.282
-			y: root.height * 0.5
+			x: root.width * 0.345
+			y: root.height * 0.45
 			size_hint_x: 8
 			on_value: root.rightScooperSliderChange(self.value)
 
@@ -96,7 +96,7 @@
 			value: 0
 			step: 1
 			x: root.width * 0.235
-			y: root.height * 0.4
+			y: root.height * 0.35
 			size_hint_x: 8
 			on_value: root.leftScooperSliderChange(self.value)
 			
@@ -107,7 +107,7 @@
             font_size: 50
             size: 400, 150
             background_color: .6, 0, 0, 1
-            center: 950, 250
+            center: 950, 200
             on_release: root.scoopCallback()
             
         DPEAButton:

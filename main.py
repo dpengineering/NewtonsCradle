@@ -34,15 +34,13 @@ ballDiameter = 2.25 * 25.4
 lowerSpeed = 120
 liftSpeed = 40
 horizontalSpeed = 30
-rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
+rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
+rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 
+32, speed = liftSpeed)
+
 
 leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)
-
-collisionDetected = True
-   
-
-rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
@@ -89,6 +87,65 @@ def scoop():
     distLeft = leftStartPosition + ballDiameter * numLeft
     distRight = rightStartPosition + ballDiameter * numRight
     
+    if((numLeft + numRight) > 5):
+        #move the left stepper to position
+        leftHorizontalStepper.startGoToPosition(distLeft)
+        
+        while leftHorizontalStepper.isBusy():
+            continue
+        
+        #move the left vertical stepper up
+        leftVerticalStepper.setSpeed(liftSpeed)
+        leftVerticalStepper.startRelativeMove(distUp)
+        
+        while leftVerticalStepper.isBusy():
+            continue
+            
+        #move the left horizontal stepper back to position
+        leftHorizontalStepper.startRelativeMove(-1 * distBack)
+        
+        while leftHorizontalStepper.isBusy():
+            continue
+        
+        #move the right horizontal stepper to position
+        rightHorizontalSteper.startGoToPosition(distRight)
+        
+        while rightHorizontalStepper.isBusy():
+            continue
+        
+        #move the right vertical stepper up            
+        rightVerticalStepper.setSpeed(liftSpeed)
+        rightVerticalStepper.startRelativeMove(distUp)
+        
+        while rightVerticalStepper.isBusy():
+            continue
+        
+        #move the right horizontal stepper to drop position
+        rightHorizontalStepper.startRelativeMove(-1 * distBack)
+        
+        while rightHorizontalStepper.isBusy():
+            continue
+        
+        #letting go
+        leftVerticalStepper.setSpeed(lowerSpeed)
+        rightVerticalStepper.setSpeed(lowerSpeed)
+        leftVerticalStepper.startGoToPosition(0)
+        rightVerticalStepper.startGoToPosition(0)
+        
+        while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
+            continue
+        
+        #move the horizontal steppers back to the starting position
+        leftHorizontalStepper.startGoToPosition(leftStartPosition)
+        rightHorizontalStepper.startGoToPosition(rightStartPosition)
+        
+        while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+            continue
+            
+        resetAllWidgets()
+        transitionBack('main')
+        return
+
     
     if (numLeft != 0): 
         leftHorizontalStepper.startGoToPosition(distLeft)
@@ -249,7 +306,7 @@ class MainScreen(Screen):
         self.numBallsLeft = int(value)
         
         if((self.numBallsLeft + self.numBallsRight) > 4):
-            self.numBallsLeft = 4 - self.numBallsRight
+            self.numBallsLeft = 5 - self.numBallsRight
             self.ids.leftScooperSlider.value = self.numBallsLeft
         
         self.ids.leftScooperLabel.text = str(int(self.numBallsLeft)) + " Balls Left Side" 
@@ -258,7 +315,7 @@ class MainScreen(Screen):
         self.numBallsRight = self.ids.rightScooperSlider.max - int(value)
         
         if((self.numBallsLeft + self.numBallsRight) > 4):
-            self.numBallsLeft = 4 - self.numBallsRight
+            self.numBallsLeft = 5 - self.numBallsRight
             self.ids.leftScooperSlider.value = self.numBallsLeft
         
         self.ids.rightScooperLabel.text = str(int(self.numBallsRight)) + " Balls Right Side"
