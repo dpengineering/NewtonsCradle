@@ -87,7 +87,7 @@ def scoop():
     distLeft = leftStartPosition + ballDiameter * numLeft
     distRight = rightStartPosition + ballDiameter * numRight
     
-    if((numLeft + numRight) > 5):
+    if((numLeft + numRight) >= 5):
         #move the left stepper to position
         leftHorizontalStepper.startGoToPosition(distLeft)
         
@@ -108,7 +108,7 @@ def scoop():
             continue
         
         #move the right horizontal stepper to position
-        rightHorizontalSteper.startGoToPosition(distRight)
+        rightHorizontalStepper.startGoToPosition(distRight)
         
         while rightHorizontalStepper.isBusy():
             continue
