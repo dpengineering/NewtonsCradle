@@ -34,9 +34,9 @@ ballDiameter = 2.25 * 25.4
 lowerSpeed = 120
 liftSpeed = 40
 horizontalSpeed = 30
+
 rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
-
 
 leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)
@@ -98,39 +98,24 @@ def scoop():
         leftHorizontalStepper.relativeMove(-1 * distBack)
         
         #move the right horizontal stepper to position
-        rightHorizontalStepper.startGoToPosition(distRight)
-        
-        while rightHorizontalStepper.isBusy():
-            continue
+        rightHorizontalStepper.goToPosition(distRight)
         
         #move the right vertical stepper up            
         rightVerticalStepper.setSpeed(liftSpeed)
-        rightVerticalStepper.startRelativeMove(distUp)
-        
-        while rightVerticalStepper.isBusy():
-            continue
+        rightVerticalStepper.relativeMove(distUp)
         
         #move the right horizontal stepper to drop position
-        rightHorizontalStepper.startRelativeMove(-1 * distBack)
-        
-        while rightHorizontalStepper.isBusy():
-            continue
+        rightHorizontalStepper.relativeMove(-1 * distBack)
         
         #letting go
         leftVerticalStepper.setSpeed(lowerSpeed)
         rightVerticalStepper.setSpeed(lowerSpeed)
-        leftVerticalStepper.startGoToPosition(0)
-        rightVerticalStepper.startGoToPosition(0)
-        
-        while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
-            continue
+        leftVerticalStepper.goToPosition(0)
+        rightVerticalStepper.goToPosition(0)
         
         #move the horizontal steppers back to the starting position
-        leftHorizontalStepper.startGoToPosition(leftStartPosition)
-        rightHorizontalStepper.startGoToPosition(rightStartPosition)
-        
-        while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
-            continue
+        leftHorizontalStepper.goToPosition(leftStartPosition)
+        rightHorizontalStepper.goToPosition(rightStartPosition)
             
         resetAllWidgets()
         transitionBack('main')
@@ -153,19 +138,13 @@ def scoop():
 
     if (numRight != 0): 
         rightVerticalStepper.setSpeed(liftSpeed)
-        rightVerticalStepper.startRelativeMove(distUp)
-       
-    while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
-        continue
+        rightVerticalStepper.relativeMove(distUp)
         
     #moving back
     if (numLeft != 0): 
-        leftHorizontalStepper.startRelativeMove(-1 * distBack)
+        leftHorizontalStepper.relativeMove(-1 * distBack)
     if (numRight != 0): 
-        rightHorizontalStepper.startRelativeMove(-1 * distBack)
-        
-    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
-        continue
+        rightHorizontalStepper.relativeMove(-1 * distBack)
         
     #letting go
     leftVerticalStepper.setSpeed(lowerSpeed)
@@ -176,11 +155,8 @@ def scoop():
     while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
         continue
 
-    leftHorizontalStepper.startGoToPosition(leftStartPosition)
-    rightHorizontalStepper.startGoToPosition(rightStartPosition)
-    
-    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
-        continue
+    leftHorizontalStepper.goToPosition(leftStartPosition)
+    rightHorizontalStepper.goToPosition(rightStartPosition)
     
     resetAllWidgets()
     transitionBack('main')
@@ -257,8 +233,10 @@ def resetAllWidgets():
             
     sm.get_screen('main').ids.rightScooperLabel.text = "Control The Right Scooper"
     sm.get_screen('main').ids.leftScooperLabel.text = "Control The Left Scooper"
-    
-
+   
+# ////////////////////////////////////////////////////////////////
+# //                     KIVY FILE LOAD-INS                     //
+# ////////////////////////////////////////////////////////////////
 sm = ScreenManager()
 
 class MyApp(App):
@@ -288,12 +266,6 @@ class MainScreen(Screen):
     def scoopCallback(self):
         pause('Scooping!', 5, 'main')
         Clock.schedule_once(scoop_balls_thread, 0)
-        
-    def resetImages(self):
-        imagesList = [self.ids.ballOne, self.ids.ballTwo, self.ids.ballThree, self.ids.ballFour, self.ids.ballFive]
-        
-        for index in range(0,5):
-            imagesList[index].color = 1,1,1,1
     
     def changeImageColors(self):
         imagesList = [self.ids.ballOne, self.ids.ballTwo, self.ids.ballThree, self.ids.ballFour, self.ids.ballFive]
@@ -338,7 +310,7 @@ sm.add_widget(PauseScene(name = 'pauseScene'))
 # ////////////////////////////////////////////////////////////////
 
 #home all of the hardware
-#home()
+home()
 
 MyApp().run()
 quitAll()
