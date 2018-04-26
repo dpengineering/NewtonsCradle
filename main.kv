@@ -5,26 +5,26 @@
         ################# TITLE #################
         Label:
             center_x: root.center_x
-            center_y: root.center_y + 500
+            center_y: root.center_y + 335
             text: "Newton's Cradle"
             color: 0,0,0,1
-            font_size: 80
+            font_size: 70
             
         ################# SCOOP LABELS #################    
         Label:
             id: leftScooperLabel
             center_x: root.center_x
-            center_y: root.center_y * .75
+            center_y: root.center_y * .7
             text: 'Control Left Scooper'
-            color: 0,255,255,.65
-            font_size: 65
+            color: 0,0,0,1     #0,255,255,.65
+            font_size: 45
         Label:
             id: rightScooperLabel
             center_x: root.center_x 
-            center_y: root.center_y * 1.25
+            center_y: root.center_y * 1.15
             text: 'Control Right Scooper'
-            color: 0,255,255,.65
-            font_size: 65
+            color: 0,0,0,1
+            font_size: 45
             
         ################# BALLS #################          
 		
@@ -34,97 +34,97 @@
 			keep_ratio: True
 			allow_stretch: False
 			size_hint: None, None
-			size: 200, 200
-			center_x: root.center_x - 400
-			center_y: root.center_y + 300
+			size: 175, 175
+			center_x: root.center_x - 350
+			center_y: root.center_y + 200
 		Image:
 			source: 'ball.png'
 			id: ballTwo
 			keep_ratio: True
 			allow_stretch: False
 			size_hint: None, None
-			size: 200, 200
-			center_x: root.center_x - 200
-			center_y: root.center_y + 300
+			size: 175, 175
+			center_x: root.center_x - 175
+			center_y: root.center_y + 200
 		Image:
 			source: 'ball.png'
 			id: ballThree
 			keep_ratio: True
 			allow_stretch: False
 			size_hint: None, None
-			size: 200, 200
+			size: 175, 175
 			center_x: root.center_x 
-			center_y: root.center_y + 300
+			center_y: root.center_y + 200
 		Image:
 			source: 'ball.png'
 			id: ballFour
 			keep_ratio: True
 			allow_stretch: False
 			size_hint: None, None
-			size: 200, 200
-			center_x: root.center_x + 200
-			center_y: root.center_y + 300
+			size: 175, 175
+			center_x: root.center_x + 175
+			center_y: root.center_y + 200
 		Image:
 			source: 'ball.png'
 			id: ballFive
 			keep_ratio: True
 			allow_stretch: False
 			size_hint: None, None
-			size: 200, 200
-			center_x: root.center_x + 400
-			center_y: root.center_y + 300
+			size: 175, 175
+			center_x: root.center_x + 350
+			center_y: root.center_y + 200
             
-        ### BALL SLIDERS ###
+        ################# BALL SLIDERS ##################
 
 		Slider: #RIGHT SCOOPER
 			id: rightScooperSlider
 			orientation: 'horizontal'
 			min: 0
-			max: 5
-			value: 5
+			max: 4
+			value: 4
 			step: 1
-			x: root.width * 0.235
-			y: root.height * 0.5
-			size_hint_x: 10
+			center_x: root.center_x + 82
+			y: root.height * 0.45
+			size_hint_x: 7.2
 			on_value: root.rightScooperSliderChange(self.value)
 
 		Slider: #LEFT SCOOPER
 			id: leftScooperSlider
 			orientation: 'horizontal'
 			min: 0
-			max: 5
+			max: 4
 			value: 0
 			step: 1
-			x: root.width * 0.235
-			y: root.height * 0.4
-			size_hint_x: 10
+			center_x: root.center_x - 88
+			y: root.height * 0.35
+			size_hint_x: 7.2
 			on_value: root.leftScooperSliderChange(self.value)
 			
         ################# EXECUTE #################    
-        Button:
+        DPEAButton:
             size_hint: None,None
             text: 'SCOOP!'
-            font_size: 50
-            size: 200, 75
-            background_color: .6, 0, 0, 1
-            center: 950, 250
-            on_release: root.scoopCallback()
-            
-        Button:
-            size_hint: None,None
-            text: 'STOP BALLS'
-            font_size: 50
             size: 400, 150
             background_color: .6, 0, 0, 1
-            center: 1750, 100
+            x: root.width * 0.35
+			y: root.height * 0.1
+            on_release: root.scoopCallback()
+            
+        DPEAButton:
+            size_hint: None,None
+            text: 'STOP BALLS'
+            size: 150, 100
+            background_color: .6, 0, 0, 1
+            x: root.width * 0.8
+			y: root.height * 0.02
             on_release: root.stopBallsCallback()
             
         ################# QUIT #################    
-        Button:
+        DPEAButton:
             size_hint: None,None
             text: 'Quit'
-            font_size: 50
-            size: 200, 75
-            background_color: 0,0,0,.3
-            center: 150, 100
+            size: 150, 100
+            background_color: 0.6, 0, 0, 1 
+            x: root.width * 0.01
+			y: root.height * 0.02
             on_release: root.exitProgram()
