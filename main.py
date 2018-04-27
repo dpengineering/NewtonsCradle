@@ -35,6 +35,8 @@ lowerSpeed = 120
 liftSpeed = 40
 horizontalSpeed = 30
 
+numScoop = 0
+
 rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
 
@@ -78,6 +80,11 @@ def home():
         continue
     
 def scoop():
+    global numScoop
+    
+    if(numScoop > 0):
+        while(stopBalls()):
+            continue
 
     #moving to x posnumLeft
     numLeft = sm.get_screen('main').numBallsLeft
@@ -98,27 +105,43 @@ def scoop():
         leftHorizontalStepper.relativeMove(-1 * distBack)
         
         #move the right horizontal stepper to position
-        rightHorizontalStepper.goToPosition(distRight)
+        rightHorizontalStepper.startGoToPosition(distRight)
+        
+        while rightHorizontalStepper.isBusy():
+            continue
         
         #move the right vertical stepper up            
         rightVerticalStepper.setSpeed(liftSpeed)
-        rightVerticalStepper.relativeMove(distUp)
+        rightVerticalStepper.startRelativeMove(distUp)
+        
+        while rightVerticalStepper.isBusy():
+            continue
         
         #move the right horizontal stepper to drop position
-        rightHorizontalStepper.relativeMove(-1 * distBack)
+        rightHorizontalStepper.startRelativeMove(-1 * distBack)
+        
+        while rightHorizontalStepper.isBusy():
+            continue
         
         #letting go
         leftVerticalStepper.setSpeed(lowerSpeed)
         rightVerticalStepper.setSpeed(lowerSpeed)
-        leftVerticalStepper.goToPosition(0)
-        rightVerticalStepper.goToPosition(0)
+        leftVerticalStepper.startGoToPosition(0)
+        rightVerticalStepper.startGoToPosition(0)
+        
+        while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
+            continue
         
         #move the horizontal steppers back to the starting position
-        leftHorizontalStepper.goToPosition(leftStartPosition)
-        rightHorizontalStepper.goToPosition(rightStartPosition)
+        leftHorizontalStepper.startGoToPosition(leftStartPosition)
+        rightHorizontalStepper.startGoToPosition(rightStartPosition)
+        
+        while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+            continue
             
         resetAllWidgets()
         transitionBack('main')
+        numScoop+=1
         return
 
     
@@ -138,13 +161,19 @@ def scoop():
 
     if (numRight != 0): 
         rightVerticalStepper.setSpeed(liftSpeed)
-        rightVerticalStepper.relativeMove(distUp)
+        rightVerticalStepper.startRelativeMove(distUp)
+       
+    while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
+        continue
         
     #moving back
     if (numLeft != 0): 
-        leftHorizontalStepper.relativeMove(-1 * distBack)
+        leftHorizontalStepper.startRelativeMove(-1 * distBack)
     if (numRight != 0): 
-        rightHorizontalStepper.relativeMove(-1 * distBack)
+        rightHorizontalStepper.startRelativeMove(-1 * distBack)
+        
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
         
     #letting go
     leftVerticalStepper.setSpeed(lowerSpeed)
@@ -155,11 +184,15 @@ def scoop():
     while leftVerticalStepper.isBusy() or rightVerticalStepper.isBusy():
         continue
 
-    leftHorizontalStepper.goToPosition(leftStartPosition)
-    rightHorizontalStepper.goToPosition(rightStartPosition)
+    leftHorizontalStepper.startGoToPosition(leftStartPosition)
+    rightHorizontalStepper.startGoToPosition(rightStartPosition)
     
+    while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
+        continue
+
     resetAllWidgets()
     transitionBack('main')
+    numScoop+=1
         
 def stopBalls():
     #bring the vertical steppers down
@@ -173,7 +206,6 @@ def stopBalls():
     leftHorizontalStepper.startGoToPosition(0)
     rightHorizontalStepper.startGoToPosition(0)
 
-       
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
        
@@ -207,7 +239,8 @@ def stopBalls():
     while leftHorizontalStepper.isBusy() or rightHorizontalStepper.isBusy():
         continue
     
-    transitionBack('main')
+    return 
+
 
         
 def stop_balls_thread(*largs):
@@ -273,9 +306,9 @@ class MainScreen(Screen):
         for index in range(len(imagesList)):
             color = 1,1,1,1
             if (index < self.numBallsLeft):
-                color = 0,0,1,1
+                color = .7, .82, .988, 1
             elif (index >= len(imagesList) - self.numBallsRight):
-                color = 0,1,0,1
+                color = .988, .709, .831, 1
             imagesList[index].color = color   
 
     

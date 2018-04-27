@@ -5,7 +5,7 @@
         ################# TITLE #################
         Label:
             center_x: root.center_x
-            center_y: root.center_y + 335
+            center_y: root.center_y + 300
             text: "Newton's Cradle"
             color: 0,0,0,1
             font_size: 70
@@ -14,14 +14,14 @@
         Label:
             id: leftScooperLabel
             center_x: root.center_x
-            center_y: root.center_y * .7
+            center_y: root.center_y * .55
             text: 'Control Left Scooper'
             color: 0,0,0,1     #0,255,255,.65
             font_size: 45
         Label:
             id: rightScooperLabel
             center_x: root.center_x 
-            center_y: root.center_y * 1.15
+            center_y: root.center_y * 1.03
             text: 'Control Right Scooper'
             color: 0,0,0,1
             font_size: 45
@@ -36,7 +36,7 @@
 			size_hint: None, None
 			size: 175, 175
 			center_x: root.center_x - 350
-			center_y: root.center_y + 200
+			center_y: root.center_y + 150
 		Image:
 			source: 'ball.png'
 			id: ballTwo
@@ -45,7 +45,7 @@
 			size_hint: None, None
 			size: 175, 175
 			center_x: root.center_x - 175
-			center_y: root.center_y + 200
+			center_y: root.center_y + 150
 		Image:
 			source: 'ball.png'
 			id: ballThree
@@ -54,7 +54,7 @@
 			size_hint: None, None
 			size: 175, 175
 			center_x: root.center_x 
-			center_y: root.center_y + 200
+			center_y: root.center_y + 150
 		Image:
 			source: 'ball.png'
 			id: ballFour
@@ -63,7 +63,7 @@
 			size_hint: None, None
 			size: 175, 175
 			center_x: root.center_x + 175
-			center_y: root.center_y + 200
+			center_y: root.center_y + 150
 		Image:
 			source: 'ball.png'
 			id: ballFive
@@ -72,7 +72,7 @@
 			size_hint: None, None
 			size: 175, 175
 			center_x: root.center_x + 350
-			center_y: root.center_y + 200
+			center_y: root.center_y + 150
             
         ################# BALL SLIDERS ##################
 
@@ -84,7 +84,7 @@
 			value: 4
 			step: 1
 			center_x: root.center_x + 82
-			y: root.height * 0.45
+			y: root.height * 0.38
 			size_hint_x: 7.2
 			on_value: root.rightScooperSliderChange(self.value)
 
@@ -96,7 +96,7 @@
 			value: 0
 			step: 1
 			center_x: root.center_x - 88
-			y: root.height * 0.35
+			y: root.height * 0.3
 			size_hint_x: 7.2
 			on_value: root.leftScooperSliderChange(self.value)
 			
@@ -104,20 +104,21 @@
         DPEAButton:
             size_hint: None,None
             text: 'SCOOP!'
+            text_color: 0, 0, 1, 1
             size: 400, 150
             background_color: .6, 0, 0, 1
             x: root.width * 0.35
-			y: root.height * 0.1
+			y: root.height * 0.05
             on_release: root.scoopCallback()
             
-        DPEAButton:
-            size_hint: None,None
-            text: 'STOP BALLS'
-            size: 150, 100
-            background_color: .6, 0, 0, 1
-            x: root.width * 0.8
-			y: root.height * 0.02
-            on_release: root.stopBallsCallback()
+#        DPEAButton:
+#            size_hint: None,None
+#            text: 'STOP BALLS'
+#            size: 150, 100
+#            background_color: .6, 0, 0, 1
+#            x: root.width * 0.8
+#			y: root.height * 0.02
+#            on_release: root.stopBallsCallback()
             
         ################# QUIT #################    
         DPEAButton:
