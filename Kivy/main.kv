@@ -29,7 +29,7 @@
         ################# BALLS #################          
 		
 		Image:
-			source: 'ball.png'
+			source: 'Kivy/ball.png'
 			id: ballOne
 			keep_ratio: True
 			allow_stretch: False
@@ -38,7 +38,7 @@
 			center_x: root.center_x - 350
 			center_y: root.center_y + 150
 		Image:
-			source: 'ball.png'
+			source: 'Kivy/ball.png'
 			id: ballTwo
 			keep_ratio: True
 			allow_stretch: False
@@ -47,7 +47,7 @@
 			center_x: root.center_x - 175
 			center_y: root.center_y + 150
 		Image:
-			source: 'ball.png'
+			source: 'Kivy/ball.png'
 			id: ballThree
 			keep_ratio: True
 			allow_stretch: False
@@ -56,7 +56,7 @@
 			center_x: root.center_x 
 			center_y: root.center_y + 150
 		Image:
-			source: 'ball.png'
+			source: 'Kivy/ball.png'
 			id: ballFour
 			keep_ratio: True
 			allow_stretch: False
@@ -65,7 +65,7 @@
 			center_x: root.center_x + 175
 			center_y: root.center_y + 150
 		Image:
-			source: 'ball.png'
+			source: 'Kivy/ball.png'
 			id: ballFive
 			keep_ratio: True
 			allow_stretch: False
@@ -104,28 +104,8 @@
         DPEAButton:
             size_hint: None,None
             text: 'SCOOP!'
-            text_color: 0, 0, 1, 1
             size: 400, 150
             background_color: .6, 0, 0, 1
             x: root.width * 0.35
 			y: root.height * 0.05
             on_release: root.scoopCallback()
-            
-#        DPEAButton:
-#            size_hint: None,None
-#            text: 'STOP BALLS'
-#            size: 150, 100
-#            background_color: .6, 0, 0, 1
-#            x: root.width * 0.8
-#			y: root.height * 0.02
-#            on_release: root.stopBallsCallback()
-            
-        ################# QUIT #################    
-        DPEAButton:
-            size_hint: None,None
-            text: 'Quit'
-            size: 150, 100
-            background_color: 0.6, 0, 0, 1 
-            x: root.width * 0.01
-			y: root.height * 0.02
-            on_release: root.exitProgram()
