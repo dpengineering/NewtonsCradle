@@ -276,9 +276,9 @@ class MyApp(App):
     def build(self):
         return sm
 
-Builder.load_file('main.kv')
+Builder.load_file('Kivy/main.kv')
 Builder.load_file('Libraries/DPEAButton.kv')
-Builder.load_file('PauseScene.kv')
+Builder.load_file('Kivy/PauseScene.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
 # ////////////////////////////////////////////////////////////////
