@@ -13,6 +13,7 @@ from kivy.clock import Clock
 from kivy.animation import Animation
 from functools import partial
 from threading import Thread
+import AdminScreen
 
 import Stepper
 
@@ -248,6 +249,7 @@ def stopBalls():
 # ////////////////////////////////////////////////////////////////
 # //                       Threading                            //
 # ////////////////////////////////////////////////////////////////
+
 def stop_balls_thread(*largs):
     Thread(target = stopBalls).start()
         
@@ -256,9 +258,11 @@ def scoop_balls_thread(*largs):
         Thread(target = scoop).start()
     else:
         Thread(target = scoopFiveBalls).start()
+        
 # ////////////////////////////////////////////////////////////////
-# //                       Pause Scene Functions                //
+# //             Pause and Admin Scene Functions                //
 # ////////////////////////////////////////////////////////////////
+
 def pause(text, sec, originalScene):
     sm.transition.direction = 'left'
     sm.current = 'pauseScene'
@@ -273,6 +277,7 @@ def transitionBack(originalScene, *larg):
 # ////////////////////////////////////////////////////////////////
 # //                     KIVY FILE LOAD-INS                     //
 # ////////////////////////////////////////////////////////////////
+
 sm = ScreenManager()
 
 class MyApp(App):
@@ -282,6 +287,7 @@ class MyApp(App):
 Builder.load_file('Kivy/main.kv')
 Builder.load_file('Libraries/DPEAButton.kv')
 Builder.load_file('Kivy/PauseScene.kv')
+Builder.load_file('Libraries/AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
 # ////////////////////////////////////////////////////////////////
@@ -291,6 +297,10 @@ Window.clearcolor = (1, 1, 1, 1) # (WHITE)
 class MainScreen(Screen):
     numBallsRight = 0
     numBallsLeft = 0
+    
+    def adminTransition(self):
+            sm.current = 'admin'
+
     
     def scoopCallback(self):
         pause('Scooping!', 5, 'main')
@@ -329,9 +339,32 @@ class MainScreen(Screen):
     
 class PauseScene(Screen):
     pass
+    
+class AdminScreen(Screen):
+    
+    def backButtonDown(self):
+        sm.current = 'main'
+        
+    def resetColors(self):
+        self.ids.zero.color = 0.019, 0.337, 1, 1
+        self.ids.one.color = 0.019, 0.337, 1, 1
+        self.ids.two.color = 0.019, 0.337, 1, 1
+        self.ids.three.color = 0.019, 0.337, 1, 1
+        self.ids.four.color = 0.019, 0.337, 1, 1
+        self.ids.five.color = 0.019, 0.337, 1, 1
+        self.ids.six.color = 0.019, 0.337, 1, 1
+        self.ids.seven.color = 0.019, 0.337, 1, 1
+        self.ids.eight.color = 0.019, 0.337, 1, 1
+        self.ids.nine.color = 0.019, 0.337, 1, 1
+        
+        self.ids.back.color = 0.019, 0.337, 1, 1
+        self.ids.backspace.color = 0.019, 0.337, 1, 1
+        self.ids.enter.color = 0.019, 0.337, 1, 1
+
 
 sm.add_widget(MainScreen(name = 'main'))
 sm.add_widget(PauseScene(name = 'pauseScene'))
+sm.add_widget(AdminScreen(name = 'admin'))
 
 # ////////////////////////////////////////////////////////////////
 # //                          RUN APP                           //
