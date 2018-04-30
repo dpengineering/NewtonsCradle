@@ -19,9 +19,8 @@ import Stepper
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN VARIABLES                       //
 # ////////////////////////////////////////////////////////////////
-
+distBack = 4 * 25.4 
 distUp = 2 * 25.4
-distBack = 4 * 25.4
 
 stopDistLeft = 2.25 * 25.4
 stopDistRight = 2.5 * 25.4
@@ -68,10 +67,6 @@ def checkVerticalSteppersIfBusy():
 def changeVerticalSteppersSpeed(speed):
     leftVerticalStepper.setSpeed(speed)
     rightVerticalStepper.setSpeed(speed)
-    
-def bringVerticalSteppersDown():
-    leftVerticalStepper.startGoToPosition(0)   
-    rightVerticalStepper.startGoToPosition(0)
 
 def releaseBalls():
     changeVerticalSteppersSpeed(dropSpeed)
@@ -87,21 +82,40 @@ def pickupBalls():
         leftVerticalStepper.startRelativeMove(distUp)
     if(sm.get_screen('main').numBallsRight != 0):
         rightVerticalStepper.startRelativeMove(distUp)
+    
+    while checkVerticalSteppersIfBusy():
+        continue
         
 def moveSteppersBackToDrop():
     if(sm.get_screen('main').numBallsLeft != 0):
         leftHorizontalStepper.startRelativeMove(-1 * distBack)
     if(sm.get_screen('main').numBallsRight != 0):
         rightHorizontalStepper.startRelativeMove(-1 * distBack)
+    
+    while checkHorizontalSteppersIfBusy():
+        continue
+
+def moveSteppersToZero():
+    leftHorizontalStepper.startGoToPosition(0)
+    rightHorizontalStepper.startGoToPosition(0)
+
+    while checkHorizontalSteppersIfBusy():
+        continue
 
 def moveSteppersToPickupPositions(distRight, distLeft):
     rightHorizontalStepper.startGoToPosition(distRight)
     leftHorizontalStepper.startGoToPosition(distLeft)
+    
+    while checkHorizontalSteppersIfBusy():
+        continue
 
 def moveSteppersToStart():
     global stopDistLeft, stopDistRight
     leftHorizontalStepper.startGoToPosition(stopDistLeft)
     rightHorizontalStepper.startGoToPosition(stopDistRight)
+    
+    while checkHorizontalSteppersIfBusy():
+        continue
 
 def resetAllWidgets():
     sm.get_screen('main').ids.rightScooperSlider.value = 4
@@ -137,9 +151,7 @@ def home():
             rightIsHome = True
             
     moveSteppersToStart()
-    
-    while checkHorizontalSteppersIfBusy():
-        continue
+
     
 def scoop():
     global numScoop
@@ -158,25 +170,13 @@ def scoop():
     
     moveSteppersToPickupPositions(distRight, distLeft)
     
-    while checkHorizontalSteppersIfBusy():
-        continue
-    
     pickupBalls()
-    
-    while checkVerticalSteppersIfBusy():
-        continue
         
     moveSteppersBackToDrop()
-    
-    while checkHorizontalSteppersIfBusy():
-        continue
     
     releaseBalls()
     
     moveSteppersToStart()
-    
-    while checkHorizontalSteppersIfBusy():
-        continue
 
     scoopExitTasks()
     return
@@ -208,38 +208,24 @@ def scoopFiveBalls():
     
     #letting go
     changeVerticalSteppersSpeed(dropSpeed)
-    bringVerticalSteppersDown()
-    
-    while checkVerticalSteppersIfBusy():
-        continue
+    releaseBalls()
     
     #move the horizontal steppers back to the starting position
     moveSteppersToStart()
-    
-    while checkHorizontalSteppersIfBusy():
-        continue
         
     scoopExitTasks()
     return
         
 def stopBalls():
     changeVerticalSteppersSpeed(liftSpeed)
-    bringVerticalSteppersDown()
-    
-    while checkVerticalSteppersIfBusy():
-        continue
+    releaseBalls()
     
     #move horizontal steppers to home position
-    leftHorizontalStepper.startGoToPosition(0)
-    rightHorizontalStepper.startGoToPosition(0)
-
-    while checkHorizontalSteppersIfBusy():
-        continue
+    moveSteppersToZero()
        
     #move vertical steppers up
-    pickupBalls()
-    #~ leftVerticalStepper.startRelativeMove(distUp)
-    #~ rightVerticalStepper.startRelativeMove(distUp)
+    leftVerticalStepper.startRelativeMove(distUp)
+    rightVerticalStepper.startRelativeMove(distUp)
        
     while checkVerticalSteppersIfBusy():
         continue
@@ -252,16 +238,10 @@ def stopBalls():
         continue
     
     #bring the vertical steppers down
-    bringVerticalSteppersDown()
-    
-    while checkVerticalSteppersIfBusy():
-        continue
+    releaseBalls()
     
     #bring the horizontal steppers back to their starting position
     moveSteppersToStart()
-    
-    while checkHorizontalSteppersIfBusy():
-        continue
     
     return
     
