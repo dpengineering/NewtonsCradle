@@ -33,7 +33,9 @@ ballDiameter = 2.25 * 25.4
 
 liftSpeed = 40
 dropSpeed = 120
+
 horizontalSpeed = 30
+fastHorizontalSpeed = 60
 
 rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
 rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
@@ -68,8 +70,17 @@ def checkVerticalSteppersIfBusy():
 def changeVerticalSteppersSpeed(speed):
     leftVerticalStepper.setSpeed(speed)
     rightVerticalStepper.setSpeed(speed)
+    
+def changeVerticalSteppersMicroSteps(microSteps):
+    leftVerticalStepper.setMicroSteps(microSteps)
+    rightVerticalStepper.setMicroSteps(microSteps)
+
+def changeHorizontalSteppersSpeed(speed):
+    leftHorizontalStepper.setSpeed(speed)
+    rigtHorizontalStepper.setSpeed(speed)
 
 def releaseBalls():
+	changeVerticalSteppersMicroSteps(8)
     changeVerticalSteppersSpeed(dropSpeed)
     
     leftVerticalStepper.startGoToPosition(0)
@@ -218,26 +229,26 @@ def scoopFiveBalls():
     return
         
 def stopBalls():
-    changeVerticalSteppersSpeed(liftSpeed)
     releaseBalls()
     
     #move horizontal steppers to home position
-    moveSteppersToZero()
+    changeHorizontalSteppersSpeed(fastHorizontalSpeed)
+	moveSteppersToZero()
        
     #move vertical steppers up
-    leftVerticalStepper.startRelativeMove(distUp)
-    rightVerticalStepper.startRelativeMove(distUp)
-       
-    while checkVerticalSteppersIfBusy():
-        continue
+	changeVerticalSteppersSpeed(liftSpeed)
+    pickUpBalls()
         
-    #move the horizontal steppers in to the middle
+    #slowly move the horizontal steppers into the middle/stopping positions
+	changeHorizontalSteppersSpeed(15)
     leftHorizontalStepper.startRelativeMove(1 * stopDistLeft)
     rightHorizontalStepper.startRelativeMove(1 * stopDistRight)
     
     while checkHorizontalSteppersIfBusy():
         continue
     
+	changeHorizontalSteppersSpeed(horizontalSpeed)
+	
     #bring the vertical steppers down
     releaseBalls()
     
