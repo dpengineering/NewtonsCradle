@@ -14,7 +14,6 @@ from kivy.animation import Animation
 from functools import partial
 from threading import Thread
 import AdminScreen
-
 import Stepper
 
 # ////////////////////////////////////////////////////////////////
@@ -23,6 +22,7 @@ import Stepper
 distBack = 4 * 25.4 
 distUp = 2 * 25.4
 
+
 stopDistLeft = 2.25 * 25.4
 stopDistRight = 2.5 * 25.4
 
@@ -30,7 +30,6 @@ leftStartPosition = stopDistLeft
 rightStartPosition = stopDistRight
 
 ballDiameter = 2.25 * 25.4     
-
 liftSpeed = 40
 dropSpeed = 120
 horizontalSpeed = 30
@@ -287,7 +286,7 @@ class MyApp(App):
 Builder.load_file('Kivy/main.kv')
 Builder.load_file('Libraries/DPEAButton.kv')
 Builder.load_file('Kivy/PauseScene.kv')
-Builder.load_file('Libraries/AdminScreen.kv')
+Builder.load_file('AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
 # ////////////////////////////////////////////////////////////////
@@ -301,7 +300,6 @@ class MainScreen(Screen):
     def adminTransition(self):
             sm.current = 'admin'
 
-    
     def scoopCallback(self):
         pause('Scooping!', 5, 'main')
         Clock.schedule_once(scoop_balls_thread, 0)
@@ -336,35 +334,21 @@ class MainScreen(Screen):
         
         self.ids.rightScooperLabel.text = str(int(self.numBallsRight)) + " Balls Right Side"
         self.changeImageColors()
+
+    def adminAction(self):
+       sm.current = 'admin'
     
 class PauseScene(Screen):
     pass
-    
-class AdminScreen(Screen):
-    
-    def backButtonDown(self):
-        sm.current = 'main'
-        
-    def resetColors(self):
-        self.ids.zero.color = 0.019, 0.337, 1, 1
-        self.ids.one.color = 0.019, 0.337, 1, 1
-        self.ids.two.color = 0.019, 0.337, 1, 1
-        self.ids.three.color = 0.019, 0.337, 1, 1
-        self.ids.four.color = 0.019, 0.337, 1, 1
-        self.ids.five.color = 0.019, 0.337, 1, 1
-        self.ids.six.color = 0.019, 0.337, 1, 1
-        self.ids.seven.color = 0.019, 0.337, 1, 1
-        self.ids.eight.color = 0.019, 0.337, 1, 1
-        self.ids.nine.color = 0.019, 0.337, 1, 1
-        
-        self.ids.back.color = 0.019, 0.337, 1, 1
-        self.ids.backspace.color = 0.019, 0.337, 1, 1
-        self.ids.enter.color = 0.019, 0.337, 1, 1
 
+class quitScreen(Screen):
+    def quitAction(self):
+        quitAll()
 
 sm.add_widget(MainScreen(name = 'main'))
 sm.add_widget(PauseScene(name = 'pauseScene'))
-sm.add_widget(AdminScreen(name = 'admin'))
+sm.add_widget(AdminScreen.AdminScreen(name = 'admin'))
+sm.add_widget(quitScreen(name = 'quitScreen'))
 
 # ////////////////////////////////////////////////////////////////
 # //                          RUN APP                           //
