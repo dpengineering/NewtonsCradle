@@ -113,9 +113,23 @@
         ################# ADMIN #################   
         DPEAButton:
             size_hint: None,None
-            text: 'Admin!'
+            text: 'Admin'
+            size: 75, 75
+            background_color: .6, 0, 0, 1
+            x: root.width * 0.03
+			y: root.height * 0.03
+            on_release: root.adminAction()
+
+<quitScreen>:    #start scene with a button and label
+    name: 'quitScreen'
+    FloatLayout:
+        size_hint: None, None
+        
+        DPEAButton:
+            size_hint: None,None
+            text: 'Quit'
             size: 400, 150
             background_color: .6, 0, 0, 1
-            x: root.width * 0.05
-			y: root.height * 0.05
-            on_release: root.adminTransition()
+            center_x: root.width * .50 
+			center_y: root.height * .50
+            on_release: root.quitAction()
