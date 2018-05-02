@@ -32,21 +32,21 @@ rightStartPosition = stopDistRight
 ballDiameter = 2.25 * 25.4     
 
 liftSpeed = 40
-dropSpeed = 200
+dropSpeed = 225
 
 horizontalSpeedSlow = 15
 horizontalSpeed = 36
 
-accel = 300
+accel = 60
 
 rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 16, 
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
-rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 4, 
+rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 8, 
   speed = liftSpeed, accel = accel)
 
 leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 16, 
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
-leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 4, 
+leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 8, 
   speed = liftSpeed, accel = accel)
 
 numScoop = 0
