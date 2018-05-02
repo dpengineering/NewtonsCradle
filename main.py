@@ -37,7 +37,7 @@ dropSpeed = 225
 horizontalSpeedSlow = 15
 horizontalSpeed = 36
 
-accel = 60
+accel = 55
 
 rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 16, 
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
@@ -299,14 +299,14 @@ def scoop_balls_thread(*largs):
     pauseTime = 10 + 2 * (max(numLeft, numRight) - 1)
     
     if (numScoop is not 0):
-        pauseTime += 10
+        pauseTime += 8
     
     if(ballSum <= 4):
         pause('Scooping!', pauseTime, 'main')
         Thread(target = scoop).start()
     else:
         pauseTime += 10
-        pause('Scooping!', pauseTime + 5, 'main')
+        pause('Scooping!', pauseTime, 'main')
         Thread(target = scoopFiveBalls).start()
    
 # ////////////////////////////////////////////////////////////////
