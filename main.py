@@ -32,21 +32,21 @@ rightStartPosition = stopDistRight
 ballDiameter = 2.25 * 25.4     
 
 liftSpeed = 40
-dropSpeed = 15625 / 25
+dropSpeed = 200
 
 horizontalSpeedSlow = 15
 horizontalSpeed = 36
 
-accel = 2000
+accel = 300
 
 rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 16, 
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
-rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 8, 
+rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 4, 
   speed = liftSpeed, accel = accel)
 
 leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 16, 
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
-leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 8, 
+leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 4, 
   speed = liftSpeed, accel = accel)
 
 numScoop = 0
@@ -98,7 +98,6 @@ def releaseBalls():
     while checkVerticalSteppersIfBusy():
         continue
 
-
 def pickupBalls(stoppingBalls = False):
     changeVerticalSteppersSpeed(liftSpeed)
         
@@ -115,7 +114,6 @@ def moveSteppersBackToDrop():
         leftHorizontalStepper.startRelativeMove(-1 * distBack)
     if(sm.get_screen('main').numBallsRight != 0):
         rightHorizontalStepper.startRelativeMove(-1 * distBack)
-
     
     while checkHorizontalSteppersIfBusy():
         continue
@@ -126,7 +124,6 @@ def moveSteppersToZero():
 
     while checkHorizontalSteppersIfBusy():
         continue
-    
 
 def moveSteppersToPickupPositions(distRight, distLeft):
     rightHorizontalStepper.startGoToPosition(distRight)
@@ -273,7 +270,6 @@ def stopBalls():
 # ////////////////////////////////////////////////////////////////
 # //             Pause and Admin Scene Functions                //
 # ////////////////////////////////////////////////////////////////
-
 def pause(text, sec, originalScene):
     sm.transition.direction = 'left'
     sm.current = 'pauseScene'
