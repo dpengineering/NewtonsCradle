@@ -118,12 +118,18 @@ def moveSteppersBackToDrop():
     while checkHorizontalSteppersIfBusy():
         continue
 
-def moveSteppersToZero():
+def moveSteppersToZero(fastMovement = False):
+    if(fastMovement):
+        changeHorizontalSteppersSpeed(horizontalSpeed)
+    
     leftHorizontalStepper.startGoToPosition(0)
     rightHorizontalStepper.startGoToPosition(0)
 
     while checkHorizontalSteppersIfBusy():
         continue
+    
+    if(fastMovement):
+        changeHorizontalSteppersSpeed(horizontalSpeed)
 
 def moveSteppersToPickupPositions(distRight, distLeft):
     rightHorizontalStepper.startGoToPosition(distRight)
@@ -258,7 +264,6 @@ def stopBalls():
     #move vertical steppers up
     pickupBalls(True)
     
-    #~ leftVerticalStepper.startRelativeMove(distUp)
     #slowly move the horizontal steppers into the middle/stopping positions
     moveSteppersToStop()
     
