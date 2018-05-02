@@ -1,10 +1,9 @@
+#!/usr/bin/python3
+
 # ////////////////////////////////////////////////////////////////
 # //                     IMPORT STATEMENTS                      //
 # ////////////////////////////////////////////////////////////////
-
 import sys
-sys.path.insert(0, 'Libraries/')
-
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -17,8 +16,10 @@ from kivy.clock import Clock
 from kivy.animation import Animation
 from functools import partial
 from threading import Thread
-import AdminScreen
 
+#necessary to include folders in main directory for imports
+sys.path.insert(0, 'Libraries/')
+import AdminScreen
 import Stepper
 
 # ////////////////////////////////////////////////////////////////
@@ -262,7 +263,6 @@ def stopBalls():
     #move vertical steppers up
     pickupBalls(True)
     
-    #~ leftVerticalStepper.startRelativeMove(distUp)
     #slowly move the horizontal steppers into the middle/stopping positions
     moveSteppersToStop()
     
