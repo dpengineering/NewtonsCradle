@@ -18,7 +18,7 @@ from functools import partial
 from threading import Thread
 
 #necessary to include folders in main directory for imports
-sys.path.insert(0, 'Libraries/')
+sys.path.insert(0, 'Kivy/')
 import AdminScreen
 import Stepper
 
@@ -321,7 +321,7 @@ class MyApp(App):
 Builder.load_file('Kivy/main.kv')
 Builder.load_file('Libraries/DPEAButton.kv')
 Builder.load_file('Kivy/PauseScene.kv')
-Builder.load_file('Libraries/AdminScreen.kv')
+Builder.load_file('Kivy/AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
 # ////////////////////////////////////////////////////////////////
