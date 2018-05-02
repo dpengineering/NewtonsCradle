@@ -14,33 +14,40 @@ from kivy.animation import Animation
 from functools import partial
 from threading import Thread
 import AdminScreen
+
 import Stepper
 
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN VARIABLES                       //
 # ////////////////////////////////////////////////////////////////
-distBack = 4 * 25.4 
-distUp = 2 * 25.4
+distBack = 5 * 25.4 
+distUp = 3.25 * 25.4
 
-
-stopDistLeft = 2.25 * 25.4
-stopDistRight = 2.5 * 25.4
+stopDistLeft = 2.125 * 25.4
+stopDistRight = 2.625 * 25.4
 
 leftStartPosition = stopDistLeft
 rightStartPosition = stopDistRight
 
 ballDiameter = 2.25 * 25.4     
+
 liftSpeed = 40
-dropSpeed = 120
+dropSpeed = 15625 / 25
 
-horizontalSpeed = 30
-fastHorizontalSpeed = 60
+horizontalSpeedSlow = 15
+horizontalSpeed = 36
 
-rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
-rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 32, speed = liftSpeed)
+accel = 2000
 
-leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 32, stepsPerUnit = 25, speed = horizontalSpeed)
-leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 32, speed = liftSpeed)
+rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 16, 
+  stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
+rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 8, 
+  speed = liftSpeed, accel = accel)
+
+leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 16, 
+  stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
+leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 8, 
+  speed = liftSpeed, accel = accel)
 
 numScoop = 0
 
@@ -76,22 +83,28 @@ def changeVerticalSteppersMicroSteps(microSteps):
 
 def changeHorizontalSteppersSpeed(speed):
     leftHorizontalStepper.setSpeed(speed)
-    rigtHorizontalStepper.setSpeed(speed)
+    rightHorizontalStepper.setSpeed(speed)
+
+def changeHorizontalSteppersMicroSteps(microSteps):
+    leftHorizontalStepper.setMicroSteps(microSteps)
+    rightHorizontalStepper.setMicroSteps(microSteps)
 
 def releaseBalls():
-	changeVerticalSteppersMicroSteps(8)
     changeVerticalSteppersSpeed(dropSpeed)
-    
+
     leftVerticalStepper.startGoToPosition(0)
     rightVerticalStepper.startGoToPosition(0)
-    
+
     while checkVerticalSteppersIfBusy():
         continue
 
-def pickupBalls():
-    if(sm.get_screen('main').numBallsLeft != 0):
+
+def pickupBalls(stoppingBalls = False):
+    changeVerticalSteppersSpeed(liftSpeed)
+        
+    if(sm.get_screen('main').numBallsLeft != 0 or stoppingBalls):
         leftVerticalStepper.startRelativeMove(distUp)
-    if(sm.get_screen('main').numBallsRight != 0):
+    if(sm.get_screen('main').numBallsRight != 0 or stoppingBalls):
         rightVerticalStepper.startRelativeMove(distUp)
     
     while checkVerticalSteppersIfBusy():
@@ -102,6 +115,7 @@ def moveSteppersBackToDrop():
         leftHorizontalStepper.startRelativeMove(-1 * distBack)
     if(sm.get_screen('main').numBallsRight != 0):
         rightHorizontalStepper.startRelativeMove(-1 * distBack)
+
     
     while checkHorizontalSteppersIfBusy():
         continue
@@ -112,6 +126,7 @@ def moveSteppersToZero():
 
     while checkHorizontalSteppersIfBusy():
         continue
+    
 
 def moveSteppersToPickupPositions(distRight, distLeft):
     rightHorizontalStepper.startGoToPosition(distRight)
@@ -120,13 +135,16 @@ def moveSteppersToPickupPositions(distRight, distLeft):
     while checkHorizontalSteppersIfBusy():
         continue
 
-def moveSteppersToStart():
-    global stopDistLeft, stopDistRight
+def moveSteppersToStop():
+    changeHorizontalSteppersSpeed(horizontalSpeedSlow)
+   
     leftHorizontalStepper.startGoToPosition(stopDistLeft)
     rightHorizontalStepper.startGoToPosition(stopDistRight)
     
     while checkHorizontalSteppersIfBusy():
         continue
+        
+    changeHorizontalSteppersSpeed(horizontalSpeed)
 
 def resetAllWidgets():
     sm.get_screen('main').ids.rightScooperSlider.value = 4
@@ -160,20 +178,25 @@ def home():
             rightHorizontalStepper.hardStop()
             rightHorizontalStepper.setAsHome()
             rightIsHome = True
-            
-    moveSteppersToStart()
 
-    
 def scoop():
-    global numScoop
-    
     #distances to move when picking up balls
-    distRight = rightStartPosition + ballDiameter * sm.get_screen('main').numBallsRight
-    distLeft = leftStartPosition + ballDiameter * sm.get_screen('main').numBallsLeft
+    numLeft = sm.get_screen('main').numBallsLeft
+    numRight = sm.get_screen('main').numBallsRight
     
-    if((sm.get_screen('main').numBallsLeft + sm.get_screen('main').numBallsRight) == 0):
+    if(numLeft + numRight == 0):
         transitionBack('main')
         return
+        
+    if numLeft != 0:
+        distLeft = leftStartPosition + ballDiameter * numLeft
+    else:
+        distLeft = 0
+    
+    if numRight != 0:
+        distRight = rightStartPosition + ballDiameter * numRight
+    else:
+        distRight = 0
     
     if(numScoop > 0):
         while(stopBalls()):
@@ -187,7 +210,7 @@ def scoop():
     
     releaseBalls()
     
-    moveSteppersToStart()
+    moveSteppersToZero()
 
     scoopExitTasks()
     return
@@ -195,6 +218,9 @@ def scoop():
 #scoop five balls needs to do left side movements first then right side
 #in order to prevent collisions
 def scoopFiveBalls():
+    if(numScoop > 0):
+        while(stopBalls()):
+            continue
     distLeft = leftStartPosition + ballDiameter * sm.get_screen('main').numBallsLeft
     distRight = rightStartPosition + ballDiameter * sm.get_screen('main').numBallsRight
     
@@ -218,57 +244,32 @@ def scoopFiveBalls():
     rightHorizontalStepper.relativeMove(-1 * distBack)
     
     #letting go
-    changeVerticalSteppersSpeed(dropSpeed)
     releaseBalls()
     
     #move the horizontal steppers back to the starting position
-    moveSteppersToStart()
+    moveSteppersToZero()
         
     scoopExitTasks()
     return
         
 def stopBalls():
-    releaseBalls()
+    #releaseBalls()
     
     #move horizontal steppers to home position
-    changeHorizontalSteppersSpeed(fastHorizontalSpeed)
-	moveSteppersToZero()
+    moveSteppersToZero()
        
     #move vertical steppers up
-	changeVerticalSteppersSpeed(liftSpeed)
-    pickUpBalls()
-        
+    pickupBalls(True)
+    
+    #~ leftVerticalStepper.startRelativeMove(distUp)
     #slowly move the horizontal steppers into the middle/stopping positions
-	changeHorizontalSteppersSpeed(15)
-    leftHorizontalStepper.startRelativeMove(1 * stopDistLeft)
-    rightHorizontalStepper.startRelativeMove(1 * stopDistRight)
+    moveSteppersToStop()
     
-    while checkHorizontalSteppersIfBusy():
-        continue
-    
-	changeHorizontalSteppersSpeed(horizontalSpeed)
-	
     #bring the vertical steppers down
     releaseBalls()
     
-    #bring the horizontal steppers back to their starting position
-    moveSteppersToStart()
-    
     return
-    
-# ////////////////////////////////////////////////////////////////
-# //                       Threading                            //
-# ////////////////////////////////////////////////////////////////
-
-def stop_balls_thread(*largs):
-    Thread(target = stopBalls).start()
-        
-def scoop_balls_thread(*largs):
-    if(sm.get_screen('main').numBallsLeft + sm.get_screen('main').numBallsRight <= 4):
-        Thread(target = scoop).start()
-    else:
-        Thread(target = scoopFiveBalls).start()
-        
+       
 # ////////////////////////////////////////////////////////////////
 # //             Pause and Admin Scene Functions                //
 # ////////////////////////////////////////////////////////////////
@@ -277,12 +278,35 @@ def pause(text, sec, originalScene):
     sm.transition.direction = 'left'
     sm.current = 'pauseScene'
     sm.current_screen.ids.pauseText.text = text
-    load = Animation(size = (10, 10), duration = 0) + Animation(size = (150, 10), duration = sec)
+    load = Animation(size = (10, 10), duration = 0) + \
+        Animation(size = (150, 10), duration = sec)
     load.start(sm.current_screen.ids.progressBar)
         
 def transitionBack(originalScene, *larg):
     sm.transition.direction = 'right'
     sm.current = originalScene
+    
+# ////////////////////////////////////////////////////////////////
+# //                       Threading                            //
+# ////////////////////////////////////////////////////////////////
+        
+def scoop_balls_thread(*largs):
+    numLeft = sm.get_screen('main').numBallsLeft
+    numRight = sm.get_screen('main').numBallsRight
+    ballSum = numLeft + numRight 
+    
+    pauseTime = 10 + 2 * (max(numLeft, numRight) - 1)
+    
+    if (numScoop is not 0):
+        pauseTime += 10
+    
+    if(ballSum <= 4):
+        pause('Scooping!', pauseTime, 'main')
+        Thread(target = scoop).start()
+    else:
+        pauseTime += 10
+        pause('Scooping!', pauseTime + 5, 'main')
+        Thread(target = scoopFiveBalls).start()
    
 # ////////////////////////////////////////////////////////////////
 # //                     KIVY FILE LOAD-INS                     //
@@ -297,7 +321,7 @@ class MyApp(App):
 Builder.load_file('Kivy/main.kv')
 Builder.load_file('Libraries/DPEAButton.kv')
 Builder.load_file('Kivy/PauseScene.kv')
-Builder.load_file('AdminScreen.kv')
+Builder.load_file('Libraries/AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
 # ////////////////////////////////////////////////////////////////
@@ -308,15 +332,15 @@ class MainScreen(Screen):
     numBallsRight = 0
     numBallsLeft = 0
     
-    def adminTransition(self):
+    def adminAction(self):
             sm.current = 'admin'
 
     def scoopCallback(self):
-        pause('Scooping!', 5, 'main')
         Clock.schedule_once(scoop_balls_thread, 0)
     
     def changeImageColors(self):
-        imagesList = [self.ids.ballOne, self.ids.ballTwo, self.ids.ballThree, self.ids.ballFour, self.ids.ballFive]
+        imagesList = [self.ids.ballOne, self.ids.ballTwo, 
+            self.ids.ballThree, self.ids.ballFour, self.ids.ballFive]
         
         for index in range(len(imagesList)):
             color = 1,1,1,1
@@ -331,9 +355,11 @@ class MainScreen(Screen):
         
         if((self.numBallsLeft + self.numBallsRight) > 4):
             self.numBallsRight = 5 - self.numBallsLeft
-            self.ids.rightScooperSlider.value = self.ids.rightScooperSlider.max - self.numBallsRight
+            self.ids.rightScooperSlider.value = \
+              self.ids.rightScooperSlider.max - self.numBallsRight
 
-        self.ids.leftScooperLabel.text = str(int(self.numBallsLeft)) + " Balls Left Side"
+        self.ids.leftScooperLabel.text = \
+          str(int(self.numBallsLeft)) + " Balls Left Side"
         self.changeImageColors()
 
     def rightScooperSliderChange(self, value):
@@ -343,19 +369,17 @@ class MainScreen(Screen):
             self.numBallsLeft = 5 - self.numBallsRight
             self.ids.leftScooperSlider.value = self.numBallsLeft
         
-        self.ids.rightScooperLabel.text = str(int(self.numBallsRight)) + " Balls Right Side"
+        self.ids.rightScooperLabel.text = \
+          str(int(self.numBallsRight)) + " Balls Right Side"
         self.changeImageColors()
-
-    def adminAction(self):
-       sm.current = 'admin'
     
 class PauseScene(Screen):
     pass
-
+    
 class quitScreen(Screen):
     def quitAction(self):
         quitAll()
-
+    
 sm.add_widget(MainScreen(name = 'main'))
 sm.add_widget(PauseScene(name = 'pauseScene'))
 sm.add_widget(AdminScreen.AdminScreen(name = 'admin'))
@@ -367,6 +391,5 @@ sm.add_widget(quitScreen(name = 'quitScreen'))
 
 #home all of the hardware
 home()
-
 MyApp().run()
 quitAll()
