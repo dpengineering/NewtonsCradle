@@ -97,6 +97,7 @@
 			step: 1
 			center_x: root.center_x - 88
 			y: root.height * 0.3
+            cursor_image:'Kivy/ball.png'
 			size_hint_x: 7.2
 			on_value: root.leftScooperSliderChange(self.value)
 			
@@ -113,17 +114,18 @@
             on_release: root.scoopCallback()
             
         ################# ADMIN #################   
-        DPEAButton:
+        Button:
             size_hint: None,None
             text: 'Admin'
             size: 75, 75
-            background_color: .6, 0, 0, 1
-            x: root.width * 0.03
-			y: root.height * 0.03
+            color: 0, 0, 0, 0
+            background_color: 0, 0, 0, 0
+            x: root.width * 0.9
+			y: root.height * 0.9
             on_release: root.adminAction()
 
-<quitScreen>:    #start scene with a button and label
-    name: 'quitScreen'
+<adminFunctionsScreen>:    #start scene with a button and label
+    name: 'adminFunctionsScreen'
     FloatLayout:
         size_hint: None, None
         
@@ -135,3 +137,11 @@
             center_x: root.width * .50 
 			center_y: root.height * .50
             on_release: root.quitAction()
+        DPEAButton:
+            size_hint: None, None
+            text: 'Home'
+            size: 400, 150
+            background_color:.6, 0, 0, 1
+            center_x: root.width * .50 
+			center_y: root.height * .35
+            on_release: root.homeAction()

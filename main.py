@@ -1,6 +1,10 @@
 # ////////////////////////////////////////////////////////////////
 # //                     IMPORT STATEMENTS                      //
 # ////////////////////////////////////////////////////////////////
+
+import sys
+sys.path.insert(0, 'Libraries/')
+
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -372,14 +376,21 @@ class MainScreen(Screen):
 class PauseScene(Screen):
     pass
     
-class quitScreen(Screen):
+class adminFunctionsScreen(Screen):
     def quitAction(self):
         quitAll()
+    
+    def homeAction(self):
+        home()
+        
+        while checkHorizontalSteppersIfBusy() or checkVerticalSteppersIfBusy():
+            continue
+        sm.current = 'main'
     
 sm.add_widget(MainScreen(name = 'main'))
 sm.add_widget(PauseScene(name = 'pauseScene'))
 sm.add_widget(AdminScreen.AdminScreen(name = 'admin'))
-sm.add_widget(quitScreen(name = 'quitScreen'))
+sm.add_widget(adminFunctionsScreen(name = 'adminFunctionsScreen'))
 
 # ////////////////////////////////////////////////////////////////
 # //                          RUN APP                           //

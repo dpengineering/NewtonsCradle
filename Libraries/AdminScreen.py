@@ -10,7 +10,7 @@ password = '0'
 userPW = ''
 
 Builder.load_file('Libraries/DPEAButton.kv')
-Builder.load_file('AdminScreen.kv')
+Builder.load_file('Libraries/AdminScreen.kv')
 
 class AdminScreen(Screen):
     def addNum(self, num):
@@ -30,7 +30,7 @@ class AdminScreen(Screen):
             print('correct')
             self.ids.pw.text = ' '
             userPW = ''
-            self.parent.current = 'quitScreen'
+            self.parent.current = 'adminFunctionsScreen'
 
     def backAction(self):
         global userPW
