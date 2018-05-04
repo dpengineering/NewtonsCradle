@@ -37,21 +37,21 @@ rightStartPosition = stopDistRight
 ballDiameter = 2.25 * 25.4     
 
 liftSpeed = 40
-dropSpeed = 200
+dropSpeed = 220
 
 horizontalSpeedSlow = 15
 horizontalSpeed = 36
 
-accel = 300
+accel = 45
 
 rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 16, 
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
-rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 4, 
+rightVerticalStepper = Stepper.Stepper(port = 1, microSteps = 8, 
   speed = liftSpeed, accel = accel)
 
 leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 16, 
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
-leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 4, 
+leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 8, 
   speed = liftSpeed, accel = accel)
 
 numScoop = 0
@@ -81,18 +81,10 @@ def checkVerticalSteppersIfBusy():
 def changeVerticalSteppersSpeed(speed):
     leftVerticalStepper.setSpeed(speed)
     rightVerticalStepper.setSpeed(speed)
-    
-def changeVerticalSteppersMicroSteps(microSteps):
-    leftVerticalStepper.setMicroSteps(microSteps)
-    rightVerticalStepper.setMicroSteps(microSteps)
 
 def changeHorizontalSteppersSpeed(speed):
     leftHorizontalStepper.setSpeed(speed)
     rightHorizontalStepper.setSpeed(speed)
-
-def changeHorizontalSteppersMicroSteps(microSteps):
-    leftHorizontalStepper.setMicroSteps(microSteps)
-    rightHorizontalStepper.setMicroSteps(microSteps)
 
 def releaseBalls():
     changeVerticalSteppersSpeed(dropSpeed)
@@ -123,7 +115,7 @@ def moveSteppersBackToDrop():
     while checkHorizontalSteppersIfBusy():
         continue
 
-def moveSteppersToZero():
+def moveSteppersToZero():    
     leftHorizontalStepper.startGoToPosition(0)
     rightHorizontalStepper.startGoToPosition(0)
 
@@ -160,7 +152,7 @@ def scoopExitTasks():
     
     resetAllWidgets()
     transitionBack('main')
-    numScoop+=1
+    numScoop += 1
     
 def home():
     leftVerticalStepper.home(0)   
@@ -298,14 +290,14 @@ def scoop_balls_thread(*largs):
     pauseTime = 10 + 2 * (max(numLeft, numRight) - 1)
     
     if (numScoop is not 0):
-        pauseTime += 10
+        pauseTime += 8
     
     if(ballSum <= 4):
         pause('Scooping!', pauseTime, 'main')
         Thread(target = scoop).start()
     else:
         pauseTime += 10
-        pause('Scooping!', pauseTime + 5, 'main')
+        pause('Scooping!', pauseTime, 'main')
         Thread(target = scoopFiveBalls).start()
    
 # ////////////////////////////////////////////////////////////////
