@@ -37,7 +37,6 @@ class AdminScreen(Screen):
         self.ids.pw.text = ' '
         userPW = ''
         self.parent.current = 'main'
-        
 
     def resetColors(self):
         self.ids.back.color = 0.019, 0.337, 1, 1
