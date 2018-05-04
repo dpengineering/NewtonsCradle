@@ -78,18 +78,10 @@ def checkVerticalSteppersIfBusy():
 def changeVerticalSteppersSpeed(speed):
     leftVerticalStepper.setSpeed(speed)
     rightVerticalStepper.setSpeed(speed)
-    
-def changeVerticalSteppersMicroSteps(microSteps):
-    leftVerticalStepper.setMicroSteps(microSteps)
-    rightVerticalStepper.setMicroSteps(microSteps)
 
 def changeHorizontalSteppersSpeed(speed):
     leftHorizontalStepper.setSpeed(speed)
     rightHorizontalStepper.setSpeed(speed)
-
-def changeHorizontalSteppersMicroSteps(microSteps):
-    leftHorizontalStepper.setMicroSteps(microSteps)
-    rightHorizontalStepper.setMicroSteps(microSteps)
 
 def releaseBalls():
     changeVerticalSteppersSpeed(dropSpeed)
@@ -157,7 +149,7 @@ def scoopExitTasks():
     
     resetAllWidgets()
     transitionBack('main')
-    numScoop+=1
+    numScoop += 1
     
 def home():
     leftVerticalStepper.home(0)   
