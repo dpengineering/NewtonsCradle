@@ -345,9 +345,12 @@ class MainScreen(Screen):
         for index in range(len(imagesList)):
             color = 1,1,1,1
             if (index < self.numBallsLeft):
-                color = .7, .82, .988, 1
+                #change to blue
+                color = 0.160, 0.231, 0.682,.75
+                # blue .7, .82, .988, 1
             elif (index >= len(imagesList) - self.numBallsRight):
-                color = .988, .709, .831, 1
+                #change to red
+                color = 0.905, 0.360, 0.294, 1
             imagesList[index].color = color   
 
     def leftScooperSliderChange(self, value):

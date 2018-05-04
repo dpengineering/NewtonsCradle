@@ -86,7 +86,8 @@
 			center_x: root.center_x + 82
 			y: root.height * 0.38
             cursor_image:'Kivy/right_scooper_image.png'
-            cursor_size: 100, 100
+            background_width: 50
+            cursor_size: 100, 75
 			size_hint_x: 7.2
 			on_value: root.rightScooperSliderChange(self.value)
 
@@ -100,18 +101,19 @@
 			center_x: root.center_x - 88
 			y: root.height * 0.3
             cursor_image:'Kivy/left_scooper_image.png'
-            cursor_size: 100, 100
+            background_width: 50
+            cursor_size: 100, 75
 			size_hint_x: 7.2
 			on_value: root.leftScooperSliderChange(self.value)
 			
         ################# EXECUTE #################    
         DPEAButton:
+            background_normal: ''
             size_hint: None,None
             text: 'SCOOP!'
             size: 250, 100
-            #background_color: 1,0,0,1
-            #.6, 0, 0, 1
-            color: 0.607, 0.964, 0.572, 1
+            color: 0,1,0,1
+            #.2, .2, .2, 1
             center_x: root.width * .50 
 			y: root.height * 0.05
             on_release: root.scoopCallback()
@@ -146,5 +148,5 @@
             size: 400, 150
             background_color:.6, 0, 0, 1
             center_x: root.width * .50 
-			center_y: root.height * .35
+			center_y: root.height * .25
             on_release: root.homeAction()
