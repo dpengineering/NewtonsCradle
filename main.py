@@ -39,7 +39,7 @@ dropSpeed = 220
 horizontalSpeedSlow = 15
 horizontalSpeed = 36
 
-accel = 50
+accel = 45
 
 rightHorizontalStepper = Stepper.Stepper(port = 0, microSteps = 16, 
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
@@ -120,18 +120,12 @@ def moveSteppersBackToDrop():
     while checkHorizontalSteppersIfBusy():
         continue
 
-def moveSteppersToZero(fastMovement = False):
-    if(fastMovement):
-        changeHorizontalSteppersSpeed(horizontalSpeed)
-    
+def moveSteppersToZero():    
     leftHorizontalStepper.startGoToPosition(0)
     rightHorizontalStepper.startGoToPosition(0)
 
     while checkHorizontalSteppersIfBusy():
         continue
-    
-    if(fastMovement):
-        changeHorizontalSteppersSpeed(horizontalSpeed)
 
 def moveSteppersToPickupPositions(distRight, distLeft):
     rightHorizontalStepper.startGoToPosition(distRight)
