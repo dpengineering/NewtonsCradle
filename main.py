@@ -3,6 +3,7 @@
 # ////////////////////////////////////////////////////////////////
 # //                     IMPORT STATEMENTS                      //
 # ////////////////////////////////////////////////////////////////
+import sys
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -15,8 +16,10 @@ from kivy.clock import Clock
 from kivy.animation import Animation
 from functools import partial
 from threading import Thread
-import AdminScreen
 
+#necessary to include folders in main directory for imports
+sys.path.insert(0, 'Kivy/')
+import AdminScreen
 import Stepper
 
 # ////////////////////////////////////////////////////////////////
@@ -310,7 +313,7 @@ class MyApp(App):
 Builder.load_file('Kivy/main.kv')
 Builder.load_file('Libraries/DPEAButton.kv')
 Builder.load_file('Kivy/PauseScene.kv')
-Builder.load_file('Libraries/AdminScreen.kv')
+Builder.load_file('Kivy/AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
 # ////////////////////////////////////////////////////////////////
@@ -333,10 +336,15 @@ class MainScreen(Screen):
         
         for index in range(len(imagesList)):
             color = 1,1,1,1
+            red = 1, 0, 0.050, 1
+            blue = 0.062, 0, 1, 1
             if (index < self.numBallsLeft):
-                color = .7, .82, .988, 1
+                #change to blue
+                color = blue #0.160, 0.231, 0.682,.75
+                # blue .7, .82, .988, 1
             elif (index >= len(imagesList) - self.numBallsRight):
-                color = .988, .709, .831, 1
+                #change to red
+                color =  red#0.905, 0.360, 0.294, 1
             imagesList[index].color = color   
 
     def leftScooperSliderChange(self, value):
@@ -365,14 +373,22 @@ class MainScreen(Screen):
 class PauseScene(Screen):
     pass
     
-class quitScreen(Screen):
+class adminFunctionsScreen(Screen):
     def quitAction(self):
         quitAll()
+    
+    def homeAction(self):
+        home()
+        resetAllWidgets()
+        
+        while checkHorizontalSteppersIfBusy() or checkVerticalSteppersIfBusy():
+            continue
+        sm.current = 'main'
     
 sm.add_widget(MainScreen(name = 'main'))
 sm.add_widget(PauseScene(name = 'pauseScene'))
 sm.add_widget(AdminScreen.AdminScreen(name = 'admin'))
-sm.add_widget(quitScreen(name = 'quitScreen'))
+sm.add_widget(adminFunctionsScreen(name = 'adminFunctionsScreen'))
 
 # ////////////////////////////////////////////////////////////////
 # //                          RUN APP                           //

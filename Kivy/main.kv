@@ -14,7 +14,7 @@
         Label:
             id: leftScooperLabel
             center_x: root.center_x
-            center_y: root.center_y * .55
+            center_y: root.center_y * .45 #55
             text: 'Control Left Scooper'
             color: 0,0,0,1     #0,255,255,.65
             font_size: 45
@@ -85,6 +85,9 @@
 			step: 1
 			center_x: root.center_x + 82
 			y: root.height * 0.38
+            cursor_image:'Kivy/right_scooper_image.png'
+            background_width: 50
+            cursor_size: 100, 75
 			size_hint_x: 7.2
 			on_value: root.rightScooperSliderChange(self.value)
 
@@ -96,34 +99,39 @@
 			value: 0
 			step: 1
 			center_x: root.center_x - 88
-			y: root.height * 0.3
+			y: root.height * 0.25
+            cursor_image:'Kivy/left_scooper_image.png'
+            background_width: 50
+            cursor_size: 100, 75
 			size_hint_x: 7.2
 			on_value: root.leftScooperSliderChange(self.value)
 			
         ################# EXECUTE #################    
         DPEAButton:
+            background_normal: ''
             size_hint: None,None
             text: 'SCOOP!'
             size: 250, 100
+            color: 1,1,0,1
+            center_x: root.width * .50 
+	      		y: root.height * 0.05
             color: 0.607, 0.964, 0.572, 1
-            center_x: root.width * .50
-            y: root.height * 0.05
             background_color: .6, 0, 0, 1
-            color: 0,0,0,1
             on_release: root.scoopCallback()
             
         ################# ADMIN #################   
-        DPEAButton:
+        Button:
             size_hint: None,None
             text: 'Admin'
             size: 75, 75
-            background_color: .6, 0, 0, 1
-            x: root.width * 0.03
-			y: root.height * 0.03
+            color: 0, 0, 0, 0
+            background_color: 0, 0, 0, 0
+            x: root.width * 0.9
+			y: root.height * 0.9
             on_release: root.adminAction()
 
-<quitScreen>:    #start scene with a button and label
-    name: 'quitScreen'
+<adminFunctionsScreen>:    #start scene with a button and label
+    name: 'adminFunctionsScreen'
     FloatLayout:
         size_hint: None, None
         
@@ -135,3 +143,11 @@
             center_x: root.width * .50 
 			center_y: root.height * .50
             on_release: root.quitAction()
+        DPEAButton:
+            size_hint: None, None
+            text: 'Home'
+            size: 400, 150
+            background_color:.6, 0, 0, 1
+            center_x: root.width * .50 
+			center_y: root.height * .25
+            on_release: root.homeAction()
