@@ -344,13 +344,15 @@ class MainScreen(Screen):
         
         for index in range(len(imagesList)):
             color = 1,1,1,1
+            red = 1, 0, 0.050, 1
+            blue = 0.062, 0, 1, 1
             if (index < self.numBallsLeft):
                 #change to blue
-                color = 0.160, 0.231, 0.682,.75
+                color = blue #0.160, 0.231, 0.682,.75
                 # blue .7, .82, .988, 1
             elif (index >= len(imagesList) - self.numBallsRight):
                 #change to red
-                color = 0.905, 0.360, 0.294, 1
+                color =  red#0.905, 0.360, 0.294, 1
             imagesList[index].color = color   
 
     def leftScooperSliderChange(self, value):
@@ -385,6 +387,7 @@ class adminFunctionsScreen(Screen):
     
     def homeAction(self):
         home()
+        resetAllWidgets()
         
         while checkHorizontalSteppersIfBusy() or checkVerticalSteppersIfBusy():
             continue

@@ -14,7 +14,7 @@
         Label:
             id: leftScooperLabel
             center_x: root.center_x
-            center_y: root.center_y * .55
+            center_y: root.center_y * .45 #55
             text: 'Control Left Scooper'
             color: 0,0,0,1     #0,255,255,.65
             font_size: 45
@@ -99,7 +99,7 @@
 			value: 0
 			step: 1
 			center_x: root.center_x - 88
-			y: root.height * 0.3
+			y: root.height * 0.25
             cursor_image:'Kivy/left_scooper_image.png'
             background_width: 50
             cursor_size: 100, 75
@@ -112,8 +112,7 @@
             size_hint: None,None
             text: 'SCOOP!'
             size: 250, 100
-            color: 0,1,0,1
-            #.2, .2, .2, 1
+            color: 1,1,0,1
             center_x: root.width * .50 
 			y: root.height * 0.05
             on_release: root.scoopCallback()
