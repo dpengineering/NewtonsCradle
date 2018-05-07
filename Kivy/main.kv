@@ -116,7 +116,7 @@
             center_x: root.width * .50 
             y: root.height * 0.05
             color: 0.607, 0.964, 0.572, 1
-            background_color: .6, 0, 0, 1
+            background_color: 0, 0, 0, 0
             on_release: root.scoopCallback()
             
         ################# ADMIN #################   
@@ -137,17 +137,19 @@
         
         DPEAButton:
             size_hint: None,None
+            background_normal: '' 
             text: 'Quit'
             size: 400, 150
-            background_color: .6, 0, 0, 1
+            background_color: 0, 0, 0, 0
             center_x: root.width * .50 
 			center_y: root.height * .50
             on_release: root.quitAction()
         DPEAButton:
             size_hint: None, None
+            background_normal: '' 
             text: 'Home'
             size: 400, 150
-            background_color:.6, 0, 0, 1
+            background_color:0, 0, 0, 0
             center_x: root.width * .50 
 			center_y: root.height * .25
             on_release: root.homeAction()

@@ -9,8 +9,8 @@ from kivy.graphics import *
 password = '0'
 userPW = ''
 
-Builder.load_file('Libraries/DPEAButton.kv')
-Builder.load_file('Kivy/AdminScreen.kv')
+#~ Builder.load_file('Kivy/DPEAButton.kv')
+#~ Builder.load_file('Kivy/AdminScreen.kv')
 
 class AdminScreen(Screen):
     def addNum(self, num):

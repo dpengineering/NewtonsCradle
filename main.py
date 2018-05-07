@@ -26,7 +26,7 @@ import Stepper
 # //                       MAIN VARIABLES                       //
 # ////////////////////////////////////////////////////////////////
 distBack = 5 * 25.4 
-distUp = 3.25 * 25.4
+distUp = 3.2 * 25.4
 
 stopDistLeft = 2.125 * 25.4
 stopDistRight = 2.625 * 25.4
@@ -37,7 +37,7 @@ rightStartPosition = stopDistRight
 ballDiameter = 2.25 * 25.4     
 
 liftSpeed = 40
-dropSpeed = 220
+dropSpeed = 360
 
 horizontalSpeedSlow = 15
 horizontalSpeed = 36
@@ -311,7 +311,7 @@ class MyApp(App):
         return sm
 
 Builder.load_file('Kivy/main.kv')
-Builder.load_file('Libraries/DPEAButton.kv')
+Builder.load_file('Kivy/DPEAButton.kv')
 Builder.load_file('Kivy/PauseScene.kv')
 Builder.load_file('Kivy/AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1) # (WHITE)
