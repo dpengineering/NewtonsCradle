@@ -20,6 +20,7 @@ from threading import Thread
 #necessary to include folders in main directory for imports
 sys.path.insert(0, 'Kivy/')
 import AdminScreen
+sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 import Stepper
 
 # ////////////////////////////////////////////////////////////////
