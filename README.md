@@ -18,7 +18,8 @@ Is called before scooping balls after the intial scoop to stop the momentum of b
 * Images of balls will change color based on ho many balls are being picked up on each side.
 
 ## Admin Button
- The Admin button is located in the top right corner, but is invisible.
+* The Admin button is located in the top right corner, but is invisible.
+* Password to enter the Admin Scene is "1717"
 
 ### Quit
 Quits excution of the program and exits to the desktop

@@ -6,7 +6,7 @@ from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 
-password = '0'
+password = '1717'
 userPW = ''
 
 #~ Builder.load_file('Kivy/DPEAButton.kv')
