@@ -146,8 +146,8 @@ def resetAllWidgets():
     sm.get_screen('main').ids.rightScooperSlider.value = 4
     sm.get_screen('main').ids.leftScooperSlider.value = 0
             
-    sm.get_screen('main').ids.rightScooperLabel.text = "Control The Right Scooper"
-    sm.get_screen('main').ids.leftScooperLabel.text = "Control The Left Scooper"
+    sm.get_screen('main').ids.rightScooperLabel.text = "Slide To Control The Right Scooper"
+    sm.get_screen('main').ids.leftScooperLabel.text = "Slide To Control The Left Scooper"
 
 def scoopExitTasks():
     global numScoop
@@ -360,7 +360,7 @@ class MainScreen(Screen):
               self.ids.rightScooperSlider.max - self.numBallsRight
 
         self.ids.leftScooperLabel.text = \
-          str(int(self.numBallsLeft)) + " Balls Left Side"
+          str(int(self.numBallsLeft)) + " Balls Left Side: Slide To Adjust"
         self.changeImageColors()
 
     def rightScooperSliderChange(self, value):
@@ -371,7 +371,7 @@ class MainScreen(Screen):
             self.ids.leftScooperSlider.value = self.numBallsLeft
         
         self.ids.rightScooperLabel.text = \
-          str(int(self.numBallsRight)) + " Balls Right Side"
+          str(int(self.numBallsRight)) + " Balls Right Side: Slide To Adjust"
         self.changeImageColors()
     
 class PauseScene(Screen):
