@@ -16,6 +16,7 @@ from kivy.clock import Clock
 from kivy.animation import Animation
 from functools import partial
 from threading import Thread
+import time
 
 #necessary to include folders in main directory for imports
 sys.path.insert(0, 'Kivy/')
@@ -29,8 +30,10 @@ import Stepper
 distBack = 5 * 25.4 
 distUp = 3.2 * 25.4
 
-stopDistLeft = 2.125 * 25.4
-stopDistRight = 2.625 * 25.4
+#2.125 * 25.4
+stopDistLeft = 2.12 * 25.4
+#2.625 * 25.4
+stopDistRight = 2.57 * 25.4
 
 leftStartPosition = stopDistLeft
 rightStartPosition = stopDistRight
@@ -261,6 +264,7 @@ def stopBalls():
     
     #bring the vertical steppers down
     releaseBalls()
+    time.sleep(1)
     
     return
        
@@ -277,6 +281,7 @@ def pause(text, sec, originalScene):
         
 def transitionBack(originalScene, *larg):
     sm.transition.direction = 'right'
+    resetAllWidgets()
     sm.current = originalScene
     
 # ////////////////////////////////////////////////////////////////
