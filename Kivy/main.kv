@@ -15,14 +15,14 @@
             id: leftScooperLabel
             center_x: root.center_x
             center_y: root.center_y * .45 #55
-            text: 'Control Left Scooper'
+            text: 'Slide To Control Left Scooper'
             color: 0,0,0,1     #0,255,255,.65
             font_size: 45
         Label:
             id: rightScooperLabel
             center_x: root.center_x 
             center_y: root.center_y * 1.03
-            text: 'Control Right Scooper'
+            text: 'Slide To Control Right Scooper'
             color: 0,0,0,1
             font_size: 45
             
@@ -74,6 +74,87 @@
 			center_x: root.center_x + 350
 			center_y: root.center_y + 150
             
+        ################# RIGHT SLIDER DOT IMAGES ##################    
+        Image:
+			source: 'Kivy/ball.png'
+			id: rightSliderDotOne
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 35, 35
+			x: root.center_x + 237
+			y: root.height * 0.395
+            
+        Image:
+			source: 'Kivy/ball.png'
+			id: rightSliderDotTwo
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 35, 35
+			x: root.center_x + 65
+			y: root.height * 0.395
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: rightSliderDotThree
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 35, 35
+			x: root.center_x - 107
+			y: root.height * 0.395
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: rightSliderDotFour
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 35, 35
+			x: root.center_x - 275
+			y: root.height * 0.395
+            
+        ################# RIGHT SLIDER DOT IMAGES ##################
+        Image:
+			source: 'Kivy/ball.png'
+			id: leftSliderDotOne
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 35, 35
+			x: root.center_x - 275
+			y: root.height * 0.285
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: leftSliderDotTwo
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 35, 35
+			x: root.center_x - 107
+			y: root.height * 0.285
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: leftSliderDotThree
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 35, 35
+			x: root.center_x + 65
+			y: root.height * 0.285
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: leftSliderDotFour
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 35, 35
+			x: root.center_x + 237
+			y: root.height * 0.285    
         ################# BALL SLIDERS ##################
 
 		Slider: #RIGHT SCOOPER
@@ -99,7 +180,7 @@
 			value: 0
 			step: 1
 			center_x: root.center_x - 88
-			y: root.height * 0.27
+			y: root.height * 0.25
             cursor_image:'Kivy/left_scooper_image.png'
             background_width: 100
             cursor_size: 100, 75
