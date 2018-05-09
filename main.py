@@ -349,37 +349,7 @@ class MainScreen(Screen):
                 #change to red
                 color =  red
             imagesList[index].color = color
-    
-    def changeRightSliderDotColors(self):
-        rightSliderDots = [self.ids.rightSliderDotOne, self.ids.rightSliderDotTwo, 
-            self.ids.rightSliderDotThree, self.ids.rightSliderDotFour]
-  
-        for index in range(len(rightSliderDots)):
-            red = 1, 0, 0.050, 1
-            color = 1,1,1,1
-            
-            if (index + 1 <= self.numBallsRight):
-                print("num balls right" + str(self.numBallsRight))
-                print("index" + str(index))
-                #change to red
-                color =  red
-            rightSliderDots[index].color = color
         
-    def changeLeftSliderDotColors(self):
-        leftSliderDots = [self.ids.leftSliderDotOne, self.ids.leftSliderDotTwo,
-            self.ids.leftSliderDotThree, self.ids.leftSliderDotFour]
-            
-        for index in range(len(leftSliderDots)):
-            blue = 0.062, 0, 1, 1
-            color = 1,1,1,1
-            
-            if (index + 1 <= self.numBallsLeft):
-                print("num balls right" + str(self.numBallsLeft))
-                print("index" + str(index))
-                #change to red
-                color =  blue
-            leftSliderDots[index].color = color
-
     def leftScooperSliderChange(self, value):
         self.numBallsLeft = int(value)
         
@@ -390,7 +360,6 @@ class MainScreen(Screen):
 
         self.ids.leftScooperLabel.text = \
           str(int(self.numBallsLeft)) + " Balls Left Side: Slide To Adjust"
-        #~ self.changeLeftSliderDotColors()
         self.changeImageColors()
 
     def rightScooperSliderChange(self, value):
@@ -402,9 +371,11 @@ class MainScreen(Screen):
         
         self.ids.rightScooperLabel.text = \
           str(int(self.numBallsRight)) + " Balls Right Side: Slide To Adjust"
-        #~ self.changeRightSliderDotColors()
         self.changeImageColors()
-    
+        
+# ////////////////////////////////////////////////////////////////
+# //        PauseScene and Admin Scene Class                    //
+# ////////////////////////////////////////////////////////////////
 class PauseScene(Screen):
     pass
     
@@ -429,7 +400,6 @@ sm.add_widget(adminFunctionsScreen(name = 'adminFunctionsScreen'))
 # //                          RUN APP                           //
 # ////////////////////////////////////////////////////////////////
 
-#home all of the hardware
 home()
 MyApp().run()
 quitAll()
