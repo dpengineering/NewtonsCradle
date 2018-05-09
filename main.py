@@ -20,8 +20,10 @@ import time
 
 #necessary to include folders in main directory for imports
 sys.path.insert(0, 'Kivy/')
-import AdminScreen
+sys.path.insert(0, 'Libraries')
 sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
+
+import AdminScreen
 import Stepper
 
 # ////////////////////////////////////////////////////////////////
