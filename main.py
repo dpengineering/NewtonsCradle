@@ -390,7 +390,7 @@ class MainScreen(Screen):
 
         self.ids.leftScooperLabel.text = \
           str(int(self.numBallsLeft)) + " Balls Left Side: Slide To Adjust"
-        self.changeLeftSliderDotColors()
+        #~ self.changeLeftSliderDotColors()
         self.changeImageColors()
 
     def rightScooperSliderChange(self, value):
@@ -402,7 +402,7 @@ class MainScreen(Screen):
         
         self.ids.rightScooperLabel.text = \
           str(int(self.numBallsRight)) + " Balls Right Side: Slide To Adjust"
-        self.changeRightSliderDotColors()
+        #~ self.changeRightSliderDotColors()
         self.changeImageColors()
     
 class PauseScene(Screen):

@@ -74,87 +74,6 @@
 			center_x: root.center_x + 350
 			center_y: root.center_y + 150
             
-        ################# RIGHT SLIDER DOT IMAGES ##################    
-        Image:
-			source: 'Kivy/ball.png'
-			id: rightSliderDotOne
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 35, 35
-			x: root.center_x + 237
-			y: root.height * 0.395
-            
-        Image:
-			source: 'Kivy/ball.png'
-			id: rightSliderDotTwo
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 35, 35
-			x: root.center_x + 65
-			y: root.height * 0.395
-        
-        Image:
-			source: 'Kivy/ball.png'
-			id: rightSliderDotThree
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 35, 35
-			x: root.center_x - 107
-			y: root.height * 0.395
-        
-        Image:
-			source: 'Kivy/ball.png'
-			id: rightSliderDotFour
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 35, 35
-			x: root.center_x - 275
-			y: root.height * 0.395
-            
-        ################# RIGHT SLIDER DOT IMAGES ##################
-        Image:
-			source: 'Kivy/ball.png'
-			id: leftSliderDotOne
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 35, 35
-			x: root.center_x - 275
-			y: root.height * 0.285
-        
-        Image:
-			source: 'Kivy/ball.png'
-			id: leftSliderDotTwo
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 35, 35
-			x: root.center_x - 107
-			y: root.height * 0.285
-        
-        Image:
-			source: 'Kivy/ball.png'
-			id: leftSliderDotThree
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 35, 35
-			x: root.center_x + 65
-			y: root.height * 0.285
-        
-        Image:
-			source: 'Kivy/ball.png'
-			id: leftSliderDotFour
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 35, 35
-			x: root.center_x + 237
-			y: root.height * 0.285    
         ################# BALL SLIDERS ##################
 
 		Slider: #RIGHT SCOOPER
@@ -187,6 +106,96 @@
 			size_hint_x: 7.2
 			on_value: root.leftScooperSliderChange(self.value)
 			
+################# RIGHT SLIDER DOT IMAGES ##################    
+        Image:
+			source: 'Kivy/ball.png'
+			id: rightSliderDotOne
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 20, 20
+            color: 0,0,0,1
+			x: root.center_x + 244
+			y: root.height * 0.404
+            
+        Image:
+			source: 'Kivy/ball.png'
+			id: rightSliderDotTwo
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 20, 20
+            color: 0,0,0,1
+			x: root.center_x + 72
+			y: root.height * 0.404
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: rightSliderDotThree
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 20, 20
+            color: 0,0,0,1
+			x: root.center_x - 100
+			y: root.height * 0.404
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: rightSliderDotFour
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 20, 20
+            color: 0,0,0,1
+			x: root.center_x - 270
+			y: root.height * 0.404
+            
+        ################# LEFT SLIDER DOT IMAGES ##################
+        Image:
+			source: 'Kivy/ball.png'
+			id: leftSliderDotOne
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 20, 20
+            color: 0,0,0,1
+			x: root.center_x - 270
+			y: root.height * 0.294
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: leftSliderDotTwo
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 20, 20
+            color: 0,0,0,1
+			x: root.center_x - 100
+			y: root.height * 0.294
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: leftSliderDotThree
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 20, 20
+            color: 0,0,0,1
+			x: root.center_x + 72
+			y: root.height * 0.294
+        
+        Image:
+			source: 'Kivy/ball.png'
+			id: leftSliderDotFour
+			keep_ratio: True
+			allow_stretch: False
+			size_hint: None, None
+			size: 20, 20
+            color: 0,0,0,1
+			x: root.center_x + 244
+			y: root.height * 0.294    
+            
         ################# EXECUTE #################    
         DPEAButton:
             background_normal: ''
