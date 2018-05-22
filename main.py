@@ -148,8 +148,13 @@ def resetAllWidgets():
     sm.get_screen('main').ids.rightScooperSlider.value = 4
     sm.get_screen('main').ids.leftScooperSlider.value = 0
             
-    sm.get_screen('main').ids.rightScooperLabel.text = "Slide To Control The Right Scooper"
-    sm.get_screen('main').ids.leftScooperLabel.text = "Slide To Control The Left Scooper"
+    sm.get_screen('main').ids.rightScooperLabel.text = "Slide To Control Right Scooper"
+    sm.get_screen('main').ids.leftScooperLabel.text = "Slide To Control Left Scooper"
+    
+    sm.get_screen('main').ids.rightScooperSlider.background_width = 100
+    sm.get_screen('main').ids.leftScooperSlider.background_width = 100
+    
+    sm.get_screen('main').changeImageColors()
 
 def scoopExitTasks():
     global numScoop
@@ -157,9 +162,9 @@ def scoopExitTasks():
     resetAllWidgets()
     transitionBack('main')
     numScoop += 1
-    
+     
 def home():
-    leftVerticalStepper.home(0)   
+    leftVerticalStepper.home(0)  
     rightVerticalStepper.home(0)
     leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
     rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
@@ -359,9 +364,17 @@ class MainScreen(Screen):
             self.numBallsRight = 5 - self.numBallsLeft
             self.ids.rightScooperSlider.value = \
               self.ids.rightScooperSlider.max - self.numBallsRight
-
-        self.ids.leftScooperLabel.text = \
-          str(int(self.numBallsLeft)) + " Balls Left Side: Slide To Adjust"
+        
+        #Check the value of each slider and change the text accordingly
+        if(self.numBallsLeft == 0):
+            self.ids.leftScooperLabel.text = "Slide To Control Left Scooper"
+        elif(self.numBallsLeft == 1):
+              self.ids.leftScooperLabel.text = \
+          str(int(self.numBallsLeft)) + " Ball Left Side: Slide To Adjust"  
+        else:
+            self.ids.leftScooperLabel.text = \
+              str(int(self.numBallsLeft)) + " Balls Left Side: Slide To Adjust"
+            
         self.changeImageColors()
 
     def rightScooperSliderChange(self, value):
@@ -371,8 +384,16 @@ class MainScreen(Screen):
             self.numBallsLeft = 5 - self.numBallsRight
             self.ids.leftScooperSlider.value = self.numBallsLeft
         
-        self.ids.rightScooperLabel.text = \
-          str(int(self.numBallsRight)) + " Balls Right Side: Slide To Adjust"
+        #Check the value of each slider and change the text accordingly
+        if(self.numBallsRight == 0):
+            self.ids.rightScooperLabel.text = "Slide To Control Right Scooper"
+        elif(self.numBallsRight == 1):
+            self.ids.rightScooperLabel.text = \
+              str(int(self.numBallsRight)) + " Ball Right Side: Slide To Adjust"
+        else:            
+            self.ids.rightScooperLabel.text = \
+              str(int(self.numBallsRight)) + " Balls Right Side: Slide To Adjust"
+            
         self.changeImageColors()
         
 # ////////////////////////////////////////////////////////////////
