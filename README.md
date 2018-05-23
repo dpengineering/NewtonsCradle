@@ -1,23 +1,26 @@
 # NewtonsCradle Documentation :
 
-# Main Methods
+## Main Methods
 
-## scoop
-Scoops desired numbers of balls simultaneoulsy if the sum of the balls being scooped is less than 5
+### scoop
+Scoops desired numbers of balls simultaneoulsy if the sum of the balls being scooped is less than 5.
+Must be called in a thread to ensure the UI and hardware function as intended.
 
-## scoopFiveBalls
-Scoops left side first then right side. this is necessary to prevent a collision
+### scoopFiveBalls
+Scoops left side first then right side. this is necessary to prevent a collision.
+Must be called in a thread to ensure the UI and hardware function as intended.
 
-## stopBalls
+### stopBalls
 Is called before scooping balls after the intial scoop to stop the momentum of balls to ensure a successful scoop.
+Must be called in a thread to ensure the UI and hardware function as intended.
 
-# UI Features
+## UI Features
 * Sliders will change he value of opposite slider to prevent a collision. 
   * It will not allow the user to select more than five balls for scooping.
 
 * Images of balls will change color based on ho many balls are being picked up on each side.
 
-## Admin Button
+### Admin Button
 * The Admin button is located in the top right corner, but is invisible.
 * Password to enter the Admin Scene is "1717"
 
@@ -26,6 +29,3 @@ Quits excution of the program and exits to the desktop
 
 ### Home
 Homes the hardware and brings back to the main screen
-
-# Palak's Google Doc
-https://docs.google.com/document/d/1YR656y_hVkTHUEAZFwuV1H24VCglRr-KeiGioX7JBtc/edit 
