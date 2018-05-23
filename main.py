@@ -32,7 +32,7 @@ import Stepper
 distBack = 5 * 25.4 
 distUp = 3.2 * 25.4
 
-stopDistLeft = 2.12 * 25.4
+stopDistLeft = 2.18 * 25.4 #2.12 * 25.4
 stopDistRight = 2.57 * 25.4
 
 leftStartPosition = stopDistLeft
@@ -57,8 +57,6 @@ leftHorizontalStepper = Stepper.Stepper(port = 2, microSteps = 16,
   stepsPerUnit = 25, speed = horizontalSpeed, accel = accel)
 leftVerticalStepper = Stepper.Stepper(port = 3, microSteps = 8, 
   speed = liftSpeed, accel = accel)
-
-numScoop = 0
 
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
@@ -147,40 +145,31 @@ def moveSteppersToStop():
 def resetAllWidgets():
     sm.get_screen('main').ids.rightScooperSlider.value = 4
     sm.get_screen('main').ids.leftScooperSlider.value = 0
-            
+    
+    #ensure slider label text resets
     sm.get_screen('main').ids.rightScooperLabel.text = "Slide To Control Right Scooper"
     sm.get_screen('main').ids.leftScooperLabel.text = "Slide To Control Left Scooper"
     
+    #ensure slider border is redrawn
     sm.get_screen('main').ids.rightScooperSlider.background_width = 100
     sm.get_screen('main').ids.leftScooperSlider.background_width = 100
     
+    #ensure cursor image is re drawn
+    sm.get_screen('main').ids.rightScooperSlider.cursor_image='Kivy/right_scooper_image.png'
+    sm.get_screen('main').ids.leftScooperSlider.cursor_image='Kivy/left_scooper_image.png'
+    
+    #ensure the ball image colors are drawn correctly
     sm.get_screen('main').changeImageColors()
 
 def scoopExitTasks():
-    global numScoop
-    
     resetAllWidgets()
     transitionBack('main')
-    numScoop += 1
      
 def home():
     leftVerticalStepper.home(0)  
     rightVerticalStepper.home(0)
-    leftHorizontalStepper.run(0, leftHorizontalStepper.speed)
-    rightHorizontalStepper.run(0, rightHorizontalStepper.speed)
-    
-    leftIsHome = False
-    rightIsHome = False
-    
-    while not leftIsHome or not rightIsHome:
-        if not leftIsHome and leftHorizontalStepper.readSwitch() == True:
-            leftHorizontalStepper.hardStop()
-            leftHorizontalStepper.setAsHome()
-            leftIsHome = True
-        if not rightIsHome and rightHorizontalStepper.readSwitch() == True:
-            rightHorizontalStepper.hardStop()
-            rightHorizontalStepper.setAsHome()
-            rightIsHome = True
+    leftHorizontalStepper.home(0)
+    rightHorizontalStepper.home(0)
 
 def scoop():
     #distances to move when picking up balls
@@ -201,10 +190,9 @@ def scoop():
     else:
         distRight = 0
     
-    if(numScoop > 0):
-        while(stopBalls()):
-            continue
-    
+    while(stopBalls()):
+        continue
+
     moveSteppersToPickupPositions(distRight, distLeft)
     
     pickupBalls()
@@ -221,9 +209,9 @@ def scoop():
 #scoop five balls needs to do left side movements first then right side
 #in order to prevent collisions
 def scoopFiveBalls():
-    if(numScoop > 0):
-        while(stopBalls()):
-            continue
+    while(stopBalls()):
+        continue
+            
     distLeft = leftStartPosition + ballDiameter * sm.get_screen('main').numBallsLeft
     distRight = rightStartPosition + ballDiameter * sm.get_screen('main').numBallsRight
     
@@ -256,8 +244,6 @@ def scoopFiveBalls():
     return
         
 def stopBalls():
-    #releaseBalls()
-    
     #move horizontal steppers to home position
     moveSteppersToZero()
        
@@ -270,7 +256,6 @@ def stopBalls():
     #bring the vertical steppers down
     time.sleep(1)
     releaseBalls()
-    
     return
        
 # ////////////////////////////////////////////////////////////////
@@ -292,16 +277,12 @@ def transitionBack(originalScene, *larg):
 # ////////////////////////////////////////////////////////////////
 # //                       Threading                            //
 # ////////////////////////////////////////////////////////////////
-        
 def scoop_balls_thread(*largs):
     numLeft = sm.get_screen('main').numBallsLeft
     numRight = sm.get_screen('main').numBallsRight
     ballSum = numLeft + numRight 
     
-    pauseTime = 10 + 2 * (max(numLeft, numRight) - 1)
-    
-    if (numScoop is not 0):
-        pauseTime += 8
+    pauseTime = 18 + 2 * (max(numLeft, numRight) - 1)
     
     if(ballSum <= 4):
         pause('Scooping!', pauseTime, 'main')
@@ -314,7 +295,6 @@ def scoop_balls_thread(*largs):
 # ////////////////////////////////////////////////////////////////
 # //                     KIVY FILE LOAD-INS                     //
 # ////////////////////////////////////////////////////////////////
-
 sm = ScreenManager()
 
 class MyApp(App):
@@ -329,14 +309,13 @@ Window.clearcolor = (1, 1, 1, 1) # (WHITE)
        
 # ////////////////////////////////////////////////////////////////
 # //        MainScreen Class                                    //
-# ////////////////////////////////////////////////////////////////
-    
+# ////////////////////////////////////////////////////////////////    
 class MainScreen(Screen):
     numBallsRight = 0
     numBallsLeft = 0
     
     def adminAction(self):
-            sm.current = 'admin'
+        sm.current = 'admin'
 
     def scoopCallback(self):
         Clock.schedule_once(scoop_balls_thread, 0)
@@ -374,7 +353,7 @@ class MainScreen(Screen):
         else:
             self.ids.leftScooperLabel.text = \
               str(int(self.numBallsLeft)) + " Balls Left Side: Slide To Adjust"
-            
+            ScreenManager
         self.changeImageColors()
 
     def rightScooperSliderChange(self, value):
