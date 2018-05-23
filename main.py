@@ -155,8 +155,8 @@ def resetAllWidgets():
     sm.get_screen('main').ids.leftScooperSlider.background_width = 100
     
     #ensure cursor image is re drawn
-    sm.get_screen('main').ids.rightScooperSlider.cursor_image='Kivy/right_scooper_image.png'
-    sm.get_screen('main').ids.leftScooperSlider.cursor_image='Kivy/left_scooper_image.png'
+    sm.get_screen('main').ids.rightScooperSlider.cursor_image='Kivy/Images/right_scooper_image.png'
+    sm.get_screen('main').ids.leftScooperSlider.cursor_image='Kivy/Images/left_scooper_image.png'
     
     #ensure the ball image colors are drawn correctly
     sm.get_screen('main').changeImageColors()
