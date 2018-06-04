@@ -29,3 +29,9 @@ Quits excution of the program and exits to the desktop
 
 ### Home
 Homes the hardware and brings back to the main screen
+
+
+## End of year 2018
+
+### Bugs
+After running Newton's Cradle for a while the UI will not update as intended, the cursor will not move but updates the values correctly. The reset widgetsm method should rn on its own thread or the main thread to guarantee it re draws correctly.
