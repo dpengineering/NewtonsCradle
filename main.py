@@ -32,8 +32,8 @@ import Stepper
 distBack = 5 * 25.4 
 distUp = 3.2 * 25.4
 
-stopDistLeft = 2.18 * 25.4 #2.12 * 25.4
-stopDistRight = 2.57 * 25.4
+stopDistLeft = 2.41 * 25.4
+stopDistRight = 2.41 * 25.4
 
 leftStartPosition = stopDistLeft
 rightStartPosition = stopDistRight
@@ -254,7 +254,14 @@ def stopBalls():
     moveSteppersToStop()
     
     #bring the vertical steppers down
-    time.sleep(1)
+    time.sleep(3)
+
+    rightHorizontalStepper.startRelativeMove(-5)
+    leftHorizontalStepper.startRelativeMove(-5)
+
+    while (checkHorizontalSteppersIfBusy()):
+        continue
+
     releaseBalls()
     return
        
