@@ -3,7 +3,7 @@
 ## Main Methods
 
 ### scoop
-Scoops desired numbers of balls simultaneoulsy if the sum of the balls being scooped is less than 5.
+Scoops desired numbers of balls simultaneously if the sum of the balls being scooped is less than 5.
 Must be called in a thread to ensure the UI and hardware function as intended.
 
 ### scoopFiveBalls
@@ -11,7 +11,7 @@ Scoops left side first then right side. this is necessary to prevent a collision
 Must be called in a thread to ensure the UI and hardware function as intended.
 
 ### stopBalls
-Is called before scooping balls after the intial scoop to stop the momentum of balls to ensure a successful scoop.
+Is called before scooping balls after the initial scoop to stop the momentum of balls to ensure a successful scoop.
 Must be called in a thread to ensure the UI and hardware function as intended.
 
 ## UI Features
@@ -25,7 +25,7 @@ Must be called in a thread to ensure the UI and hardware function as intended.
 * Password to enter the Admin Scene is "1717"
 
 ### Quit
-Quits excution of the program and exits to the desktop
+Quits execution of the program and exits to the desktop
 
 ### Home
 Homes the hardware and brings back to the main screen
@@ -34,4 +34,4 @@ Homes the hardware and brings back to the main screen
 ## End of year 2018
 
 ### Bugs
-After running Newton's Cradle for a while the UI will not update as intended, the cursor will not move but updates the values correctly. The reset widgetsm method should rn on its own thread or the main thread to guarantee it re draws correctly.
+After running Newton's Cradle for a while the UI will not update as intended, the cursor will not move but updates the values correctly. The reset widgets method should rn on its own thread or the main thread to guarantee it re draws correctly.

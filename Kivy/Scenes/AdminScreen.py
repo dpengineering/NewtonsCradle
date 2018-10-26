@@ -93,6 +93,6 @@ class AdminScreen(Screen):
         self.ids.enter.color = 0.01, 0.168, .5, 1
 
 class quitScreen(Screen):
-    def quitACtion(self):
+    def quitAction(self):
         
         quit()
