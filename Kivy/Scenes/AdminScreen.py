@@ -1,16 +1,7 @@
-from kivy.lang import Builder
-from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.label import Label
-from kivy.uix.image import Image
-from kivy.uix.floatlayout import FloatLayout
-from kivy.graphics import *
 
-password = '1717'
+password = '7266'
 userPW = ''
-
-#~ Builder.load_file('Kivy/DPEAButton.kv')
-#~ Builder.load_file('Kivy/AdminScreen.kv')
 
 class AdminScreen(Screen):
     def addNum(self, num):
@@ -27,7 +18,6 @@ class AdminScreen(Screen):
         global password
         global userPW
         if (password == userPW):
-            print('correct')
             self.ids.pw.text = ' '
             userPW = ''
             self.parent.current = 'adminFunctionsScreen'
@@ -93,6 +83,5 @@ class AdminScreen(Screen):
         self.ids.enter.color = 0.01, 0.168, .5, 1
 
 class quitScreen(Screen):
-    def quitACtion(self):
-        
+    def quitAction(self):
         quit()

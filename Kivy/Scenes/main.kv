@@ -211,14 +211,13 @@
         ################# ADMIN #################   
         Button:
             size_hint: None,None
-            size: 50, 50
-            color: 0, 0, 0, 0
-            background_color: 0, 0, 0, 0
-            x: root.width * 0.955
-			y: root.height * 0.95
+            size: 10, 10
+            font_size: 20
+            background_color: 0.5, 0, 0, 0
+            center: root.width -5, 5
             on_release: root.adminAction()
 
-<adminFunctionsScreen>:    #start scene with a button and label
+<adminFunctionsScreen>:
     name: 'adminFunctionsScreen'
     FloatLayout:
         size_hint: None, None
