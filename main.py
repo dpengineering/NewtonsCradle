@@ -3,7 +3,6 @@
 import sys
 import time
 from threading import Thread
-
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
@@ -23,19 +22,19 @@ import Stepper
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN VARIABLES                       //
 # ////////////////////////////////////////////////////////////////
-distBack = 5 * 25.4
+distBack = 5 * 25.4 + 50
 distUp = 3.2 * 25.4
 
 stopDistLeft = 2.41 * 25.4
 stopDistRight = 2.41 * 25.4
 
-leftStartPosition = stopDistLeft
-rightStartPosition = stopDistRight
+leftStartPosition = stopDistLeft - 5
+rightStartPosition = stopDistRight - 5
 
 ballDiameter = 2.25 * 25.4
 
 liftSpeed = 40
-dropSpeed = 360
+dropSpeed = 800
 
 horizontalSpeedSlow = 15
 horizontalSpeed = 36
@@ -51,7 +50,6 @@ leftHorizontalStepper = Stepper.Stepper(port=2, microSteps=16,
                                         stepsPerUnit=25, speed=horizontalSpeed, accel=accel)
 leftVerticalStepper = Stepper.Stepper(port=3, microSteps=8,
                                       speed=liftSpeed, accel=accel)
-
 
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
@@ -108,21 +106,113 @@ def pickupBalls(stoppingBalls=False):
 
     while checkVerticalSteppersIfBusy():
         continue
+    return
+
+def slowMoveDownToDrop():
+    numBallsLeft = sm.get_screen('main').numBallsLeft
+    numBallsRight = sm.get_screen('main').numBallsRight
+    rightLowerDistance = 0
+    leftLowerDistance = 0
+
+    #Change lower distance for right scooper
+    if numBallsRight == 1:
+        rightLowerDistance = -35
+    elif numBallsRight == 2:
+        rightLowerDistance = -35
+    elif numBallsRight == 3:
+        rightLowerDistance = -30
+    else:
+        rightLowerDistance = -35
+
+    #Change lower distance for left scooper
+    if numBallsLeft == 1:
+        leftLowerDistance = -35
+    elif numBallsLeft == 2:
+        leftLowerDistance = -35
+    elif numBallsLeft == 3:
+        leftLowerDistance = -30
+    else:
+        leftLowerDistance = -35
+
+    changeVerticalSteppersSpeed(10)
+    time.sleep(0.1) #ensure speed was changed
+
+    if numBallsRight > 0:
+        rightVerticalStepper.startRelativeMove(rightLowerDistance)
+
+    if numBallsLeft > 0:
+        leftVerticalStepper.startRelativeMove(leftLowerDistance)
 
 
-def moveSteppersBackToDrop():
-    if (sm.get_screen('main').numBallsLeft != 0):
-        leftHorizontalStepper.startRelativeMove(-1 * distBack)
-    if (sm.get_screen('main').numBallsRight != 0):
-        rightHorizontalStepper.startRelativeMove(-1 * distBack)
+    while checkVerticalSteppersIfBusy():
+        continue
+
+    time.sleep(1)
+
+    releaseBalls()
+    return
+
+def getBackUpDistance(rightDistance=True):
+    numBallsLeft = sm.get_screen('main').numBallsLeft
+    numBallsRight = sm.get_screen('main').numBallsRight
+    backUpDistRight = 0
+    backUpDistLeft = 0
+
+    # Change pick up distances for right side
+    if numBallsLeft == 0 and numBallsRight == 0:
+        return 0
+    elif numBallsRight == 1:
+        backUpDistRight = -1 * distBack
+    elif numBallsRight == 2:
+        backUpDistRight = -1 * distBack + 95
+    elif numBallsRight == 3:
+        backUpDistRight = -1 * distBack + 85
+    else:
+        backUpDistRight = -1 * distBack + 95
+
+    # Change pick up distances for left side
+    if numBallsLeft == 0:
+        backUpDistLeft = 0
+    elif numBallsLeft == 1:
+        backUpDistLeft = -1 * distBack
+    elif numBallsLeft == 2:
+        backUpDistLeft = -1 * distBack + 95
+    elif numBallsLeft == 3:
+        backUpDistLeft = -1 * distBack + 85
+    else:
+        backUpDistLeft = -1 * distBack + 95
+
+    if rightDistance:
+        return backUpDistRight
+    else:
+        return backUpDistLeft
+
+
+def moveSteppersBackToDrop(fiveBalls=False):
+    numBallsLeft = sm.get_screen('main').numBallsLeft
+    numBallsRight = sm.get_screen('main').numBallsRight
+
+    if fiveBalls:
+        pass
+    else: #if we are not scooping five balls
+        if numBallsLeft > 0 and numBallsRight >0:
+            rightHorizontalStepper.startRelativeMove(getBackUpDistance())
+            leftHorizontalStepper.startRelativeMove(getBackUpDistance(rightDistance=False))
+        elif numBallsRight > 0:
+            rightHorizontalStepper.startRelativeMove(getBackUpDistance())
+
+        elif numBallsLeft > 0:
+            leftHorizontalStepper.startRelativeMove(getBackUpDistance(rightDistance=False))
 
     while checkHorizontalSteppersIfBusy():
         continue
 
+    return
+
 
 def moveSteppersToZero():
-    leftHorizontalStepper.startGoToPosition(0)
-    rightHorizontalStepper.startGoToPosition(0)
+    leftHorizontalStepper.home(0)
+    rightHorizontalStepper.home(0)
 
     while checkHorizontalSteppersIfBusy():
         continue
@@ -206,9 +296,12 @@ def scoop():
 
     pickupBalls()
 
+    while checkVerticalSteppersIfBusy():
+        continue
+
     moveSteppersBackToDrop()
 
-    releaseBalls()
+    slowMoveDownToDrop()
 
     moveSteppersToZero()
 
@@ -222,30 +315,25 @@ def scoopFiveBalls():
     while (stopBalls()):
         continue
 
-    distLeft = leftStartPosition + ballDiameter * sm.get_screen('main').numBallsLeft
-    distRight = rightStartPosition + ballDiameter * sm.get_screen('main').numBallsRight
+    pickUpDistRight = rightStartPosition + ballDiameter * sm.get_screen('main').numBallsRight
+    pickUpDistLeft = leftStartPosition + ballDiameter * sm.get_screen('main').numBallsLeft
 
-    # move the left stepper to position
-    leftHorizontalStepper.goToPosition(distLeft)
+    leftHorizontalStepper.goToPosition(pickUpDistLeft)
 
-    # move the left vertical stepper up
     changeVerticalSteppersSpeed(liftSpeed)
     leftVerticalStepper.relativeMove(distUp)
 
-    # move the left horizontal stepper back to position
-    leftHorizontalStepper.relativeMove(-1 * distBack)
+    #move left stepper out and to position
+    leftHorizontalStepper.relativeMove(getBackUpDistance(rightDistance=False))
 
-    # move the right horizontal stepper to position
-    rightHorizontalStepper.goToPosition(distRight)
-
-    # move the right vertical stepper up
+    #go to pickup position
+    rightHorizontalStepper.goToPosition(pickUpDistRight)
     rightVerticalStepper.relativeMove(distUp)
 
-    # move the right horizontal stepper to drop position
-    rightHorizontalStepper.relativeMove(-1 * distBack)
+    rightHorizontalStepper.relativeMove(getBackUpDistance())
 
     # letting go
-    releaseBalls()
+    slowMoveDownToDrop()
 
     # move the horizontal steppers back to the starting position
     moveSteppersToZero()
@@ -319,18 +407,15 @@ def scoop_balls_thread(*largs):
 # ////////////////////////////////////////////////////////////////
 sm = ScreenManager()
 
-
 class MyApp(App):
     def build(self):
         return sm
-
 
 Builder.load_file('Kivy/Scenes/main.kv')
 Builder.load_file('Kivy/DPEAButton.kv')
 Builder.load_file('Kivy/Scenes/PauseScene.kv')
 Builder.load_file('Kivy/Scenes/AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1)  # (WHITE)
-
 
 # ////////////////////////////////////////////////////////////////
 # //        MainScreen Class                                    //
