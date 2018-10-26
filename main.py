@@ -412,7 +412,7 @@ class MyApp(App):
         return sm
 
 Builder.load_file('Kivy/Scenes/main.kv')
-Builder.load_file('Kivy/DPEAButton.kv')
+Builder.load_file('Kivy/Libraries/DPEAButton.kv')
 Builder.load_file('Kivy/Scenes/PauseScene.kv')
 Builder.load_file('Kivy/Scenes/AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1)  # (WHITE)

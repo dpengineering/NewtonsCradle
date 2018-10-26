@@ -18,7 +18,6 @@ class AdminScreen(Screen):
         global password
         global userPW
         if (password == userPW):
-            print('correct')
             self.ids.pw.text = ' '
             userPW = ''
             self.parent.current = 'adminFunctionsScreen'

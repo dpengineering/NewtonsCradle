@@ -21,14 +21,14 @@ Must be called in a thread to ensure the UI and hardware function as intended.
 * Images of balls will change color based on ho many balls are being picked up on each side.
 
 ### Admin Button
-* The Admin button is located in the top right corner, but is invisible.
-* Password to enter the Admin Scene is "1717"
+* The Admin button is located in the bottom right corner, but is invisible.
+* Password to enter the Admin Scene is "7266"
 
 ### Quit
 Quits execution of the program and exits to the desktop
 
 ### Home
-Homes the hardware and brings back to the main screen
+Homes the hardware and brings transitions back to the main screen
 
 
 ## End of year 2018
