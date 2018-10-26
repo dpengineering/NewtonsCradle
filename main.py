@@ -36,7 +36,7 @@ ballDiameter = 2.25 * 25.4
 liftSpeed = 40
 dropSpeed = 800
 
-horizontalSpeedSlow = 15
+stoppingSpeed = 7.5
 horizontalSpeed = 36
 
 accel = 45
@@ -227,7 +227,7 @@ def moveSteppersToPickupPositions(distRight, distLeft):
 
 
 def moveSteppersToStop():
-    changeHorizontalSteppersSpeed(horizontalSpeedSlow)
+    changeHorizontalSteppersSpeed(stoppingSpeed)
 
     leftHorizontalStepper.startGoToPosition(stopDistLeft)
     rightHorizontalStepper.startGoToPosition(stopDistRight)
@@ -350,6 +350,7 @@ def stopBalls():
     pickupBalls(True)
 
     # slowly move the horizontal steppers into the middle/stopping positions
+    changeHorizontalSteppersSpeed(stoppingSpeed)
     moveSteppersToStop()
 
     # bring the vertical steppers down
@@ -391,7 +392,7 @@ def scoop_balls_thread(*largs):
     numRight = sm.get_screen('main').numBallsRight
     ballSum = numLeft + numRight
 
-    pauseTime = 18 + 2 * (max(numLeft, numRight) - 1)
+    pauseTime = 28 + 2 * (max(numLeft, numRight) - 1)
 
     if (ballSum <= 4):
         pause('Scooping!', pauseTime, 'main')
