@@ -111,38 +111,15 @@ def pickupBalls(stoppingBalls=False):
 def slowMoveDownToDrop():
     numBallsLeft = sm.get_screen('main').numBallsLeft
     numBallsRight = sm.get_screen('main').numBallsRight
-    rightLowerDistance = 0
-    leftLowerDistance = 0
-
-    #Change lower distance for right scooper
-    if numBallsRight == 1:
-        rightLowerDistance = -35
-    elif numBallsRight == 2:
-        rightLowerDistance = -35
-    elif numBallsRight == 3:
-        rightLowerDistance = -30
-    else:
-        rightLowerDistance = -35
-
-    #Change lower distance for left scooper
-    if numBallsLeft == 1:
-        leftLowerDistance = -35
-    elif numBallsLeft == 2:
-        leftLowerDistance = -35
-    elif numBallsLeft == 3:
-        leftLowerDistance = -30
-    else:
-        leftLowerDistance = -35
 
     changeVerticalSteppersSpeed(10)
     time.sleep(0.1) #ensure speed was changed
 
     if numBallsRight > 0:
-        rightVerticalStepper.startRelativeMove(rightLowerDistance)
+        rightVerticalStepper.startRelativeMove(-30)
 
     if numBallsLeft > 0:
-        leftVerticalStepper.startRelativeMove(leftLowerDistance)
-
+        leftVerticalStepper.startRelativeMove(-30)
 
     while checkVerticalSteppersIfBusy():
         continue
@@ -162,30 +139,27 @@ def getBackUpDistance(rightDistance=True):
     if numBallsLeft == 0 and numBallsRight == 0:
         return 0
     elif numBallsRight == 1:
-        backUpDistRight = -1 * distBack
+        backUpDistRight = distBack
     elif numBallsRight == 2:
-        backUpDistRight = -1 * distBack + 95
+        backUpDistRight = distBack - 25
     elif numBallsRight == 3:
-        backUpDistRight = -1 * distBack + 85
+        backUpDistRight = distBack - 50
     else:
-        backUpDistRight = -1 * distBack + 95
+        backUpDistRight = distBack - 75
 
     # Change pick up distances for left side
     if numBallsLeft == 0:
         backUpDistLeft = 0
     elif numBallsLeft == 1:
-        backUpDistLeft = -1 * distBack
+        backUpDistLeft = distBack
     elif numBallsLeft == 2:
-        backUpDistLeft = -1 * distBack + 95
+        backUpDistLeft = distBack - 25
     elif numBallsLeft == 3:
-        backUpDistLeft = -1 * distBack + 85
+        backUpDistLeft = distBack - 50
     else:
-        backUpDistLeft = -1 * distBack + 95
+        backUpDistLeft = distBack - 75
 
-    if rightDistance:
-        return backUpDistRight
-    else:
-        return backUpDistLeft
+    return -min(backUpDistLeft, backUpDistRight)/2
 
 
 def moveSteppersBackToDrop(fiveBalls=False):
@@ -196,13 +170,14 @@ def moveSteppersBackToDrop(fiveBalls=False):
         pass
     else: #if we are not scooping five balls
         if numBallsLeft > 0 and numBallsRight >0:
-            rightHorizontalStepper.startRelativeMove(getBackUpDistance())
-            leftHorizontalStepper.startRelativeMove(getBackUpDistance(rightDistance=False))
-        elif numBallsRight > 0:
-            rightHorizontalStepper.startRelativeMove(getBackUpDistance())
+            d = getBackUpDistance()
+            rightHorizontalStepper.startRelativeMove(d)
+            leftHorizontalStepper.startRelativeMove(d)
+        #elif numBallsRight > 0:
+        #    rightHorizontalStepper.startRelativeMove(getBackUpDistance())
 
-        elif numBallsLeft > 0:
-            leftHorizontalStepper.startRelativeMove(getBackUpDistance(rightDistance=False))
+        #elif numBallsLeft > 0:
+        #    leftHorizontalStepper.startRelativeMove(getBackUpDistance(rightDistance=False))
 
     while checkHorizontalSteppersIfBusy():
         continue
