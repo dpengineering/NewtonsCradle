@@ -89,7 +89,7 @@
             background_width: 100
             cursor_size: 100, 75
 			size_hint_x: 7.2
-			on_value: root.rightScooperSliderChange(self.value)
+			on_value: root.right_scooper_slider_change(self.value)
 
 		Slider: #LEFT SCOOPER
 			id: leftScooperSlider
@@ -104,7 +104,7 @@
             background_width: 100
             cursor_size: 100, 75
 			size_hint_x: 7.2
-			on_value: root.leftScooperSliderChange(self.value)
+			on_value: root.left_scooper_slider_change(self.value)
 			
 ################# RIGHT SLIDER DOT IMAGES ##################    
         Image:
@@ -206,7 +206,7 @@
             y: root.height * 0.05
             color: 1,1,0,1
             background_color: 0, 0, 0, 0
-            on_release: root.scoopCallback()
+            on_release: root.scoop_call_back()
             
         ################# ADMIN #################   
         Button:
@@ -215,7 +215,7 @@
             font_size: 20
             background_color: 0.5, 0, 0, 0
             center: root.width -5, 5
-            on_release: root.adminAction()
+            on_release: root.admin_action()
 
 <adminFunctionsScreen>:
     name: 'adminFunctionsScreen'
@@ -231,7 +231,7 @@
             background_color: 0, 0, 0, 0
             center_x: root.width * .50 
 			center_y: root.height * .50
-            on_release: root.quitAction()
+            on_release: root.quit_action()
         DPEAButton:
             size_hint: None, None
             background_normal: '' 
@@ -241,4 +241,4 @@
             background_color:0, 0, 0, 0
             center_x: root.width * .50 
 			center_y: root.height * .25
-            on_release: root.homeAction()
+            on_release: root.home_action()
