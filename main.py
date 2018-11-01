@@ -381,6 +381,9 @@ def scoop_balls_thread(*largs):
 
     pause_time = 28 + 2 * (max(num_left, num_right) - 1)
 
+    if sm.current != "main":
+        return
+
     if ball_sum <= 4:
         pause('Scooping!', pause_time, 'main')
         Thread(target=scoop).start()
