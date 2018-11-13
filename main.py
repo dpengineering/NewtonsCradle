@@ -10,6 +10,7 @@ import time
 from threading import Thread
 from kivy.animation import Animation
 from kivy.app import App
+from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.lang import Builder
@@ -399,12 +400,25 @@ def scoop_balls_thread(*largs):
 sm = ScreenManager()
 
 
+class Ball(Widget):
+    def released(self, args):
+        touch = args[1]
+        self = args[0]
+        if self.collide_point(*touch.pos):
+            print("Whoa")
+
+
+class Cradle(Widget):
+    pass
+
+
 class MyApp(App):
     def build(self):
         return sm
 
 
 Builder.load_file('Kivy/Scenes/main.kv')
+Builder.load_file('Kivy/Scenes/Ball.kv')
 Builder.load_file('Kivy/Libraries/DPEAButton.kv')
 Builder.load_file('Kivy/Scenes/PauseScene.kv')
 Builder.load_file('Kivy/Scenes/AdminScreen.kv')

@@ -1,3 +1,41 @@
+<Ball>:
+    size: 150, 150
+    canvas:
+        Color:
+            rgb: 0.5, 0.5, 0.5
+        Ellipse:
+            pos: self.pos
+            size: self.size
+    on_touch_up: self.released(args)
+
+
+<Cradle>:
+    Ball:
+        id: ball1
+        center_x: root.center_x - 350
+        center_y: root.center_y
+
+    Ball:
+        id: ball2
+        center_x: root.center_x - 175
+        center_y: root.center_y
+
+    Ball:
+        id: ball3
+        center_x: root.center_x
+        center_y: root.center_y
+
+    Ball:
+        id: ball4
+        center_x: root.center_x + 175
+        center_y: root.center_y
+
+    Ball:
+        id: ball5
+        center_x: root.center_x + 350
+        center_y: root.center_y
+
+
 <MainScreen>:    #start scene with a button and label
     name: 'main'
     FloatLayout:
@@ -10,191 +48,11 @@
             color: 0,0,0,1
             font_size: 70
             
-        ################# SCOOP LABELS #################    
-        Label:
-            id: leftScooperLabel
-            center_x: root.center_x
-            center_y: root.center_y * .45 #55
-            text: 'Slide To Control Left Scooper'
-            color: 0,0,0,1
-            font_size: 45
-        Label:
-            id: rightScooperLabel
-            center_x: root.center_x 
-            center_y: root.center_y * 1.03
-            text: 'Slide To Control Right Scooper'
-            color: 0,0,0,1
-            font_size: 45
-            
         ################# BALLS #################          
-		
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballOne
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x - 350
-			center_y: root.center_y + 150
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballTwo
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x - 175
-			center_y: root.center_y + 150
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballThree
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x 
-			center_y: root.center_y + 150
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballFour
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x + 175
-			center_y: root.center_y + 150
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballFive
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x + 350
-			center_y: root.center_y + 150
-            
-        ################# BALL SLIDERS ##################
 
-		Slider: #RIGHT SCOOPER
-			id: rightScooperSlider
-			orientation: 'horizontal'
-			min: 0
-			max: 4
-			value: 4
-			step: 1
-			center_x: root.center_x + 82
-			y: root.height * 0.36
-            cursor_image:'Kivy/Images/right_scooper_image.png'
-            background_width: 100
-            cursor_size: 100, 75
-			size_hint_x: 7.2
-			on_value: root.right_scooper_slider_change(self.value)
-
-		Slider: #LEFT SCOOPER
-			id: leftScooperSlider
-			orientation: 'horizontal'
-			min: 0
-			max: 4
-			value: 0
-			step: 1
-			center_x: root.center_x - 88
-			y: root.height * 0.25
-            cursor_image:'Kivy/Images/left_scooper_image.png'
-            background_width: 100
-            cursor_size: 100, 75
-			size_hint_x: 7.2
-			on_value: root.left_scooper_slider_change(self.value)
-			
-################# RIGHT SLIDER DOT IMAGES ##################    
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: rightSliderDotOne
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x + 244
-			y: root.height * 0.404
-            
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: rightSliderDotTwo
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x + 72
-			y: root.height * 0.404
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: rightSliderDotThree
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x - 100
-			y: root.height * 0.404
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: rightSliderDotFour
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x - 270
-			y: root.height * 0.404
-            
-        ################# LEFT SLIDER DOT IMAGES ##################
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: leftSliderDotOne
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x - 270
-			y: root.height * 0.294
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: leftSliderDotTwo
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x - 100
-			y: root.height * 0.294
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: leftSliderDotThree
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x + 72
-			y: root.height * 0.294
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: leftSliderDotFour
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x + 244
-			y: root.height * 0.294    
+        Cradle:
+            center_x: root.center_x
+            center_y: root.center_y - 100
             
         ################# EXECUTE #################    
         DPEAButton:
