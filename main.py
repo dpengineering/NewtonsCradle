@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 
 import sys
+
+from kivy.properties import ObjectProperty
+
 sys.path.insert(0, 'Kivy/')
 sys.path.insert(0, 'Kivy/Scenes/')
 sys.path.insert(0, 'Libraries')
@@ -15,6 +18,8 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.graphics import Color
+from kivy.vector import Vector
 import AdminScreen
 import Stepper
 
@@ -24,11 +29,15 @@ import Stepper
 dist_back = 5 * 25.4 + 50
 dist_up = 3.2 * 25.4
 
-stop_dist_left = 2.41 * 25.4 - 0.25
-stop_dist_right = 2.41 * 25.4
+prerelease_pos = dist_up - 18
 
-left_start_position = stop_dist_left - 5
-right_start_position = stop_dist_right - 5
+stop_dist_left = 2.41 * 25.4 - 1
+stop_dist_right = 2.41 * 25.4 + 4
+
+backup_dist = -120
+
+left_start_position = stop_dist_left - 10
+right_start_position = stop_dist_right - 10
 
 ball_diameter = 2.25 * 25.4
 
@@ -62,184 +71,69 @@ def quit_all():
     quit()
 
 
-def check_horizontal_steppers_if_busy():
-    if right_horizontal_stepper.isBusy() or left_horizontal_stepper.isBusy():
-        return True
-    else:
-        return False
+def are_horizontal_busy():
+    return right_horizontal_stepper.isBusy() or left_horizontal_stepper.isBusy()
 
 
-def check_vertical_steppers_if_busy():
-    if right_vertical_stepper.isBusy() or left_vertical_stepper.isBusy():
-        return True
-    else:
-        return False
+def are_vertical_busy():
+    return right_vertical_stepper.isBusy() or left_vertical_stepper.isBusy()
 
 
-def change_vertical_steppers_speed(speed):
+def set_vertical_speed(speed):
     left_vertical_stepper.setSpeed(speed)
     right_vertical_stepper.setSpeed(speed)
 
 
-def change_horizontal_steppers_speed(speed):
+def set_horizontal_speed(speed):
     left_horizontal_stepper.setSpeed(speed)
     right_horizontal_stepper.setSpeed(speed)
 
 
-def release_balls():
-    change_vertical_steppers_speed(drop_speed)
+def set_vertical_pos(pos):
+    right_vertical_stepper.startGoToPosition(pos)
+    left_vertical_stepper.startGoToPosition(pos)
 
-    left_vertical_stepper.startGoToPosition(0)
-    right_vertical_stepper.startGoToPosition(0)
-
-    while check_vertical_steppers_if_busy():
+    while are_vertical_busy():
         continue
 
 
-def pickup_balls(stopping_balls=False):
-    change_vertical_steppers_speed(lift_speed)
+def set_vertical_poss(pos_l, pos_r):
+    left_vertical_stepper.startGoToPosition(pos_l)
+    right_vertical_stepper.startGoToPosition(pos_r)
 
-    if sm.get_screen('main').num_balls_left != 0 or stopping_balls:
-        left_vertical_stepper.startRelativeMove(dist_up)
-    if sm.get_screen('main').num_balls_right != 0 or stopping_balls:
-        right_vertical_stepper.startRelativeMove(dist_up)
-
-    while check_vertical_steppers_if_busy():
-        continue
-    return
-
-
-def slow_move_down_to_drop():
-    num_balls_left = sm.get_screen('main').num_balls_left
-    num_balls_right = sm.get_screen('main').num_balls_right
-
-    change_vertical_steppers_speed(10)
-    time.sleep(0.1)  # ensure speed was changed
-
-    if num_balls_right > 0:
-        right_vertical_stepper.startRelativeMove(-30)
-
-    if num_balls_left > 0:
-        left_vertical_stepper.startRelativeMove(-30)
-
-    while check_vertical_steppers_if_busy():
+    while are_vertical_busy():
         continue
 
-    time.sleep(1)
+def set_vertical_pos_rel(r):
+    right_vertical_stepper.startRelativeMove(r)
+    left_vertical_stepper.startRelativeMove(r)
 
-    release_balls()
-    return
-
-
-def get_back_up_distance(right_distance=True):
-    num_balls_left = sm.get_screen('main').num_balls_left
-    num_balls_right = sm.get_screen('main').num_balls_right
-    back_up_dist_right = 0
-    back_up_dist_left = 0
-
-    # Change pick up distances for right side
-    if num_balls_left == 0 and num_balls_right == 0:
-        return 0
-    elif num_balls_right == 1:
-        back_up_dist_right = dist_back
-    elif num_balls_right == 2:
-        back_up_dist_right = dist_back - 25
-    elif num_balls_right == 3:
-        back_up_dist_right = dist_back - 50
-    else:
-        back_up_dist_right = dist_back - 75
-
-    # Change pick up distances for left side
-    if num_balls_left == 0:
-        back_up_dist_left = 0
-    elif num_balls_left == 1:
-        back_up_dist_left = dist_back
-    elif num_balls_left == 2:
-        back_up_dist_left = dist_back - 25
-    elif num_balls_left == 3:
-        back_up_dist_left = dist_back - 50
-    else:
-        back_up_dist_left = dist_back - 75
-
-    # if num_balls_left != 0 and
-
-    return -min(back_up_dist_left, back_up_dist_right) / 2
-
-
-def move_steppers_back_to_drop(five_balls=False):
-    num_balls_left = sm.get_screen('main').num_balls_left
-    num_balls_right = sm.get_screen('main').num_balls_right
-
-    if five_balls:
-        pass
-    else:  # if we are not scooping five balls
-        d = -dist_back / 2
-        if num_balls_left > 0 and num_balls_right > 0:
-            right_horizontal_stepper.startRelativeMove(d)
-            left_horizontal_stepper.startRelativeMove(d)
-        elif num_balls_right > 0:
-            right_horizontal_stepper.startRelativeMove(d)
-
-        elif num_balls_left > 0:
-            left_horizontal_stepper.startRelativeMove(d)
-
-    while check_horizontal_steppers_if_busy():
-        continue
-
-    return
-
-
-def move_steppers_to_zero():
-    left_horizontal_stepper.home(0)
-    right_horizontal_stepper.home(0)
-
-    while check_horizontal_steppers_if_busy():
+    while are_vertical_busy():
         continue
 
 
-def move_steppers_to_pickup_positions(dist_right, dist_left):
-    right_horizontal_stepper.startGoToPosition(dist_right)
-    left_horizontal_stepper.startGoToPosition(dist_left)
+def set_horizontal_pos(pos):
+    left_horizontal_stepper.startGoToPosition(pos)
+    right_horizontal_stepper.startGoToPosition(pos)
 
-    while check_horizontal_steppers_if_busy():
+    while are_horizontal_busy():
         continue
 
 
-def move_steppers_to_stop():
-    change_horizontal_steppers_speed(stopping_speed)
+def set_horizontal_poss(pos_l, pos_r):
+    left_horizontal_stepper.startGoToPosition(pos_l)
+    right_horizontal_stepper.startGoToPosition(pos_r)
 
-    left_horizontal_stepper.startGoToPosition(stop_dist_left)
-    right_horizontal_stepper.startGoToPosition(stop_dist_right)
-
-    while check_horizontal_steppers_if_busy():
+    while are_horizontal_busy():
         continue
 
-    change_horizontal_steppers_speed(horizontal_speed)
 
+def set_horizontal_pos_rel(r):
+    left_horizontal_stepper.startRelativeMove(r)
+    right_horizontal_stepper.startRelativeMove(r)
 
-def reset_all_widgets():
-    sm.get_screen('main').ids.rightScooperSlider.value = 4
-    sm.get_screen('main').ids.leftScooperSlider.value = 0
-
-    # ensure slider label text resets
-    sm.get_screen('main').ids.rightScooperLabel.text = "Slide To Control Right Scooper"
-    sm.get_screen('main').ids.leftScooperLabel.text = "Slide To Control Left Scooper"
-
-    # ensure slider border is redrawn
-    sm.get_screen('main').ids.rightScooperSlider.background_width = 100
-    sm.get_screen('main').ids.leftScooperSlider.background_width = 100
-
-    # ensure cursor image is re drawn
-    sm.get_screen('main').ids.rightScooperSlider.cursor_image = 'Kivy/Images/right_scooper_image.png'
-    sm.get_screen('main').ids.leftScooperSlider.cursor_image = 'Kivy/Images/left_scooper_image.png'
-
-    # ensure the ball image colors are drawn correctly
-    sm.get_screen('main').change_image_colors()
-
-
-def scoop_exit_tasks():
-    reset_all_widgets()
-    transition_back('main')
+    while are_horizontal_busy():
+        continue
 
 
 def home():
@@ -249,109 +143,130 @@ def home():
     right_horizontal_stepper.home(0)
 
 
-def scoop():
-    # distances to move when picking up balls
-    num_left = sm.get_screen('main').num_balls_left
-    num_right = sm.get_screen('main').num_balls_right
+def new_scoop():
+    num_left = sm.get_screen('main').cradle.num_left()
+    num_right = sm.get_screen('main').cradle.num_right()
 
     if num_left + num_right == 0:
-        transition_back('main')
         return
 
-    if num_left != 0:
-        dist_left = left_start_position + ball_diameter * num_left
+    # stop balls
+    stop_balls()
+
+    if num_left + num_right == 5:
+        scoop_left(num_left)
+        scoop_right(num_right)
+
+        while are_horizontal_busy():
+            continue
     else:
-        dist_left = 0
+        scoop_both(num_left, num_right)
 
-    if num_right != 0:
-        dist_right = right_start_position + ball_diameter * num_right
-    else:
-        dist_right = 0
+    # release
+    release_both()
 
-    while stop_balls():
+    home()
+
+    transition_back('main')
+
+
+# does not wait for last move to complete
+def scoop_left(num):
+    if num == 0:
+        return
+
+    p = left_start_position + ball_diameter * num
+    set_horizontal_speed(horizontal_speed)
+    left_horizontal_stepper.startGoToPosition(p)
+
+    while are_horizontal_busy():
         continue
 
-    move_steppers_to_pickup_positions(dist_right, dist_left)
+    set_vertical_speed(lift_speed)
+    left_vertical_stepper.startGoToPosition(dist_up)
 
-    pickup_balls()
-
-    while check_vertical_steppers_if_busy():
+    while are_vertical_busy():
         continue
 
-    move_steppers_back_to_drop()
-
-    slow_move_down_to_drop()
-
-    move_steppers_to_zero()
-
-    scoop_exit_tasks()
-    return
+    left_horizontal_stepper.startRelativeMove(backup_dist)
 
 
-# scoop five balls needs to do left side movements first then right side
-# in order to prevent collisions
-def scoop_five_balls():
-    while stop_balls():
+# does not wait for last move to complete
+def scoop_right(num):
+    if num == 0:
+        return
+
+    p = right_start_position + ball_diameter * num
+    set_horizontal_speed(horizontal_speed)
+    right_horizontal_stepper.startGoToPosition(p)
+
+    while are_horizontal_busy():
         continue
 
-    pick_up_dist_right = right_start_position + ball_diameter * sm.get_screen('main').num_balls_right
-    pick_up_dist_left = left_start_position + ball_diameter * sm.get_screen('main').num_balls_left
+    set_vertical_speed(lift_speed)
+    right_vertical_stepper.startGoToPosition(dist_up)
 
-    left_horizontal_stepper.goToPosition(pick_up_dist_left)
+    while are_vertical_busy():
+        continue
 
-    change_vertical_steppers_speed(lift_speed)
-    left_vertical_stepper.relativeMove(dist_up)
+    right_horizontal_stepper.startRelativeMove(backup_dist)
 
-    # move left stepper out and to position
-    left_horizontal_stepper.relativeMove(get_back_up_distance(right_distance=False))
 
-    # go to pickup position
-    right_horizontal_stepper.goToPosition(pick_up_dist_right)
-    right_vertical_stepper.relativeMove(dist_up)
+def scoop_both(num_left, num_right):
+    p_r = right_start_position + ball_diameter * num_right
+    p_l = left_start_position + ball_diameter * num_left
 
-    right_horizontal_stepper.relativeMove(get_back_up_distance())
+    set_horizontal_speed(horizontal_speed)
+    if num_right > 0:
+        right_horizontal_stepper.startGoToPosition(p_r)
+    if num_left > 0:
+        left_horizontal_stepper.startGoToPosition(p_l)
 
-    # letting go
-    slow_move_down_to_drop()
+    while are_horizontal_busy():
+        continue
 
-    # move the horizontal steppers back to the starting position
-    move_steppers_to_zero()
+    set_vertical_speed(lift_speed)
+    if num_right > 0:
+        right_vertical_stepper.startGoToPosition(dist_up)
+    if num_left > 0:
+        left_vertical_stepper.startGoToPosition(dist_up)
 
-    scoop_exit_tasks()
-    return
+    while are_vertical_busy():
+        continue
+
+    if num_right > 0:
+        right_horizontal_stepper.startRelativeMove(backup_dist)
+    if num_left > 0:
+        left_horizontal_stepper.startRelativeMove(backup_dist)
+
+    while are_horizontal_busy():
+        continue
+
+
+def release_both():
+    set_vertical_speed(drop_speed)
+    set_vertical_pos(0)
 
 
 def stop_balls():
-    # move horizontal steppers to home position
-    move_steppers_to_zero()
-
     # move vertical steppers up
-    pickup_balls(True)
+    set_vertical_speed(lift_speed)
+    set_vertical_pos(dist_up)
 
     # slowly move the horizontal steppers into the middle/stopping positions
-    change_horizontal_steppers_speed(stopping_speed)
-    move_steppers_to_stop()
+    set_horizontal_speed(stopping_speed)
+    set_horizontal_poss(stop_dist_left, stop_dist_right)
+
+    # back away slowly
+    set_horizontal_speed(stopping_speed / 10)
+    set_horizontal_pos_rel(-1)
+
+    set_horizontal_speed(stopping_speed / 5)
+    set_horizontal_pos_rel(-4)
 
     # bring the vertical steppers down
-    time.sleep(3)
-
-    change_horizontal_steppers_speed(stopping_speed / 10)
-    right_horizontal_stepper.startRelativeMove(-1)
-    left_horizontal_stepper.startRelativeMove(-1)
-
-    while check_horizontal_steppers_if_busy():
-        continue
-
-    change_horizontal_steppers_speed(stopping_speed)
-    right_horizontal_stepper.startRelativeMove(-5)
-    left_horizontal_stepper.startRelativeMove(-5)
-
-    while check_horizontal_steppers_if_busy():
-        continue
-
-    change_horizontal_steppers_speed(horizontal_speed)
-    release_balls()
-    return
+    set_vertical_speed(drop_speed)
+    set_vertical_pos(0)
 
 
 # ////////////////////////////////////////////////////////////////
@@ -368,7 +283,6 @@ def pause(text, sec, original_scene):
 
 def transition_back(original_scene, *larg):
     sm.transition.direction = 'right'
-    reset_all_widgets()
     sm.current = original_scene
 
 
@@ -376,22 +290,19 @@ def transition_back(original_scene, *larg):
 # //                       Threading                            //
 # ////////////////////////////////////////////////////////////////
 def scoop_balls_thread(*largs):
-    num_left = sm.get_screen('main').num_balls_left
-    num_right = sm.get_screen('main').num_balls_right
-    ball_sum = num_left + num_right
-
-    pause_time = 28 + 2 * (max(num_left, num_right) - 1)
-
     if sm.current != "main":
         return
 
-    if ball_sum <= 4:
-        pause('Scooping!', pause_time, 'main')
-        Thread(target=scoop).start()
-    else:
-        pause_time += 10
-        pause('Scooping!', pause_time, 'main')
-        Thread(target=scoop_five_balls).start()
+    num_left = sm.get_screen('main').cradle.num_left()
+    num_right = sm.get_screen('main').cradle.num_right()
+
+    if num_right == 0 and num_left == 0:
+        return
+
+    pause_time = 26 + 2 * max(num_left, num_right)
+
+    pause('Scooping!', pause_time, 'main')
+    Thread(target=new_scoop).start()
 
 
 # ////////////////////////////////////////////////////////////////
@@ -401,15 +312,174 @@ sm = ScreenManager()
 
 
 class Ball(Widget):
+    down_exists = False
+    color = ObjectProperty((0.5, 0.5, 0.5))
+    down = ObjectProperty((0, 0))
+
+    def pushed(self, args):
+        touch = args[1]
+        self = args[0]
+        p = self.parent
+        pos = touch.pos
+        v = Vector(pos)
+        v -= Vector(self.parent.pos)
+        v = v.rotate(-self.parent.rotation)
+        v += Vector(self.parent.pos)
+
+        if self.collide_point(v.x, v.y) and not Ball.down_exists:
+            self.color = (0.2, 0.2, 0.2)
+            self.down = v
+            Ball.down_exists = True
+
+    def moved(self, args):
+        touch = args[1]
+        self = args[0]
+        p = self.parent
+        pos = touch.pos
+        v = Vector(pos)
+        v -= Vector(self.parent.pos)
+        v = v.rotate(-self.parent.rotation)
+        v += Vector(self.parent.pos)
+
+        if self.down != (0, 0):
+            dx = v.x - self.down[0]
+            dy = v.y - self.down[1]
+            if abs(dx * dx + dy * dy) > 150:
+                if dy < -150:
+                    self.parent.parent.ball_down(p)
+                    self.down = (0, 0)
+                    self.color = (0.5, 0.5, 0.5)
+                    Ball.down_exists = False
+                elif dx > 150:
+                    self.parent.parent.ball_right(p)
+                    self.down = (0, 0)
+                    self.color = (0.5, 0.5, 0.5)
+                    Ball.down_exists = False
+                elif dx < -150:
+                    self.parent.parent.ball_left(p)
+                    self.down = (0, 0)
+                    self.color = (0.5, 0.5, 0.5)
+                    Ball.down_exists = False
+
     def released(self, args):
         touch = args[1]
         self = args[0]
-        if self.collide_point(*touch.pos):
-            print("Whoa")
+        p = self.parent
+        pos = touch.pos
+        v = Vector(pos)
+        v -= Vector(self.parent.pos)
+        v = v.rotate(-self.parent.rotation)
+        v += Vector(self.parent.pos)
+
+        if self.down != (0, 0):
+            self.color = (0.5, 0.5, 0.5)
+            dx = v.x - self.down[0]
+            dy = v.y - self.down[1]
+            if dy < -50:
+                self.parent.parent.ball_down(p)
+            elif dx > 50:
+                self.parent.parent.ball_right(p)
+            elif dx < -50:
+                self.parent.parent.ball_left(p)
+            else:
+                self.parent.parent.ball_touched(p)
+            self.down = (0, 0)
+            Ball.down_exists = False
+
+
+class BallString(Widget):
+    rotation = ObjectProperty(0)
+    ball = ObjectProperty(None)
+    name = ObjectProperty("middle")
+    ROT_LEFT = -35
+    ROT_RIGHT = 35
+    ROT_DOWN = 0
+    r = ObjectProperty(ROT_DOWN)
 
 
 class Cradle(Widget):
-    pass
+    down = Animation(rotation=BallString.ROT_DOWN, t="out_quad")
+    left = Animation(rotation=BallString.ROT_LEFT, t="out_quad")
+    right = Animation(rotation=BallString.ROT_RIGHT, t="out_quad")
+
+    def num_left(self):
+        return sum(ball.r == BallString.ROT_LEFT for ball in self.get_balls())
+
+    def num_right(self):
+        return sum(ball.r == BallString.ROT_RIGHT for ball in self.get_balls())
+
+    def get_balls(self):
+        return self.children
+
+    def ball_right(self, ball_string):
+        if ball_string.r == BallString.ROT_LEFT:
+            self.ball_down(ball_string)
+            return
+        balls = self.get_balls()
+        balls = list(reversed(balls))
+        i = balls.index(ball_string)
+        for ball in balls[i:]:
+            if ball.name == "left":
+                Animation.cancel_all(ball)
+                Cradle.down.start(ball)
+                ball.r = BallString.ROT_DOWN
+            else:
+                Animation.cancel_all(ball)
+                Cradle.right.start(ball)
+                ball.r = BallString.ROT_RIGHT
+
+    def ball_left(self, ball_string):
+        if ball_string.r == BallString.ROT_RIGHT:
+            self.ball_down(ball_string)
+            return
+        balls = self.get_balls()
+        i = balls.index(ball_string)
+        for ball in balls[i:]:
+            if ball.name == "right":
+                Animation.cancel_all(ball)
+                Cradle.down.start(ball)
+                ball.r = BallString.ROT_DOWN
+            else:
+                Animation.cancel_all(ball)
+                Cradle.left.start(ball)
+                ball.r = BallString.ROT_LEFT
+
+    def ball_down(self, ball_string):
+        if ball_string.r == BallString.ROT_LEFT:
+            balls = self.get_balls()
+            balls = list(reversed(balls))
+            i = balls.index(ball_string)
+            for ball in balls[i:]:
+                if ball.r != BallString.ROT_LEFT:
+                    break
+                Animation.cancel_all(ball)
+                Cradle.down.start(ball)
+                ball.r = BallString.ROT_DOWN
+        elif ball_string.r == BallString.ROT_RIGHT:
+            balls = self.get_balls()
+            balls = balls
+            i = balls.index(ball_string)
+            for ball in balls[i:]:
+                if ball.r != BallString.ROT_RIGHT:
+                    break
+                Animation.cancel_all(ball)
+                Cradle.down.start(ball)
+                ball.r = BallString.ROT_DOWN
+
+    def ball_touched(self, ball_string):
+        if ball_string.r == BallString.ROT_DOWN:
+            if ball_string.name == "left":
+                self.ball_left(ball_string)
+            elif ball_string.name == "middle-left":
+                self.ball_left(ball_string)
+            elif ball_string.name == "middle":
+                self.ball_right(ball_string)
+            elif ball_string.name == "middle-right":
+                self.ball_right(ball_string)
+            elif ball_string.name == "right":
+                self.ball_right(ball_string)
+        else:
+            self.ball_down(ball_string)
 
 
 class MyApp(App):
@@ -429,68 +499,13 @@ Window.clearcolor = (1, 1, 1, 1)  # (WHITE)
 # //        MainScreen Class                                    //
 # ////////////////////////////////////////////////////////////////    
 class MainScreen(Screen):
-    num_balls_right = 0
-    num_balls_left = 0
+    cradle = ObjectProperty(None)
 
     def admin_action(self):
         sm.current = 'admin'
 
     def scoop_call_back(self):
         Clock.schedule_once(scoop_balls_thread, 0)
-
-    def change_image_colors(self):
-        images_list = [self.ids.ballOne, self.ids.ballTwo,
-                       self.ids.ballThree, self.ids.ballFour, self.ids.ballFive]
-
-        for index in range(len(images_list)):
-            color = 1, 1, 1, 1
-            red = 1, 0, 0.050, 1
-            blue = 0.062, 0, 1, 1
-            if index < self.num_balls_left:
-                # change to blue
-                color = blue
-            elif index >= len(images_list) - self.num_balls_right:
-                # change to red
-                color = red
-            images_list[index].color = color
-
-    def left_scooper_slider_change(self, value):
-        self.num_balls_left = int(value)
-
-        if (self.num_balls_left + self.num_balls_right) > 4:
-            self.num_balls_right = 5 - self.num_balls_left
-            self.ids.rightScooperSlider.value = \
-                self.ids.rightScooperSlider.max - self.num_balls_right
-
-        # Check the value of each slider and change the text accordingly
-        if self.num_balls_left == 0:
-            self.ids.leftScooperLabel.text = "Slide To Control Left Scooper"
-        elif self.num_balls_left == 1:
-            self.ids.leftScooperLabel.text = \
-                str(int(self.num_balls_left)) + " Ball Left Side: Slide To Adjust"
-        else:
-            self.ids.leftScooperLabel.text = \
-                str(int(self.num_balls_left)) + " Balls Left Side: Slide To Adjust"
-
-        self.change_image_colors()
-
-    def right_scooper_slider_change(self, value):
-        self.num_balls_right = self.ids.rightScooperSlider.max - int(value)
-        if (self.num_balls_left + self.num_balls_right) > 4:
-            self.num_balls_left = 5 - self.num_balls_right
-            self.ids.leftScooperSlider.value = self.num_balls_left
-
-        # Check the value of each slider and change the text accordingly
-        if self.num_balls_right == 0:
-            self.ids.rightScooperLabel.text = "Slide To Control Right Scooper"
-        elif self.num_balls_right == 1:
-            self.ids.rightScooperLabel.text = \
-                str(int(self.num_balls_right)) + " Ball Right Side: Slide To Adjust"
-        else:
-            self.ids.rightScooperLabel.text = \
-                str(int(self.num_balls_right)) + " Balls Right Side: Slide To Adjust"
-
-        self.change_image_colors()
 
 
 # ////////////////////////////////////////////////////////////////
@@ -506,9 +521,8 @@ class adminFunctionsScreen(Screen):
 
     def home_action(self):
         home()
-        reset_all_widgets()
 
-        while check_horizontal_steppers_if_busy() or check_vertical_steppers_if_busy():
+        while are_horizontal_busy() or are_vertical_busy():
             continue
         sm.current = 'main'
 

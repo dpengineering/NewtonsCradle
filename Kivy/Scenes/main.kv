@@ -1,49 +1,84 @@
 <Ball>:
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: -self.parent.rotation
+            origin: self.center
     size: 150, 150
     canvas:
         Color:
-            rgb: 0.5, 0.5, 0.5
+            rgb: self.color[0], self.color[1], self.color[2]
         Ellipse:
             pos: self.pos
-            size: self.size
+            size: (1,1)
+    canvas.after:
+        PopMatrix
+
     on_touch_up: self.released(args)
+    on_touch_down: self.pushed(args)
+    on_touch_move: self.moved(args)
+
+    Image:
+        source: "Kivy/Images/steel_ball_crisp.png"
+        pos: root.pos
+        size: root.size
+
+<BallString>:
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: self.rotation
+            origin: self.center
+    canvas:
+        Color:
+            rgb: 0.8, 0.8, 0.8
+        Line:
+            width: 5
+            points: [root.center_x, root.center_y, root.center_x, root.center_y - 400]
+    canvas.after:
+        PopMatrix
+    Ball:
+        id: ball
+        center_x: root.center_x
+        center_y: root.center_y - 400
 
 
 <Cradle>:
-    Ball:
-        id: ball1
-        center_x: root.center_x - 350
+    BallString:
+        name: "left"
+        center_x: root.center_x - 300
         center_y: root.center_y
 
-    Ball:
-        id: ball2
-        center_x: root.center_x - 175
+    BallString:
+        name: "middle-left"
+        center_x: root.center_x - 150
         center_y: root.center_y
 
-    Ball:
-        id: ball3
+    BallString:
+        name: "middle"
         center_x: root.center_x
         center_y: root.center_y
 
-    Ball:
-        id: ball4
-        center_x: root.center_x + 175
+    BallString:
+        name: "middle-right"
+        center_x: root.center_x + 150
         center_y: root.center_y
 
-    Ball:
-        id: ball5
-        center_x: root.center_x + 350
+    BallString:
+        name: "right"
+        center_x: root.center_x + 300
         center_y: root.center_y
 
 
 <MainScreen>:    #start scene with a button and label
     name: 'main'
+    cradle: cradle
     FloatLayout:
         size_hint: None, None  #Needed to be able to define define height and width of widgets
         ################# TITLE #################
         Label:
             center_x: root.center_x
-            center_y: root.center_y + 300
+            center_y: root.center_y + 320
             text: "Newton's Cradle"
             color: 0,0,0,1
             font_size: 70
@@ -51,8 +86,9 @@
         ################# BALLS #################          
 
         Cradle:
+            id: cradle
             center_x: root.center_x
-            center_y: root.center_y - 100
+            center_y: root.center_y + 250
             
         ################# EXECUTE #################    
         DPEAButton:
