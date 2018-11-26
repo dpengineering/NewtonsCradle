@@ -4,19 +4,12 @@
         Rotate:
             angle: -self.parent.rotation
             origin: self.center
-    size: 150, 150
-    canvas:
-        Color:
-            rgb: self.color[0], self.color[1], self.color[2]
-        Ellipse:
-            pos: self.pos
-            size: (1,1)
     canvas.after:
         PopMatrix
-
-    on_touch_up: self.released(args)
-    on_touch_down: self.pushed(args)
-    on_touch_move: self.moved(args)
+    size: 150, 150
+    on_touch_up: self.released(args[1])
+    on_touch_down: self.pushed(args[1])
+    on_touch_move: self.moved(args[1])
 
     Image:
         source: "Kivy/Images/steel_ball_crisp.png"
@@ -73,15 +66,21 @@
 <MainScreen>:    #start scene with a button and label
     name: 'main'
     cradle: cradle
+    execute: execute
+    hint: hint
     FloatLayout:
         size_hint: None, None  #Needed to be able to define define height and width of widgets
         ################# TITLE #################
-        Label:
-            center_x: root.center_x
-            center_y: root.center_y + 320
+        DPEAButton:
+            id: title
+            background_normal: ''
+            size_hint: None,None
             text: "Newton's Cradle"
-            color: 0,0,0,1
-            font_size: 70
+            size: 700, 100
+            center_x: root.center_x
+            center_y: root.center_y + 310
+            color: 1,1,0,1
+            background_color: 0, 0, 0, 0
             
         ################# BALLS #################          
 
@@ -92,15 +91,28 @@
             
         ################# EXECUTE #################    
         DPEAButton:
+            id: execute
+            opacity: 0
             background_normal: ''
             size_hint: None,None
-            text: 'SCOOP!'
+            text: 'Start'
             size: 250, 100
             center_x: root.width * .50 
             y: root.height * 0.05
-            color: 1,1,0,1
+            color: 0,1,0,1
             background_color: 0, 0, 0, 0
+            on_touch_up: root.update_button()
             on_release: root.scoop_call_back()
+
+        Label:
+            id: hint
+            opacity: 1
+            y: root.height * 0.05
+            center_x: root.width * .50
+            text: "Tap or Swipe"
+            color: 0.3,0.3,0.3,1
+            font_size: 40
+
             
         ################# ADMIN #################   
         Button:

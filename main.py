@@ -26,121 +26,118 @@ import Stepper
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN VARIABLES                       //
 # ////////////////////////////////////////////////////////////////
-dist_back = 5 * 25.4 + 50
-dist_up = 3.2 * 25.4
 
-prerelease_pos = dist_up - 18
+STEPS_PER_INCH = 25.4
+BALL_DIAMETER = 2.25 * STEPS_PER_INCH
 
-stop_dist_left = 2.41 * 25.4 - 1
-stop_dist_right = 2.41 * 25.4 + 4
+STOP_DISTANCE = 2.41 * STEPS_PER_INCH
+STOP_DISTANCE_LEFT = STOP_DISTANCE - 3
+STOP_DISTANCE_RIGHT = STOP_DISTANCE + 4
 
-backup_dist = -120
+START_INSET = 10
+START_POSITION_LEFT = STOP_DISTANCE_LEFT - START_INSET
+START_POSITION_RIGHT = STOP_DISTANCE_RIGHT - START_INSET
 
-left_start_position = stop_dist_left - 10
-right_start_position = stop_dist_right - 10
+BACKUP_DISTANCE = -5 * STEPS_PER_INCH
+LIFT_DISTANCE = 3 * STEPS_PER_INCH
 
-ball_diameter = 2.25 * 25.4
+VERTICAL_SPEED = 800
+LIFT_SPEED = 40
+STOPPING_SPEED = 7.5
+HORIZONTAL_SPEED = 36
 
-lift_speed = 40
-drop_speed = 800
+MICRO_STEPS_HORIZONTAL = 16
+MICRO_STEPS_VERTICAL = 16
+STEPS_PER_UNIT = 25
+ACCELERATION = 40
 
-stopping_speed = 7.5
-horizontal_speed = 36
+RIGHT_HORIZONTAL_STEPPER = Stepper.Stepper(port=0, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
+RIGHT_VERTICAL_STEPPER = Stepper.Stepper(port=1, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
 
-accel = 45
-
-right_horizontal_stepper = Stepper.Stepper(port=0, microSteps=16,
-                                           stepsPerUnit=25, speed=horizontal_speed, accel=accel)
-right_vertical_stepper = Stepper.Stepper(port=1, microSteps=8,
-                                         speed=lift_speed, accel=accel)
-
-left_horizontal_stepper = Stepper.Stepper(port=2, microSteps=16,
-                                          stepsPerUnit=25, speed=horizontal_speed, accel=accel)
-left_vertical_stepper = Stepper.Stepper(port=3, microSteps=8,
-                                        speed=lift_speed, accel=accel)
+LEFT_HORIZONTAL_STEPPER = Stepper.Stepper(port=2, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
+LEFT_VERTICAL_STEPPER = Stepper.Stepper(port=3, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
 
 
 # ////////////////////////////////////////////////////////////////
 # //                       MAIN FUNCTIONS                       //
 # ////////////////////////////////////////////////////////////////
 def quit_all():
-    right_horizontal_stepper.free()
-    right_vertical_stepper.free()
-    left_vertical_stepper.free()
-    left_horizontal_stepper.free()
+    RIGHT_HORIZONTAL_STEPPER.free()
+    RIGHT_VERTICAL_STEPPER.free()
+    LEFT_VERTICAL_STEPPER.free()
+    LEFT_HORIZONTAL_STEPPER.free()
     quit()
 
 
 def are_horizontal_busy():
-    return right_horizontal_stepper.isBusy() or left_horizontal_stepper.isBusy()
+    return RIGHT_HORIZONTAL_STEPPER.isBusy() or LEFT_HORIZONTAL_STEPPER.isBusy()
 
 
 def are_vertical_busy():
-    return right_vertical_stepper.isBusy() or left_vertical_stepper.isBusy()
-
+    return RIGHT_VERTICAL_STEPPER.isBusy() or LEFT_VERTICAL_STEPPER.isBusy()
 
 def set_vertical_speed(speed):
-    left_vertical_stepper.setSpeed(speed)
-    right_vertical_stepper.setSpeed(speed)
-
+    LEFT_VERTICAL_STEPPER.setSpeed(speed)
+    RIGHT_VERTICAL_STEPPER.setSpeed(speed)
 
 def set_horizontal_speed(speed):
-    left_horizontal_stepper.setSpeed(speed)
-    right_horizontal_stepper.setSpeed(speed)
+    LEFT_HORIZONTAL_STEPPER.setSpeed(speed)
+    RIGHT_HORIZONTAL_STEPPER.setSpeed(speed)
 
 
 def set_vertical_pos(pos):
-    right_vertical_stepper.startGoToPosition(pos)
-    left_vertical_stepper.startGoToPosition(pos)
+    RIGHT_VERTICAL_STEPPER.startGoToPosition(pos)
+    LEFT_VERTICAL_STEPPER.startGoToPosition(pos)
 
     while are_vertical_busy():
         continue
 
 
 def set_vertical_poss(pos_l, pos_r):
-    left_vertical_stepper.startGoToPosition(pos_l)
-    right_vertical_stepper.startGoToPosition(pos_r)
+    LEFT_VERTICAL_STEPPER.startGoToPosition(pos_l)
+    RIGHT_VERTICAL_STEPPER.startGoToPosition(pos_r)
 
     while are_vertical_busy():
         continue
 
+
 def set_vertical_pos_rel(r):
-    right_vertical_stepper.startRelativeMove(r)
-    left_vertical_stepper.startRelativeMove(r)
+    RIGHT_VERTICAL_STEPPER.startRelativeMove(r)
+    LEFT_VERTICAL_STEPPER.startRelativeMove(r)
 
     while are_vertical_busy():
         continue
 
 
 def set_horizontal_pos(pos):
-    left_horizontal_stepper.startGoToPosition(pos)
-    right_horizontal_stepper.startGoToPosition(pos)
+    LEFT_HORIZONTAL_STEPPER.startGoToPosition(pos)
+    RIGHT_HORIZONTAL_STEPPER.startGoToPosition(pos)
 
     while are_horizontal_busy():
         continue
 
 
 def set_horizontal_poss(pos_l, pos_r):
-    left_horizontal_stepper.startGoToPosition(pos_l)
-    right_horizontal_stepper.startGoToPosition(pos_r)
+    LEFT_HORIZONTAL_STEPPER.startGoToPosition(pos_l)
+    RIGHT_HORIZONTAL_STEPPER.startGoToPosition(pos_r)
 
     while are_horizontal_busy():
         continue
 
 
 def set_horizontal_pos_rel(r):
-    left_horizontal_stepper.startRelativeMove(r)
-    right_horizontal_stepper.startRelativeMove(r)
+    LEFT_HORIZONTAL_STEPPER.startRelativeMove(r)
+    RIGHT_HORIZONTAL_STEPPER.startRelativeMove(r)
 
     while are_horizontal_busy():
         continue
 
 
 def home():
-    left_vertical_stepper.home(0)
-    right_vertical_stepper.home(0)
-    left_horizontal_stepper.home(0)
-    right_horizontal_stepper.home(0)
+    LEFT_VERTICAL_STEPPER.home(0)
+    RIGHT_VERTICAL_STEPPER.home(0)
+    LEFT_HORIZONTAL_STEPPER.home(0)
+    RIGHT_HORIZONTAL_STEPPER.home(0)
 
 
 def new_scoop():
@@ -153,6 +150,7 @@ def new_scoop():
     # stop balls
     stop_balls()
 
+    set_vertical_speed(LIFT_SPEED)
     if num_left + num_right == 5:
         scoop_left(num_left)
         scoop_right(num_right)
@@ -162,6 +160,7 @@ def new_scoop():
     else:
         scoop_both(num_left, num_right)
 
+    set_vertical_speed(VERTICAL_SPEED)
     # release
     release_both()
 
@@ -175,20 +174,19 @@ def scoop_left(num):
     if num == 0:
         return
 
-    p = left_start_position + ball_diameter * num
-    set_horizontal_speed(horizontal_speed)
-    left_horizontal_stepper.startGoToPosition(p)
+    p = START_POSITION_LEFT + BALL_DIAMETER * num
+    set_horizontal_speed(HORIZONTAL_SPEED)
+    LEFT_HORIZONTAL_STEPPER.startGoToPosition(p)
 
     while are_horizontal_busy():
         continue
 
-    set_vertical_speed(lift_speed)
-    left_vertical_stepper.startGoToPosition(dist_up)
+    LEFT_VERTICAL_STEPPER.startGoToPosition(LIFT_DISTANCE)
 
     while are_vertical_busy():
         continue
 
-    left_horizontal_stepper.startRelativeMove(backup_dist)
+    LEFT_HORIZONTAL_STEPPER.startRelativeMove(BACKUP_DISTANCE)
 
 
 # does not wait for last move to complete
@@ -196,83 +194,78 @@ def scoop_right(num):
     if num == 0:
         return
 
-    p = right_start_position + ball_diameter * num
-    set_horizontal_speed(horizontal_speed)
-    right_horizontal_stepper.startGoToPosition(p)
+    p = START_POSITION_RIGHT + BALL_DIAMETER * num
+    set_horizontal_speed(HORIZONTAL_SPEED)
+    RIGHT_HORIZONTAL_STEPPER.startGoToPosition(p)
 
     while are_horizontal_busy():
         continue
 
-    set_vertical_speed(lift_speed)
-    right_vertical_stepper.startGoToPosition(dist_up)
+    RIGHT_VERTICAL_STEPPER.startGoToPosition(LIFT_DISTANCE)
 
     while are_vertical_busy():
         continue
 
-    right_horizontal_stepper.startRelativeMove(backup_dist)
+    RIGHT_HORIZONTAL_STEPPER.startRelativeMove(BACKUP_DISTANCE)
 
 
 def scoop_both(num_left, num_right):
-    p_r = right_start_position + ball_diameter * num_right
-    p_l = left_start_position + ball_diameter * num_left
+    p_r = START_POSITION_RIGHT + BALL_DIAMETER * num_right
+    p_l = START_POSITION_LEFT + BALL_DIAMETER * num_left
 
-    set_horizontal_speed(horizontal_speed)
+    set_horizontal_speed(HORIZONTAL_SPEED)
     if num_right > 0:
-        right_horizontal_stepper.startGoToPosition(p_r)
+        RIGHT_HORIZONTAL_STEPPER.startGoToPosition(p_r)
     if num_left > 0:
-        left_horizontal_stepper.startGoToPosition(p_l)
+        LEFT_HORIZONTAL_STEPPER.startGoToPosition(p_l)
 
     while are_horizontal_busy():
         continue
 
-    set_vertical_speed(lift_speed)
     if num_right > 0:
-        right_vertical_stepper.startGoToPosition(dist_up)
+        RIGHT_VERTICAL_STEPPER.startGoToPosition(LIFT_DISTANCE)
     if num_left > 0:
-        left_vertical_stepper.startGoToPosition(dist_up)
+        LEFT_VERTICAL_STEPPER.startGoToPosition(LIFT_DISTANCE)
 
     while are_vertical_busy():
         continue
 
     if num_right > 0:
-        right_horizontal_stepper.startRelativeMove(backup_dist)
+        RIGHT_HORIZONTAL_STEPPER.startRelativeMove(BACKUP_DISTANCE)
     if num_left > 0:
-        left_horizontal_stepper.startRelativeMove(backup_dist)
+        LEFT_HORIZONTAL_STEPPER.startRelativeMove(BACKUP_DISTANCE)
 
     while are_horizontal_busy():
         continue
 
 
 def release_both():
-    set_vertical_speed(drop_speed)
     set_vertical_pos(0)
 
 
 def stop_balls():
     # move vertical steppers up
-    set_vertical_speed(lift_speed)
-    set_vertical_pos(dist_up)
+    set_vertical_pos(LIFT_DISTANCE)
 
     # slowly move the horizontal steppers into the middle/stopping positions
-    set_horizontal_speed(stopping_speed)
-    set_horizontal_poss(stop_dist_left, stop_dist_right)
+    set_horizontal_speed(STOPPING_SPEED)
+    set_horizontal_poss(STOP_DISTANCE_LEFT, STOP_DISTANCE_RIGHT)
 
     # back away slowly
-    set_horizontal_speed(stopping_speed / 10)
+    set_horizontal_speed(STOPPING_SPEED / 10)
     set_horizontal_pos_rel(-1)
 
-    set_horizontal_speed(stopping_speed / 5)
+    set_horizontal_speed(STOPPING_SPEED / 5)
     set_horizontal_pos_rel(-4)
 
     # bring the vertical steppers down
-    set_vertical_speed(drop_speed)
     set_vertical_pos(0)
 
 
 # ////////////////////////////////////////////////////////////////
 # //             Pause and Admin Scene Functions                //
 # ////////////////////////////////////////////////////////////////
-def pause(text, sec, original_scene):
+def pause(text, sec):
     sm.transition.direction = 'left'
     sm.current = 'pauseScene'
     sm.current_screen.ids.pauseText.text = text
@@ -301,78 +294,59 @@ def scoop_balls_thread(*largs):
 
     pause_time = 26 + 2 * max(num_left, num_right)
 
-    pause('Scooping!', pause_time, 'main')
+    pause('Scooping!', pause_time)
     Thread(target=new_scoop).start()
 
 
-# ////////////////////////////////////////////////////////////////
-# //                     KIVY FILE LOAD-INS                     //
-# ////////////////////////////////////////////////////////////////
 sm = ScreenManager()
 
 
 class Ball(Widget):
     down_exists = False
-    color = ObjectProperty((0.5, 0.5, 0.5))
     down = ObjectProperty((0, 0))
 
-    def pushed(self, args):
-        touch = args[1]
-        self = args[0]
-        p = self.parent
-        pos = touch.pos
-        v = Vector(pos)
+    def transform_point(self, v):
         v -= Vector(self.parent.pos)
         v = v.rotate(-self.parent.rotation)
         v += Vector(self.parent.pos)
+        return v
+
+    def clear(self):
+        self.down = (0, 0)
+        Ball.down_exists = False
+
+    def pushed(self, touch):
+        pos = touch.pos
+        v = self.transform_point(Vector(pos))
 
         if self.collide_point(v.x, v.y) and not Ball.down_exists:
-            self.color = (0.2, 0.2, 0.2)
             self.down = v
             Ball.down_exists = True
 
-    def moved(self, args):
-        touch = args[1]
-        self = args[0]
+    def moved(self, touch):
         p = self.parent
         pos = touch.pos
-        v = Vector(pos)
-        v -= Vector(self.parent.pos)
-        v = v.rotate(-self.parent.rotation)
-        v += Vector(self.parent.pos)
+        v = self.transform_point(Vector(pos))
 
         if self.down != (0, 0):
             dx = v.x - self.down[0]
             dy = v.y - self.down[1]
-            if abs(dx * dx + dy * dy) > 150:
-                if dy < -150:
-                    self.parent.parent.ball_down(p)
-                    self.down = (0, 0)
-                    self.color = (0.5, 0.5, 0.5)
-                    Ball.down_exists = False
-                elif dx > 150:
-                    self.parent.parent.ball_right(p)
-                    self.down = (0, 0)
-                    self.color = (0.5, 0.5, 0.5)
-                    Ball.down_exists = False
-                elif dx < -150:
-                    self.parent.parent.ball_left(p)
-                    self.down = (0, 0)
-                    self.color = (0.5, 0.5, 0.5)
-                    Ball.down_exists = False
+            if dy < -150:
+                self.parent.parent.ball_down(p)
+                self.clear()
+            elif dx > 150:
+                self.parent.parent.ball_right(p)
+                self.clear()
+            elif dx < -150:
+                self.parent.parent.ball_left(p)
+                self.clear()
 
-    def released(self, args):
-        touch = args[1]
-        self = args[0]
+    def released(self, touch):
         p = self.parent
         pos = touch.pos
-        v = Vector(pos)
-        v -= Vector(self.parent.pos)
-        v = v.rotate(-self.parent.rotation)
-        v += Vector(self.parent.pos)
+        v = self.transform_point(Vector(pos))
 
         if self.down != (0, 0):
-            self.color = (0.5, 0.5, 0.5)
             dx = v.x - self.down[0]
             dy = v.y - self.down[1]
             if dy < -50:
@@ -383,8 +357,7 @@ class Ball(Widget):
                 self.parent.parent.ball_left(p)
             else:
                 self.parent.parent.ball_touched(p)
-            self.down = (0, 0)
-            Ball.down_exists = False
+            self.clear()
 
 
 class BallString(Widget):
@@ -394,14 +367,28 @@ class BallString(Widget):
     ROT_LEFT = -35
     ROT_RIGHT = 35
     ROT_DOWN = 0
+    a_down = Animation(rotation=ROT_DOWN, t="out_quad")
+    a_left = Animation(rotation=ROT_LEFT, t="out_quad")
+    a_right = Animation(rotation=ROT_RIGHT, t="out_quad")
     r = ObjectProperty(ROT_DOWN)
+
+    def down(self):
+        Animation.cancel_all(self)
+        BallString.a_down.start(self)
+        self.r = BallString.ROT_DOWN
+
+    def left(self):
+        Animation.cancel_all(self)
+        BallString.a_left.start(self)
+        self.r = BallString.ROT_LEFT
+
+    def right(self):
+        Animation.cancel_all(self)
+        BallString.a_right.start(self)
+        self.r = BallString.ROT_RIGHT
 
 
 class Cradle(Widget):
-    down = Animation(rotation=BallString.ROT_DOWN, t="out_quad")
-    left = Animation(rotation=BallString.ROT_LEFT, t="out_quad")
-    right = Animation(rotation=BallString.ROT_RIGHT, t="out_quad")
-
     def num_left(self):
         return sum(ball.r == BallString.ROT_LEFT for ball in self.get_balls())
 
@@ -415,18 +402,14 @@ class Cradle(Widget):
         if ball_string.r == BallString.ROT_LEFT:
             self.ball_down(ball_string)
             return
-        balls = self.get_balls()
-        balls = list(reversed(balls))
+        balls = self.get_balls()[::-1]
         i = balls.index(ball_string)
         for ball in balls[i:]:
             if ball.name == "left":
-                Animation.cancel_all(ball)
-                Cradle.down.start(ball)
-                ball.r = BallString.ROT_DOWN
+                ball.down()
             else:
-                Animation.cancel_all(ball)
-                Cradle.right.start(ball)
-                ball.r = BallString.ROT_RIGHT
+                ball.right()
+        sm.get_screen("main").update_button()
 
     def ball_left(self, ball_string):
         if ball_string.r == BallString.ROT_RIGHT:
@@ -436,35 +419,27 @@ class Cradle(Widget):
         i = balls.index(ball_string)
         for ball in balls[i:]:
             if ball.name == "right":
-                Animation.cancel_all(ball)
-                Cradle.down.start(ball)
-                ball.r = BallString.ROT_DOWN
+                ball.down()
             else:
-                Animation.cancel_all(ball)
-                Cradle.left.start(ball)
-                ball.r = BallString.ROT_LEFT
+                ball.left()
+        sm.get_screen("main").update_button()
 
     def ball_down(self, ball_string):
         if ball_string.r == BallString.ROT_LEFT:
-            balls = self.get_balls()
-            balls = list(reversed(balls))
+            balls = self.get_balls()[::-1]
             i = balls.index(ball_string)
             for ball in balls[i:]:
                 if ball.r != BallString.ROT_LEFT:
                     break
-                Animation.cancel_all(ball)
-                Cradle.down.start(ball)
-                ball.r = BallString.ROT_DOWN
+                ball.down()
         elif ball_string.r == BallString.ROT_RIGHT:
             balls = self.get_balls()
-            balls = balls
             i = balls.index(ball_string)
             for ball in balls[i:]:
                 if ball.r != BallString.ROT_RIGHT:
                     break
-                Animation.cancel_all(ball)
-                Cradle.down.start(ball)
-                ball.r = BallString.ROT_DOWN
+                ball.down()
+        sm.get_screen("main").update_button()
 
     def ball_touched(self, ball_string):
         if ball_string.r == BallString.ROT_DOWN:
@@ -480,6 +455,7 @@ class Cradle(Widget):
                 self.ball_right(ball_string)
         else:
             self.ball_down(ball_string)
+        sm.get_screen("main").update_button()
 
 
 class MyApp(App):
@@ -488,7 +464,6 @@ class MyApp(App):
 
 
 Builder.load_file('Kivy/Scenes/main.kv')
-Builder.load_file('Kivy/Scenes/Ball.kv')
 Builder.load_file('Kivy/Libraries/DPEAButton.kv')
 Builder.load_file('Kivy/Scenes/PauseScene.kv')
 Builder.load_file('Kivy/Scenes/AdminScreen.kv')
@@ -500,12 +475,33 @@ Window.clearcolor = (1, 1, 1, 1)  # (WHITE)
 # ////////////////////////////////////////////////////////////////    
 class MainScreen(Screen):
     cradle = ObjectProperty(None)
+    execute = ObjectProperty(None)
+    hint = ObjectProperty(None)
+
+    fade_out = Animation(opacity=0, t="out_quad")
+    fade_in = Animation(opacity=1, t="out_quad")
 
     def admin_action(self):
         sm.current = 'admin'
 
     def scoop_call_back(self):
         Clock.schedule_once(scoop_balls_thread, 0)
+
+    def update_button(self):
+        l = self.cradle.num_left()
+        r = self.cradle.num_right()
+        button = self.execute
+        label = self.hint
+
+        Animation.cancel_all(label)
+        Animation.cancel_all(button)
+
+        if l == 0 and r == 0:
+            MainScreen.fade_in.start(label)
+            MainScreen.fade_out.start(button)
+        else:
+            MainScreen.fade_in.start(button)
+            MainScreen.fade_out.start(label)
 
 
 # ////////////////////////////////////////////////////////////////
@@ -519,11 +515,9 @@ class adminFunctionsScreen(Screen):
     def quit_action(self):
         quit_all()
 
-    def home_action(self):
+    def backAction(self):
         home()
 
-        while are_horizontal_busy() or are_vertical_busy():
-            continue
         sm.current = 'main'
 
 

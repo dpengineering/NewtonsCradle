@@ -6,16 +6,37 @@
 #        id, text, color, size, position, on_press, and on_release
 
 <DPEAButton@Button>:
+    borders: 25, 25, 25, 25
     Button:
         size_hint: None,None                # Need to copy these three lines
         background_color: 0, 0, 0, 0        # of code to get rid of grey corners
         background_normal: ''               # and be able to set the size
         canvas:
             BorderImage:
-                border: 25, 25, 25, 25
+                border: self.parent.borders
                 source: 'Kivy/Images/shadow.png'
                 pos: self.parent.x, self.parent.y - 11
                 size: self.parent.width + 11, self.parent.height + 11
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                pos: self.parent.pos
+                size: self.parent.size
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                pos: self.parent.pos
+                size: self.parent.size
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                pos: self.parent.pos
+                size: self.parent.size
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                pos: self.parent.pos
+                size: self.parent.size
             Color:
                 rgba: self.parent.color
             RoundedRectangle:
