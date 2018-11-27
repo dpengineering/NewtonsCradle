@@ -38,7 +38,7 @@ START_INSET = 10
 START_POSITION_LEFT = STOP_DISTANCE_LEFT - START_INSET
 START_POSITION_RIGHT = STOP_DISTANCE_RIGHT - START_INSET
 
-BACKUP_DISTANCE = -5 * STEPS_PER_INCH
+BACKUP_DISTANCE = -4.5 * STEPS_PER_INCH
 LIFT_DISTANCE = 3 * STEPS_PER_INCH
 
 VERTICAL_SPEED = 800
@@ -56,6 +56,10 @@ RIGHT_VERTICAL_STEPPER = Stepper.Stepper(port=1, microSteps=MICRO_STEPS_VERTICAL
 
 LEFT_HORIZONTAL_STEPPER = Stepper.Stepper(port=2, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
 LEFT_VERTICAL_STEPPER = Stepper.Stepper(port=3, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
+
+
+GESTURE_MIN_DELTA = 25
+GESTURE_MAX_DELTA = 75
 
 
 # ////////////////////////////////////////////////////////////////
@@ -76,9 +80,11 @@ def are_horizontal_busy():
 def are_vertical_busy():
     return RIGHT_VERTICAL_STEPPER.isBusy() or LEFT_VERTICAL_STEPPER.isBusy()
 
+
 def set_vertical_speed(speed):
     LEFT_VERTICAL_STEPPER.setSpeed(speed)
     RIGHT_VERTICAL_STEPPER.setSpeed(speed)
+
 
 def set_horizontal_speed(speed):
     LEFT_HORIZONTAL_STEPPER.setSpeed(speed)
@@ -329,17 +335,14 @@ class Ball(Widget):
         v = self.transform_point(Vector(pos))
 
         if self.down != (0, 0):
-            dx = v.x - self.down[0]
-            dy = v.y - self.down[1]
-            if dy < -150:
-                self.parent.parent.ball_down(p)
-                self.clear()
-            elif dx > 150:
-                self.parent.parent.ball_right(p)
-                self.clear()
-            elif dx < -150:
-                self.parent.parent.ball_left(p)
-                self.clear()
+            d = v - Vector(self.down)
+            if d.length() >= GESTURE_MAX_DELTA:
+                if d.x >= GESTURE_MIN_DELTA:
+                    self.parent.parent.ball_right(p)
+                    self.clear()
+                elif d.x <= -GESTURE_MIN_DELTA:
+                    self.parent.parent.ball_left(p)
+                    self.clear()
 
     def released(self, touch):
         p = self.parent
@@ -347,16 +350,15 @@ class Ball(Widget):
         v = self.transform_point(Vector(pos))
 
         if self.down != (0, 0):
-            dx = v.x - self.down[0]
-            dy = v.y - self.down[1]
-            if dy < -50:
-                self.parent.parent.ball_down(p)
-            elif dx > 50:
+            d = v - Vector(self.down)
+            if d.x >= GESTURE_MIN_DELTA:
                 self.parent.parent.ball_right(p)
-            elif dx < -50:
+                self.clear()
+                return
+            elif d.x <= -GESTURE_MIN_DELTA:
                 self.parent.parent.ball_left(p)
-            else:
-                self.parent.parent.ball_touched(p)
+                self.clear()
+            self.parent.parent.ball_touched(p)
             self.clear()
 
 
