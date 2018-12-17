@@ -1,31 +1,20 @@
 #!/usr/bin/python3
 
-import sys
-
 from kivy.properties import ObjectProperty
-
-sys.path.insert(0, 'Kivy/')
-sys.path.insert(0, 'Kivy/Scenes/')
-sys.path.insert(0, 'Libraries')
-sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
-
-import time
-from threading import Thread
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.graphics import Color
 from kivy.vector import Vector
-import AdminScreen
-import Stepper
+from Kivy.Scenes import AdminScreen
+from pidev import stepper
+from apscheduler.schedulers.background import BackgroundScheduler
 
-# ////////////////////////////////////////////////////////////////
-# //                       MAIN VARIABLES                       //
-# ////////////////////////////////////////////////////////////////
+"""
+Globals
+"""
 
 STEPS_PER_INCH = 25.4
 BALL_DIAMETER = 2.25 * STEPS_PER_INCH
@@ -51,21 +40,24 @@ MICRO_STEPS_VERTICAL = 16
 STEPS_PER_UNIT = 25
 ACCELERATION = 40
 
-RIGHT_HORIZONTAL_STEPPER = Stepper.Stepper(port=0, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
-RIGHT_VERTICAL_STEPPER = Stepper.Stepper(port=1, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
+RIGHT_HORIZONTAL_STEPPER = stepper(port=0, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
+RIGHT_VERTICAL_STEPPER = stepper(port=1, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
 
-LEFT_HORIZONTAL_STEPPER = Stepper.Stepper(port=2, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
-LEFT_VERTICAL_STEPPER = Stepper.Stepper(port=3, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
+LEFT_HORIZONTAL_STEPPER = stepper(port=2, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
+LEFT_VERTICAL_STEPPER = stepper(port=3, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
 
 
 GESTURE_MIN_DELTA = 25
 GESTURE_MAX_DELTA = 75
 
 
-# ////////////////////////////////////////////////////////////////
-# //                       MAIN FUNCTIONS                       //
-# ////////////////////////////////////////////////////////////////
+"""
+Main functions
+"""
+
+
 def quit_all():
+    """Called upon exiting UI, frees all steppers"""
     RIGHT_HORIZONTAL_STEPPER.free()
     RIGHT_VERTICAL_STEPPER.free()
     LEFT_VERTICAL_STEPPER.free()
@@ -74,24 +66,44 @@ def quit_all():
 
 
 def are_horizontal_busy():
+    """Check to see if the horizontal steppers are currently busy (moving)"""
     return RIGHT_HORIZONTAL_STEPPER.isBusy() or LEFT_HORIZONTAL_STEPPER.isBusy()
 
 
 def are_vertical_busy():
+    """
+    Check to see if the vertical steppers are busy
+    :return: True if busy, False if not
+    """
     return RIGHT_VERTICAL_STEPPER.isBusy() or LEFT_VERTICAL_STEPPER.isBusy()
 
 
 def set_vertical_speed(speed):
+    """
+    Set the speed of the vertical steppers
+    :param speed: Speed to set the vertical steppers at
+    :return: None
+    """
     LEFT_VERTICAL_STEPPER.setSpeed(speed)
     RIGHT_VERTICAL_STEPPER.setSpeed(speed)
 
 
 def set_horizontal_speed(speed):
+    """
+    Set the speed of the horizontal steppers
+    :param speed: Speed to set the horizontal steppers at
+    :return: None
+    """
     LEFT_HORIZONTAL_STEPPER.setSpeed(speed)
     RIGHT_HORIZONTAL_STEPPER.setSpeed(speed)
 
 
 def set_vertical_pos(pos):
+    """
+    Set the vertical position of the vertical steppers
+    :param pos: The position to both of the vertical stepper to
+    :return: None
+    """
     RIGHT_VERTICAL_STEPPER.startGoToPosition(pos)
     LEFT_VERTICAL_STEPPER.startGoToPosition(pos)
 
@@ -100,6 +112,12 @@ def set_vertical_pos(pos):
 
 
 def set_vertical_poss(pos_l, pos_r):
+    """
+    Set the vertical position (relative) of the vertical steppers
+    :param pos_l: Relative move amount for left vertical stepper
+    :param pos_r: Relative move amount for right vertical stepper
+    :return: None
+    """
     LEFT_VERTICAL_STEPPER.startGoToPosition(pos_l)
     RIGHT_VERTICAL_STEPPER.startGoToPosition(pos_r)
 
@@ -116,6 +134,11 @@ def set_vertical_pos_rel(r):
 
 
 def set_horizontal_pos(pos):
+    """
+    Set the horizontal position of the horizontal steppers
+    :param pos: Position for each horizontal stepper to start a relative move to
+    :return: None
+    """
     LEFT_HORIZONTAL_STEPPER.startGoToPosition(pos)
     RIGHT_HORIZONTAL_STEPPER.startGoToPosition(pos)
 
@@ -124,6 +147,12 @@ def set_horizontal_pos(pos):
 
 
 def set_horizontal_poss(pos_l, pos_r):
+    """
+    Set the horizontal positions of the steppers
+    :param pos_l: Position of the left horizontal stepper
+    :param pos_r: Position of the right horizontal stepper
+    :return: None
+    """
     LEFT_HORIZONTAL_STEPPER.startGoToPosition(pos_l)
     RIGHT_HORIZONTAL_STEPPER.startGoToPosition(pos_r)
 
@@ -132,6 +161,11 @@ def set_horizontal_poss(pos_l, pos_r):
 
 
 def set_horizontal_pos_rel(r):
+    """
+    Start a relative horizontal move
+    :param r: Amount to perform a horizontal move
+    :return: None
+    """
     LEFT_HORIZONTAL_STEPPER.startRelativeMove(r)
     RIGHT_HORIZONTAL_STEPPER.startRelativeMove(r)
 
@@ -140,6 +174,10 @@ def set_horizontal_pos_rel(r):
 
 
 def home():
+    """
+    Home all of the steppers
+    :return:
+    """
     LEFT_VERTICAL_STEPPER.home(0)
     RIGHT_VERTICAL_STEPPER.home(0)
     LEFT_HORIZONTAL_STEPPER.home(0)
@@ -147,13 +185,16 @@ def home():
 
 
 def new_scoop():
+    """
+    New scooped initiated, gets the number of balls on each side and calls the perspective function to control pickups
+    :return: None
+    """
     num_left = sm.get_screen('main').cradle.num_left()
     num_right = sm.get_screen('main').cradle.num_right()
 
     if num_left + num_right == 0:
         return
 
-    # stop balls
     stop_balls()
 
     set_vertical_speed(LIFT_SPEED)
@@ -167,7 +208,6 @@ def new_scoop():
         scoop_both(num_left, num_right)
 
     set_vertical_speed(VERTICAL_SPEED)
-    # release
     release_both()
 
     home()
@@ -175,8 +215,12 @@ def new_scoop():
     transition_back('main')
 
 
-# does not wait for last move to complete
 def scoop_left(num):
+    """
+    Scoop the balls on the left, doesn't wait for the last move to complete
+    :param num: Number of balls to scoop on the left
+    :return: None
+    """
     if num == 0:
         return
 
@@ -195,8 +239,12 @@ def scoop_left(num):
     LEFT_HORIZONTAL_STEPPER.startRelativeMove(BACKUP_DISTANCE)
 
 
-# does not wait for last move to complete
 def scoop_right(num):
+    """
+    Scoop the balls on the right, doesn't wait for the last move to complete
+    :param num: Number of balls to scoop on the right
+    :return: None
+    """
     if num == 0:
         return
 
@@ -216,6 +264,12 @@ def scoop_right(num):
 
 
 def scoop_both(num_left, num_right):
+    """
+    Scoop both sides
+    :param num_left: Number of balls on the left side to be scooped
+    :param num_right: Number of balls on the right side to be scooped
+    :return: None
+    """
     p_r = START_POSITION_RIGHT + BALL_DIAMETER * num_right
     p_l = START_POSITION_LEFT + BALL_DIAMETER * num_left
 
@@ -246,10 +300,18 @@ def scoop_both(num_left, num_right):
 
 
 def release_both():
+    """
+    Release both of the vertical steppers
+    :return: None
+    """
     set_vertical_pos(0)
 
 
 def stop_balls():
+    """
+    Stop the balls movement, by bringing horiz. steppers out the uo to stop all balls
+    :return: None
+    """
     # move vertical steppers up
     set_vertical_pos(LIFT_DISTANCE)
 
@@ -268,10 +330,18 @@ def stop_balls():
     set_vertical_pos(0)
 
 
-# ////////////////////////////////////////////////////////////////
-# //             Pause and Admin Scene Functions                //
-# ////////////////////////////////////////////////////////////////
+"""
+PauseScene functions
+"""
+
+
 def pause(text, sec):
+    """
+    Pause the screen for a set amount of time
+    :param text: Text to display while the pause screen is visible
+    :param sec: Number of seconds to pause the screen for
+    :return: None
+    """
     sm.transition.direction = 'left'
     sm.current = 'pauseScene'
     sm.current_screen.ids.pauseText.text = text
@@ -280,28 +350,14 @@ def pause(text, sec):
     load.start(sm.current_screen.ids.progressBar)
 
 
-def transition_back(original_scene, *larg):
+def transition_back(original_scene):
+    """
+    Transition back to the previous scene
+    :param original_scene: The previous scene to transition back to
+    :return: None
+    """
     sm.transition.direction = 'right'
     sm.current = original_scene
-
-
-# ////////////////////////////////////////////////////////////////
-# //                       Threading                            //
-# ////////////////////////////////////////////////////////////////
-def scoop_balls_thread(*largs):
-    if sm.current != "main":
-        return
-
-    num_left = sm.get_screen('main').cradle.num_left()
-    num_right = sm.get_screen('main').cradle.num_right()
-
-    if num_right == 0 and num_left == 0:
-        return
-
-    pause_time = 26 + 2 * max(num_left, num_right)
-
-    pause('Scooping!', pause_time)
-    Thread(target=new_scoop).start()
 
 
 sm = ScreenManager()
@@ -462,6 +518,10 @@ class Cradle(Widget):
 
 class MyApp(App):
     def build(self):
+        """
+        Called upon launching application
+        :return: Screen Manager
+        """
         return sm
 
 
@@ -471,10 +531,11 @@ Builder.load_file('Kivy/Scenes/PauseScene.kv')
 Builder.load_file('Kivy/Scenes/AdminScreen.kv')
 Window.clearcolor = (1, 1, 1, 1)  # (WHITE)
 
+"""
+MainScreen Class
+"""
 
-# ////////////////////////////////////////////////////////////////
-# //        MainScreen Class                                    //
-# ////////////////////////////////////////////////////////////////    
+
 class MainScreen(Screen):
     cradle = ObjectProperty(None)
     execute = ObjectProperty(None)
@@ -483,11 +544,26 @@ class MainScreen(Screen):
     fade_out = Animation(opacity=0, t="out_quad")
     fade_in = Animation(opacity=1, t="out_quad")
 
-    def admin_action(self):
+    @staticmethod
+    def admin_action():
         sm.current = 'admin'
 
-    def scoop_call_back(self):
-        Clock.schedule_once(scoop_balls_thread, 0)
+    @staticmethod
+    def scoop_call_back():
+        if sm.current != "main":
+            return
+
+        num_left = sm.get_screen('main').cradle.num_left()
+        num_right = sm.get_screen('main').cradle.num_right()
+
+        if num_right == 0 and num_left == 0:
+            return
+
+        pause_time = 26 + 2 * max(num_left, num_right)
+
+        pause('Scooping!', pause_time)
+        scoop = BackgroundScheduler()
+        scoop.add_job(new_scoop, 'once')
 
     def update_button(self):
         l = self.cradle.num_left()
@@ -506,20 +582,26 @@ class MainScreen(Screen):
             MainScreen.fade_out.start(label)
 
 
-# ////////////////////////////////////////////////////////////////
-# //        PauseScene and Admin Scene Class                    //
-# ////////////////////////////////////////////////////////////////
+"""
+PauseScene and AdminScreen Class
+"""
+
+
 class PauseScene(Screen):
+    """
+    Passed onto Kivy/Scenes/PauseScene.kv
+    """
     pass
 
 
 class adminFunctionsScreen(Screen):
-    def quit_action(self):
+    @staticmethod
+    def quit_action():
         quit_all()
 
-    def backAction(self):
+    @staticmethod
+    def backAction():
         home()
-
         sm.current = 'main'
 
 
@@ -529,6 +611,8 @@ sm.add_widget(AdminScreen.AdminScreen(name='admin'))
 sm.add_widget(adminFunctionsScreen(name='adminFunctionsScreen'))
 
 if __name__ == "__main__":
-    home()
-    MyApp().run()
-    quit_all()
+    try:
+        home()
+        MyApp().run()
+    except KeyboardInterrupt:
+        quit_all()
