@@ -1,212 +1,118 @@
+<Ball>:
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: -self.parent.rotation
+            origin: self.center
+    canvas.after:
+        PopMatrix
+    size: 150, 150
+    on_touch_up: self.released(args[1])
+    on_touch_down: self.pushed(args[1])
+    on_touch_move: self.moved(args[1])
+
+    Image:
+        source: "Kivy/Images/steel_ball_crisp.png"
+        pos: root.pos
+        size: root.size
+
+<BallString>:
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: self.rotation
+            origin: self.center
+    canvas:
+        Color:
+            rgb: 0.8, 0.8, 0.8
+        Line:
+            width: 5
+            points: [root.center_x, root.center_y, root.center_x, root.center_y - 400]
+    canvas.after:
+        PopMatrix
+    Ball:
+        id: ball
+        center_x: root.center_x
+        center_y: root.center_y - 400
+
+
+<Cradle>:
+    BallString:
+        name: "left"
+        center_x: root.center_x - 300
+        center_y: root.center_y
+
+    BallString:
+        name: "middle-left"
+        center_x: root.center_x - 150
+        center_y: root.center_y
+
+    BallString:
+        name: "middle"
+        center_x: root.center_x
+        center_y: root.center_y
+
+    BallString:
+        name: "middle-right"
+        center_x: root.center_x + 150
+        center_y: root.center_y
+
+    BallString:
+        name: "right"
+        center_x: root.center_x + 300
+        center_y: root.center_y
+
+
 <MainScreen>:    #start scene with a button and label
     name: 'main'
+    cradle: cradle
+    execute: execute
+    hint: hint
     FloatLayout:
         size_hint: None, None  #Needed to be able to define define height and width of widgets
         ################# TITLE #################
-        Label:
-            center_x: root.center_x
-            center_y: root.center_y + 300
+        DPEAButton:
+            id: title
+            background_normal: ''
+            size_hint: None,None
             text: "Newton's Cradle"
-            color: 0,0,0,1
-            font_size: 70
-            
-        ################# SCOOP LABELS #################    
-        Label:
-            id: leftScooperLabel
+            size: 700, 100
             center_x: root.center_x
-            center_y: root.center_y * .45 #55
-            text: 'Slide To Control Left Scooper'
-            color: 0,0,0,1
-            font_size: 45
-        Label:
-            id: rightScooperLabel
-            center_x: root.center_x 
-            center_y: root.center_y * 1.03
-            text: 'Slide To Control Right Scooper'
-            color: 0,0,0,1
-            font_size: 45
+            center_y: root.center_y + 310
+            color: 1,1,0,1
+            background_color: 0, 0, 0, 0
             
         ################# BALLS #################          
-		
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballOne
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x - 350
-			center_y: root.center_y + 150
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballTwo
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x - 175
-			center_y: root.center_y + 150
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballThree
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x 
-			center_y: root.center_y + 150
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballFour
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x + 175
-			center_y: root.center_y + 150
-		Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: ballFive
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 175, 175
-			center_x: root.center_x + 350
-			center_y: root.center_y + 150
-            
-        ################# BALL SLIDERS ##################
 
-		Slider: #RIGHT SCOOPER
-			id: rightScooperSlider
-			orientation: 'horizontal'
-			min: 0
-			max: 4
-			value: 4
-			step: 1
-			center_x: root.center_x + 82
-			y: root.height * 0.36
-            cursor_image:'Kivy/Images/right_scooper_image.png'
-            background_width: 100
-            cursor_size: 100, 75
-			size_hint_x: 7.2
-			on_value: root.right_scooper_slider_change(self.value)
-
-		Slider: #LEFT SCOOPER
-			id: leftScooperSlider
-			orientation: 'horizontal'
-			min: 0
-			max: 4
-			value: 0
-			step: 1
-			center_x: root.center_x - 88
-			y: root.height * 0.25
-            cursor_image:'Kivy/Images/left_scooper_image.png'
-            background_width: 100
-            cursor_size: 100, 75
-			size_hint_x: 7.2
-			on_value: root.left_scooper_slider_change(self.value)
-			
-################# RIGHT SLIDER DOT IMAGES ##################    
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: rightSliderDotOne
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x + 244
-			y: root.height * 0.404
-            
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: rightSliderDotTwo
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x + 72
-			y: root.height * 0.404
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: rightSliderDotThree
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x - 100
-			y: root.height * 0.404
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: rightSliderDotFour
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x - 270
-			y: root.height * 0.404
-            
-        ################# LEFT SLIDER DOT IMAGES ##################
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: leftSliderDotOne
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x - 270
-			y: root.height * 0.294
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: leftSliderDotTwo
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x - 100
-			y: root.height * 0.294
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: leftSliderDotThree
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x + 72
-			y: root.height * 0.294
-        
-        Image:
-			source: 'Kivy/Images/steel_ball.png'
-			id: leftSliderDotFour
-			keep_ratio: True
-			allow_stretch: False
-			size_hint: None, None
-			size: 20, 20
-            color: 0,0,0,1
-			x: root.center_x + 244
-			y: root.height * 0.294    
+        Cradle:
+            id: cradle
+            center_x: root.center_x
+            center_y: root.center_y + 250
             
         ################# EXECUTE #################    
         DPEAButton:
+            id: execute
+            opacity: 0
             background_normal: ''
             size_hint: None,None
-            text: 'SCOOP!'
+            text: 'Start'
             size: 250, 100
             center_x: root.width * .50 
             y: root.height * 0.05
-            color: 1,1,0,1
+            color: 0,1,0,1
             background_color: 0, 0, 0, 0
+            on_touch_up: root.update_button()
             on_release: root.scoop_call_back()
+
+        Label:
+            id: hint
+            opacity: 1
+            y: root.height * 0.05
+            center_x: root.width * .50
+            text: "Tap or Swipe"
+            color: 0.3,0.3,0.3,1
+            font_size: 40
+
             
         ################# ADMIN #################   
         Button:
@@ -215,6 +121,7 @@
             font_size: 20
             background_color: 0.5, 0, 0, 0
             center: root.width -5, 5
+
             on_release: root.admin_action()
 
 <adminFunctionsScreen>:
