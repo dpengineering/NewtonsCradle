@@ -1,31 +1,35 @@
 #!/usr/bin/python3
 
 import sys
-
-from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
-
 sys.path.insert(0, 'Kivy/')
 sys.path.insert(0, 'Kivy/Scenes/')
 sys.path.insert(0, 'Libraries')
-sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
+
+
 
 import time
 from threading import Thread
+from kivy.properties import ObjectProperty
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
+from kivy.graphics import Color
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.graphics import Color
 from kivy.vector import Vector
-import AdminScreen
+from Kivy.Scenes import AdminScreen
+from pidev import stepper
+from apscheduler.schedulers.background import BackgroundScheduler
+from dpea.utilities import MixPanel
+import TemperatureSensor
 import Stepper
+"""
+Globals
+"""
 
-# ////////////////////////////////////////////////////////////////
-# //                       MAIN VARIABLES                       //
-# ////////////////////////////////////////////////////////////////
+MIXPANEL_TOKEN = "02f0373e5a3d6354fbc9d41d6b3a002a"
 
 STEPS_PER_INCH = 25.4
 BALL_DIAMETER = 2.25 * STEPS_PER_INCH
@@ -65,9 +69,11 @@ GESTURE_MIN_DELTA = 25
 GESTURE_MAX_DELTA = 75
 
 
-# ////////////////////////////////////////////////////////////////
-# //                       MAIN FUNCTIONS                       //
-# ////////////////////////////////////////////////////////////////
+"""
+Main functions
+"""
+
+
 def quit_all():
     """Called upon exiting UI, frees all steppers"""
     RIGHT_HORIZONTAL_STEPPER.free()
@@ -195,6 +201,33 @@ def home():
     LEFT_HORIZONTAL_STEPPER.home(0)
     RIGHT_HORIZONTAL_STEPPER.home(0)
 
+
+def send_start_event(num_left, num_right):
+    """
+    Send the number of balls selected on both sides to MixPanel
+    :param num_left: Number of balls selected on the left side
+    :param num_right: Number of balls selected on the right side
+    :return: None
+    """
+    global mixpanel
+    mixpanel.setEventName("Start")
+    mixpanel.addProperty("Left ball count", num_left)
+    mixpanel.addProperty("Right ball count", num_right)
+    mixpanel.sendEvent()
+
+
+def check_temperature():
+    """
+    Check the temperature from the slush engine temperature sensor and send the data to MixPanel
+    :return:
+    """
+    global mixpanel
+    temp_sensor = TemperatureSensor.TemperatureSensor()
+    temp = temp_sensor.getTemperatureInFahrenheit()
+
+    mixpanel.setEventName("Temperature")
+    mixpanel.addProperty("Temperature", temp)
+    mixpanel.sendEvent()
 
 def new_scoop():
     """
@@ -344,25 +377,34 @@ def stop_balls():
     set_vertical_pos(0)
 
 
-# ////////////////////////////////////////////////////////////////
-# //                       Threading                            //
-# ////////////////////////////////////////////////////////////////
-def scoop_balls_thread(*largs):
-    if sm.current != "main":
-        return
+"""
+PauseScene functions
+"""
 
-    main = sm.get_screen('main')
 
-    num_left = main.cradle.num_left()
-    num_right = main.cradle.num_right()
+def pause(text, sec):
+    """
+    Pause the screen for a set amount of time
+    :param text: Text to display while the pause screen is visible
+    :param sec: Number of seconds to pause the screen for
+    :return: None
+    """
+    sm.transition.direction = 'left'
+    sm.current = 'pauseScene'
+    sm.current_screen.ids.pauseText.text = text
+    load = Animation(size=(10, 10), duration=0) + \
+           Animation(size=(150, 10), duration=sec)
+    load.start(sm.current_screen.ids.progressBar)
 
-    if num_right == 0 and num_left == 0:
-        return
 
-    pause_time = 5 + 26 + 2 * max(num_left, num_right)
-    main.pause(pause_time)
-
-    Thread(target=new_scoop).start()
+def transition_back(original_scene):
+    """
+    Transition back to the previous scene
+    :param original_scene: The previous scene to transition back to
+    :return: None
+    """
+    sm.transition.direction = 'right'
+    sm.current = original_scene
 
 
 sm = ScreenManager()
@@ -545,9 +587,6 @@ class MainScreen(Screen):
     cradle = ObjectProperty(None)
     execute = ObjectProperty(None)
     hint = ObjectProperty(None)
-    progress = ObjectProperty(None)
-
-    is_paused = False
 
     fade_out = Animation(opacity=0, t="out_quad")
     fade_in = Animation(opacity=1, t="out_quad")
@@ -644,10 +683,21 @@ class adminFunctionsScreen(Screen):
 
 
 sm.add_widget(MainScreen(name='main'))
+sm.add_widget(PauseScene(name='pauseScene'))
 sm.add_widget(AdminScreen.AdminScreen(name='admin'))
 sm.add_widget(adminFunctionsScreen(name='adminFunctionsScreen'))
 
+mixpanel = MixPanel("Newtons Cradle", MIXPANEL_TOKEN)
+
+temperature_refresh = BackgroundScheduler()
+temperature_refresh.add_job(check_temperature(), 'interval', minutes=5)
+
 if __name__ == "__main__":
-    home()
-    MyApp().run()
-    quit_all()
+    try:
+        home()
+        mixpanel.setEventName("Project Initialized")
+        mixpanel.sendEvent()
+        temperature_refresh.start()
+        MyApp().run()
+    except KeyboardInterrupt:
+        quit_all()
