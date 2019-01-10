@@ -5,26 +5,23 @@ sys.path.insert(0, 'Kivy/')
 sys.path.insert(0, 'Kivy/Scenes/')
 sys.path.insert(0, 'Libraries')
 
-
-
 import time
 from threading import Thread
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
-from kivy.graphics import Color
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.vector import Vector
 from Kivy.Scenes import AdminScreen
-from pidev import stepper
 from apscheduler.schedulers.background import BackgroundScheduler
 from dpea.utilities import MixPanel
 import TemperatureSensor
 import Stepper
+
 """
 Globals
 """
@@ -407,6 +404,24 @@ def transition_back(original_scene):
     sm.current = original_scene
 
 
+def scoop_balls_thread(*largs):
+    if sm.current != "main":
+        return
+
+    main = sm.get_screen('main')
+
+    num_left = main.cradle.num_left()
+    num_right = main.cradle.num_right()
+
+    if num_right == 0 and num_left == 0:
+        return
+
+    pause_time = 5 + 26 + 2 * max(num_left, num_right)
+    main.pause(pause_time)
+
+    Thread(target=new_scoop).start()
+
+
 sm = ScreenManager()
 
 
@@ -683,7 +698,6 @@ class adminFunctionsScreen(Screen):
 
 
 sm.add_widget(MainScreen(name='main'))
-sm.add_widget(PauseScene(name='pauseScene'))
 sm.add_widget(AdminScreen.AdminScreen(name='admin'))
 sm.add_widget(adminFunctionsScreen(name='adminFunctionsScreen'))
 
