@@ -1,3 +1,16 @@
+<MyProgressBar>:
+    canvas:
+        Color:
+            rgb: 0.8, 0.8, 0.8
+        RoundedRectangle:
+            pos: self.x, self.y
+            size: self.width, self.height
+        Color:
+            rgb: 0, 0, 1
+        RoundedRectangle:
+            pos: self.x, self.y
+            size: self.width * (self.value / float(self.max)) if self.max else 0, self.height
+
 <Ball>:
     canvas.before:
         PushMatrix
@@ -67,6 +80,7 @@
     name: 'main'
     cradle: cradle
     execute: execute
+    progress: progress
     hint: hint
     FloatLayout:
         size_hint: None, None  #Needed to be able to define define height and width of widgets
@@ -113,6 +127,17 @@
             color: 0.3,0.3,0.3,1
             font_size: 40
 
+        MyProgressBar:
+            id: progress
+            opacity: 0
+            size_hint: None,None
+            max: 100
+            size: 800, 50
+            center_x: root.width * .50
+            y: root.height * 0.05
+            color: 0,1,0,1
+            background_color: 0, 0, 0, 0
+
             
         ################# ADMIN #################   
         Button:
@@ -141,10 +166,10 @@
         DPEAButton:
             size_hint: None, None
             background_normal: '' 
-            text: 'Home'
+            text: 'Back'
             size: 400, 150
-            color: 0, 1, 0, 1
+            color: 0, 0, 1, 1
             background_color:0, 0, 0, 0
             center_x: root.width * .50 
 			center_y: root.height * .25
-            on_release: root.home_action()
+            on_release: root.back_action()

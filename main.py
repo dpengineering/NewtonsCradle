@@ -2,7 +2,7 @@
 
 import sys
 
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 
 sys.path.insert(0, 'Kivy/')
 sys.path.insert(0, 'Kivy/Scenes/')
@@ -51,12 +51,15 @@ MICRO_STEPS_VERTICAL = 16
 STEPS_PER_UNIT = 25
 ACCELERATION = 40
 
-RIGHT_HORIZONTAL_STEPPER = Stepper.Stepper(port=0, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
-RIGHT_VERTICAL_STEPPER = Stepper.Stepper(port=1, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
+RIGHT_HORIZONTAL_STEPPER = Stepper.Stepper(port=0, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT,
+                                           speed=HORIZONTAL_SPEED, accel=ACCELERATION)
+RIGHT_VERTICAL_STEPPER = Stepper.Stepper(port=1, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED,
+                                         accel=ACCELERATION)
 
-LEFT_HORIZONTAL_STEPPER = Stepper.Stepper(port=2, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT, speed=HORIZONTAL_SPEED, accel=ACCELERATION)
-LEFT_VERTICAL_STEPPER = Stepper.Stepper(port=3, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED, accel=ACCELERATION)
-
+LEFT_HORIZONTAL_STEPPER = Stepper.Stepper(port=2, microSteps=MICRO_STEPS_HORIZONTAL, stepsPerUnit=STEPS_PER_UNIT,
+                                          speed=HORIZONTAL_SPEED, accel=ACCELERATION)
+LEFT_VERTICAL_STEPPER = Stepper.Stepper(port=3, microSteps=MICRO_STEPS_VERTICAL, speed=VERTICAL_SPEED,
+                                        accel=ACCELERATION)
 
 GESTURE_MIN_DELTA = 25
 GESTURE_MAX_DELTA = 75
@@ -172,7 +175,9 @@ def new_scoop():
 
     home()
 
-    transition_back('main')
+    time.sleep(5)
+
+    sm.get_screen('main').unpause()
 
 
 # does not wait for last move to complete
@@ -269,38 +274,23 @@ def stop_balls():
 
 
 # ////////////////////////////////////////////////////////////////
-# //             Pause and Admin Scene Functions                //
-# ////////////////////////////////////////////////////////////////
-def pause(text, sec):
-    sm.transition.direction = 'left'
-    sm.current = 'pauseScene'
-    sm.current_screen.ids.pauseText.text = text
-    load = Animation(size=(10, 10), duration=0) + \
-           Animation(size=(150, 10), duration=sec)
-    load.start(sm.current_screen.ids.progressBar)
-
-
-def transition_back(original_scene, *larg):
-    sm.transition.direction = 'right'
-    sm.current = original_scene
-
-
-# ////////////////////////////////////////////////////////////////
 # //                       Threading                            //
 # ////////////////////////////////////////////////////////////////
 def scoop_balls_thread(*largs):
     if sm.current != "main":
         return
 
-    num_left = sm.get_screen('main').cradle.num_left()
-    num_right = sm.get_screen('main').cradle.num_right()
+    main = sm.get_screen('main')
+
+    num_left = main.cradle.num_left()
+    num_right = main.cradle.num_right()
 
     if num_right == 0 and num_left == 0:
         return
 
-    pause_time = 26 + 2 * max(num_left, num_right)
+    pause_time = 5 + 26 + 2 * max(num_left, num_right)
+    main.pause(pause_time)
 
-    pause('Scooping!', pause_time)
     Thread(target=new_scoop).start()
 
 
@@ -479,6 +469,9 @@ class MainScreen(Screen):
     cradle = ObjectProperty(None)
     execute = ObjectProperty(None)
     hint = ObjectProperty(None)
+    progress = ObjectProperty(None)
+
+    is_paused = False
 
     fade_out = Animation(opacity=0, t="out_quad")
     fade_in = Animation(opacity=1, t="out_quad")
@@ -489,42 +482,89 @@ class MainScreen(Screen):
     def scoop_call_back(self):
         Clock.schedule_once(scoop_balls_thread, 0)
 
+    def set_visible(self, widget):
+        print("set_visible", widget)
+        if self.is_paused:
+            return
+
+        Animation.cancel_all(self.hint)
+        Animation.cancel_all(self.execute)
+        Animation.cancel_all(self.progress)
+
+        MainScreen.fade_out.start(self.hint)
+        MainScreen.fade_out.start(self.execute)
+        MainScreen.fade_out.start(self.progress)
+
+        Animation.cancel_all(widget)
+        MainScreen.fade_in.start(widget)
+
+    def pause(self, delay):
+        # this is run in another thread so we can delay
+        self.set_visible(self.progress)
+        self.is_paused = True
+        self.progress.value = 0
+        a = Animation(value=100, duration=delay)
+        a.start(self.progress)
+
+    def unpause(self):
+        self.is_paused = False
+        self.set_visible(self.hint)
+
     def update_button(self):
         l = self.cradle.num_left()
         r = self.cradle.num_right()
-        button = self.execute
-        label = self.hint
-
-        Animation.cancel_all(label)
-        Animation.cancel_all(button)
 
         if l == 0 and r == 0:
-            MainScreen.fade_in.start(label)
-            MainScreen.fade_out.start(button)
+            self.set_visible(self.hint)
         else:
-            MainScreen.fade_in.start(button)
-            MainScreen.fade_out.start(label)
+            self.set_visible(self.execute)
 
+
+class MyProgressBar(Widget):
+    def __init__(self, **kwargs):
+        self._value = 0.
+        super(MyProgressBar, self).__init__(**kwargs)
+
+    def _get_value(self):
+        return self._value
+
+    def _set_value(self, value):
+        value = max(0, min(self.max, value))
+        if value != self._value:
+            self._value = value
+            return True
+
+    value = AliasProperty(_get_value, _set_value)
+
+    def get_norm_value(self):
+        d = self.max
+        if d == 0:
+            return 0
+        return self.value / float(d)
+
+    def set_norm_value(self, value):
+        self.value = value * self.max
+
+    value_normalized = AliasProperty(get_norm_value, set_norm_value,
+                                     bind=('value', 'max'))
+
+    max = NumericProperty(100.)
 
 # ////////////////////////////////////////////////////////////////
 # //        PauseScene and Admin Scene Class                    //
 # ////////////////////////////////////////////////////////////////
-class PauseScene(Screen):
-    pass
 
 
 class adminFunctionsScreen(Screen):
     def quit_action(self):
         quit_all()
 
-    def backAction(self):
+    def back_action(self):
         home()
-
         sm.current = 'main'
 
 
 sm.add_widget(MainScreen(name='main'))
-sm.add_widget(PauseScene(name='pauseScene'))
 sm.add_widget(AdminScreen.AdminScreen(name='admin'))
 sm.add_widget(adminFunctionsScreen(name='adminFunctionsScreen'))
 
