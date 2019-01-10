@@ -12,7 +12,7 @@ class TemperatureSensor:
     
     #returns double representing the temperature in Fahrenheit
     def getTemperatureInFahrenheit(self):
-        updateData()
+        self.updateData()
         ctemp = ((self.data[0] & 0x1F) * 256) + self.data[1]
         
         if ctemp > 4095 :
@@ -20,15 +20,15 @@ class TemperatureSensor:
         
         return ctemp * 0.0625 * 1.8 + 32
     
+    def updateData(self):
+        self.data = self.bus.read_i2c_block_data(0x18, 0x05, 2)
+    
     #returns double representing the temperature in Celsius
     def getTemperatureInCelsius(self):
-        updateData()
+        self.updateData()
         ctemp = ((self.data[0] & 0x1F) * 256) + self.data[1]
         
         if ctemp > 4095 :
             ctemp -= 8192
         
         return ctemp * 0.0625
-	
-	def updateData(self):
-		self.data = self.bus.read_i2c_block_data(0x18, 0x05, 2)
