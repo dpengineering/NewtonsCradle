@@ -11,10 +11,14 @@ from kivy.vector import Vector
 from Kivy.Scenes import AdminScreen
 from pidev import stepper
 from apscheduler.schedulers.background import BackgroundScheduler
+from dpea.utilities import MixPanel
+import TemperatureSensor
 
 """
 Globals
 """
+
+MIXPANEL_TOKEN = "02f0373e5a3d6354fbc9d41d6b3a002a"
 
 STEPS_PER_INCH = 25.4
 BALL_DIAMETER = 2.25 * STEPS_PER_INCH
@@ -49,6 +53,7 @@ LEFT_VERTICAL_STEPPER = stepper(port=3, microSteps=MICRO_STEPS_VERTICAL, speed=V
 
 GESTURE_MIN_DELTA = 25
 GESTURE_MAX_DELTA = 75
+
 
 
 """
@@ -184,6 +189,33 @@ def home():
     RIGHT_HORIZONTAL_STEPPER.home(0)
 
 
+def send_start_event(num_left, num_right):
+    """
+    Send the number of balls selected on both sides to MixPanel
+    :param num_left: Number of balls selected on the left side
+    :param num_right: Number of balls selected on the right side
+    :return: None
+    """
+    global mixpanel
+    mixpanel.setEventName("Start")
+    mixpanel.addProperty("Left ball count", num_left)
+    mixpanel.addProperty("Right ball count", num_right)
+    mixpanel.sendEvent()
+
+
+def check_temperature():
+    """
+    Check the temperature from the slush engine temperature sensor and send the data to MixPanel
+    :return:
+    """
+    global mixpanel
+    temp_sensor = TemperatureSensor.TemperatureSensor()
+    temp = temp_sensor.getTemperatureInFahrenheit()
+
+    mixpanel.setEventName("Temperature")
+    mixpanel.addProperty("Temperature", temp)
+    mixpanel.sendEvent()
+
 def new_scoop():
     """
     New scooped initiated, gets the number of balls on each side and calls the perspective function to control pickups
@@ -191,6 +223,8 @@ def new_scoop():
     """
     num_left = sm.get_screen('main').cradle.num_left()
     num_right = sm.get_screen('main').cradle.num_right()
+
+
 
     if num_left + num_right == 0:
         return
@@ -610,9 +644,17 @@ sm.add_widget(PauseScene(name='pauseScene'))
 sm.add_widget(AdminScreen.AdminScreen(name='admin'))
 sm.add_widget(adminFunctionsScreen(name='adminFunctionsScreen'))
 
+mixpanel = MixPanel("Newtons Cradle", MIXPANEL_TOKEN)
+
+temperature_refresh = BackgroundScheduler()
+temperature_refresh.add_job(check_temperature(), 'interval', minutes=5)
+
 if __name__ == "__main__":
     try:
         home()
+        mixpanel.setEventName("Project Initialized")
+        mixpanel.sendEvent()
+        temperature_refresh.start()
         MyApp().run()
     except KeyboardInterrupt:
         quit_all()
