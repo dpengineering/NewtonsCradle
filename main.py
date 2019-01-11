@@ -412,7 +412,9 @@ def scoop_balls_thread(*largs):
 
     num_left = main.cradle.num_left()
     num_right = main.cradle.num_right()
-
+    
+    send_start_event(num_left, num_right)
+    
     if num_right == 0 and num_left == 0:
         return
 
@@ -602,7 +604,10 @@ class MainScreen(Screen):
     cradle = ObjectProperty(None)
     execute = ObjectProperty(None)
     hint = ObjectProperty(None)
-
+    progress = ObjectProperty(None)
+    
+    is_paused = False
+    
     fade_out = Animation(opacity=0, t="out_quad")
     fade_in = Animation(opacity=1, t="out_quad")
 
@@ -704,7 +709,7 @@ sm.add_widget(adminFunctionsScreen(name='adminFunctionsScreen'))
 mixpanel = MixPanel("Newtons Cradle", MIXPANEL_TOKEN)
 
 temperature_refresh = BackgroundScheduler()
-temperature_refresh.add_job(check_temperature(), 'interval', minutes=5)
+temperature_refresh.add_job(check_temperature, 'interval', minutes=5)
 
 if __name__ == "__main__":
     try:
