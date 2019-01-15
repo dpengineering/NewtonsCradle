@@ -10,6 +10,10 @@
         RoundedRectangle:
             pos: self.x, self.y
             size: self.width * (self.value / float(self.max)) if self.max else 0, self.height
+    Label:
+        text: "Please Wait"
+        pos: self.x, self.y - 50
+        size: self.width, self.height
 
 <Ball>:
     canvas.before:
@@ -132,7 +136,7 @@
             opacity: 0
             size_hint: None,None
             max: 100
-            size: 800, 50
+            size: 800, 30
             center_x: root.width * .50
             y: root.height * 0.05
             color: 0,1,0,1

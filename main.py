@@ -1,13 +1,12 @@
 #!/usr/bin/python3
+print("test")
 
-import sys
-sys.path.insert(0, 'Kivy/')
-sys.path.insert(0, 'Kivy/Scenes/')
-sys.path.insert(0, 'Libraries')
+import os
+os.environ["DISPLAY"] = ":0.0"
 
 import time
 from threading import Thread
-from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
+import kivy.properties
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -16,11 +15,23 @@ from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.vector import Vector
+
+
+import sys
+sys.path.insert(0, 'Kivy/')
+sys.path.insert(0, 'Kivy/Scenes/')
+sys.path.insert(0, 'Libraries')
+
 from Kivy.Scenes import AdminScreen
 from apscheduler.schedulers.background import BackgroundScheduler
 from dpea.utilities import MixPanel
 import TemperatureSensor
 import Stepper
+
+from kivy.logger import Logger
+Logger.setLevel("DEBUG")
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
 
 """
 Globals
@@ -32,8 +43,8 @@ STEPS_PER_INCH = 25.4
 BALL_DIAMETER = 2.25 * STEPS_PER_INCH
 
 STOP_DISTANCE = 2.41 * STEPS_PER_INCH
-STOP_DISTANCE_LEFT = STOP_DISTANCE - 3
-STOP_DISTANCE_RIGHT = STOP_DISTANCE + 4
+STOP_DISTANCE_LEFT = STOP_DISTANCE - 5
+STOP_DISTANCE_RIGHT = STOP_DISTANCE + 2
 
 START_INSET = 10
 START_POSITION_LEFT = STOP_DISTANCE_LEFT - START_INSET
@@ -426,10 +437,10 @@ def scoop_balls_thread(*largs):
 
 sm = ScreenManager()
 
-
 class Ball(Widget):
+    interactive = True
     down_exists = False
-    down = ObjectProperty((0, 0))
+    down = kivy.properties.ObjectProperty((0, 0))
 
     def transform_point(self, v):
         v -= Vector(self.parent.pos)
@@ -444,8 +455,8 @@ class Ball(Widget):
     def pushed(self, touch):
         pos = touch.pos
         v = self.transform_point(Vector(pos))
-
-        if self.collide_point(v.x, v.y) and not Ball.down_exists:
+        print(Ball.interactive)
+        if self.collide_point(v.x, v.y) and (not Ball.down_exists) and Ball.interactive:
             self.down = v
             Ball.down_exists = True
 
@@ -483,16 +494,16 @@ class Ball(Widget):
 
 
 class BallString(Widget):
-    rotation = ObjectProperty(0)
-    ball = ObjectProperty(None)
-    name = ObjectProperty("middle")
+    rotation = kivy.properties.ObjectProperty(0)
+    ball = kivy.properties.ObjectProperty(None)
+    name = kivy.properties.ObjectProperty("middle")
     ROT_LEFT = -35
     ROT_RIGHT = 35
     ROT_DOWN = 0
     a_down = Animation(rotation=ROT_DOWN, t="out_quad")
     a_left = Animation(rotation=ROT_LEFT, t="out_quad")
     a_right = Animation(rotation=ROT_RIGHT, t="out_quad")
-    r = ObjectProperty(ROT_DOWN)
+    r = kivy.properties.ObjectProperty(ROT_DOWN)
 
     def down(self):
         Animation.cancel_all(self)
@@ -516,6 +527,11 @@ class Cradle(Widget):
 
     def num_right(self):
         return sum(ball.r == BallString.ROT_RIGHT for ball in self.get_balls())
+
+    def reset_balls(self):
+        balls = self.get_balls()
+        self.ball_down(balls[0])
+        self.ball_down(balls[-1])
 
     def get_balls(self):
         return self.children
@@ -601,10 +617,10 @@ MainScreen Class
 
 
 class MainScreen(Screen):
-    cradle = ObjectProperty(None)
-    execute = ObjectProperty(None)
-    hint = ObjectProperty(None)
-    progress = ObjectProperty(None)
+    cradle = kivy.properties.ObjectProperty(None)
+    execute = kivy.properties.ObjectProperty(None)
+    hint = kivy.properties.ObjectProperty(None)
+    progress = kivy.properties.ObjectProperty(None)
     
     is_paused = False
     
@@ -635,6 +651,7 @@ class MainScreen(Screen):
         MainScreen.fade_in.start(widget)
 
     def pause(self, delay):
+        Ball.interactive = False
         # this is run in another thread so we can delay
         self.set_visible(self.progress)
         self.is_paused = True
@@ -643,6 +660,8 @@ class MainScreen(Screen):
         a.start(self.progress)
 
     def unpause(self):
+        Ball.interactive = True
+        self.cradle.reset_balls()
         self.is_paused = False
         self.set_visible(self.hint)
 
@@ -670,7 +689,7 @@ class MyProgressBar(Widget):
             self._value = value
             return True
 
-    value = AliasProperty(_get_value, _set_value)
+    value = kivy.properties.AliasProperty(_get_value, _set_value)
 
     def get_norm_value(self):
         d = self.max
@@ -681,10 +700,10 @@ class MyProgressBar(Widget):
     def set_norm_value(self, value):
         self.value = value * self.max
 
-    value_normalized = AliasProperty(get_norm_value, set_norm_value,
+    value_normalized = kivy.properties.AliasProperty(get_norm_value, set_norm_value,
                                      bind=('value', 'max'))
 
-    max = NumericProperty(100.)
+    max = kivy.properties.NumericProperty(100.)
 
 # ////////////////////////////////////////////////////////////////
 # //        PauseScene and Admin Scene Class                    //
@@ -697,7 +716,7 @@ class adminFunctionsScreen(Screen):
         quit_all()
 
     @staticmethod
-    def back_action(self):
+    def back_action():
         home()
         sm.current = 'main'
 
