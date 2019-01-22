@@ -9,11 +9,40 @@
             rgb: 0, 0, 1
         RoundedRectangle:
             pos: self.x, self.y
-            size: self.width * (self.value / float(self.max)) if self.max else 0, self.height
+            size: self.width * (self.value / 100.0), self.height
+
+<VariableChanger>:
+    label: label
     Label:
-        text: "Please Wait"
-        pos: self.x, self.y - 50
-        size: self.width, self.height
+        id: label
+        text: (root.name if root.name else "???")+ ": " + str(root.get_value())
+        size: 80, 80
+        center_x: root.center_x
+        center_y: root.center_y + 40
+        color: 0.3,0.3,0.3,1
+        font_size: 25
+    DPEAButton:
+        background_normal: ''
+        size_hint: None,None
+        text: "+"
+        size: 80, 80
+        center_x: root.center_x + 40
+        center_y: root.center_y - 80
+        color: 1,0,0,1
+        background_color: 0, 0, 0, 0
+        on_release: root.inc_value()
+    DPEAButton:
+        background_normal: ''
+        size_hint: None,None
+        text: "-"
+        size: 80, 80
+        center_x: root.center_x - 40
+        center_y: root.center_y - 80
+        color: 1,0,0,1
+        background_color: 0, 0, 0, 0
+        on_release: root.dec_value()
+
+
 
 <Ball>:
     canvas.before:
@@ -85,6 +114,7 @@
     cradle: cradle
     execute: execute
     progress: progress
+    wait: wait
     hint: hint
     FloatLayout:
         size_hint: None, None  #Needed to be able to define define height and width of widgets
@@ -142,6 +172,14 @@
             color: 0,1,0,1
             background_color: 0, 0, 0, 0
 
+        Label:
+            id: wait
+            opacity: 0
+            y: root.height * 0.05 + 15
+            center_x: root.width * .50
+            text: "Please Wait"
+            color: 0.3,0.3,0.3,1
+            font_size: 40
 
         ################# ADMIN #################   
         Button:
@@ -156,7 +194,26 @@
     name: 'adminFunctionsScreen'
     FloatLayout:
         size_hint: None, None
-        
+        VariableChanger:
+            name: "offset_left"
+            size_hint: None,None
+            center_x: root.width * .15
+			center_y: root.height * .85
+        VariableChanger:
+            name: "offset_v_left"
+            size_hint: None,None
+            center_x: root.width * .30
+			center_y: root.height * .85
+        VariableChanger:
+            name: "offset_v_right"
+            size_hint: None,None
+            center_x: root.width * .70
+			center_y: root.height * .85
+        VariableChanger:
+            name: "offset_right"
+            size_hint: None,None
+            center_x: root.width * .85
+			center_y: root.height * .85
         DPEAButton:
             size_hint: None,None
             background_normal: '' 

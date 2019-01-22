@@ -13,9 +13,13 @@ class Stepper(Slush.Motor):
         self.setMicroSteps(self.microSteps)
         self.setCurrent(kwargs.get("runCurrent", 20), kwargs.get("accelCurrent", 20), kwargs.get("deaccelCurrent", 20),
                         kwargs.get("holdCurrent", 20))
-        self.stepsPerUnit = kwargs.get("stepsPerUnit", 200 / 25.4)
+        self._stepsPerUnit = kwargs.get("stepsPerUnit", 200 / 25.4)
         self.speed = kwargs.get("speed", 10)
         self.setSpeed(self.speed)
+
+    @property
+    def stepsPerUnit(self):
+        return self._stepsPerUnit
 
     def getMicroSteps(self):
         return self.microSteps

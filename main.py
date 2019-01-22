@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-print("test")
+import json
 
 import os
 os.environ["DISPLAY"] = ":0.0"
 
 import time
 from threading import Thread
-import kivy.properties
+from kivy.properties import AliasProperty, ObjectProperty, NumericProperty
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -39,16 +39,20 @@ Globals
 
 MIXPANEL_TOKEN = "02f0373e5a3d6354fbc9d41d6b3a002a"
 
-STEPS_PER_INCH = 25.4
+SCALE = 7.77
+
+STEPS_PER_INCH = 25.4 * SCALE
 BALL_DIAMETER = 2.25 * STEPS_PER_INCH
 
-STOP_DISTANCE = 2.41 * STEPS_PER_INCH
-STOP_DISTANCE_LEFT = STOP_DISTANCE - 5
-STOP_DISTANCE_RIGHT = STOP_DISTANCE + 2
+offset_right = 0
+offset_left = 0
 
-START_INSET = 10
-START_POSITION_LEFT = STOP_DISTANCE_LEFT - START_INSET
-START_POSITION_RIGHT = STOP_DISTANCE_RIGHT - START_INSET
+offset_v_right = 0
+offset_v_left = 0
+
+STOP_DISTANCE = 2.41 * STEPS_PER_INCH
+
+START_INSET = 10 * SCALE
 
 BACKUP_DISTANCE = -4.5 * STEPS_PER_INCH
 LIFT_DISTANCE = 3 * STEPS_PER_INCH
@@ -130,8 +134,8 @@ def set_vertical_pos(pos):
     :param pos: The position to both of the vertical stepper to
     :return: None
     """
-    RIGHT_VERTICAL_STEPPER.startGoToPosition(pos)
-    LEFT_VERTICAL_STEPPER.startGoToPosition(pos)
+    RIGHT_VERTICAL_STEPPER.startGoToPosition(pos + offset_v_right * SCALE)
+    LEFT_VERTICAL_STEPPER.startGoToPosition(pos + offset_v_left * SCALE)
 
     while are_vertical_busy():
         continue
@@ -144,8 +148,8 @@ def set_vertical_poss(pos_l, pos_r):
     :param pos_r: Relative move amount for right vertical stepper
     :return: None
     """
-    LEFT_VERTICAL_STEPPER.startGoToPosition(pos_l)
-    RIGHT_VERTICAL_STEPPER.startGoToPosition(pos_r)
+    LEFT_VERTICAL_STEPPER.startGoToPosition(pos_l + offset_v_left * SCALE)
+    RIGHT_VERTICAL_STEPPER.startGoToPosition(pos_r + offset_v_right * SCALE)
 
     while are_vertical_busy():
         continue
@@ -237,6 +241,7 @@ def check_temperature():
     mixpanel.addProperty("Temperature", temp)
     mixpanel.sendEvent()
 
+
 def new_scoop():
     """
     New scooped initiated, gets the number of balls on each side and calls the perspective function to control pickups
@@ -279,7 +284,7 @@ def scoop_left(num):
     if num == 0:
         return
 
-    p = START_POSITION_LEFT + BALL_DIAMETER * num
+    p = STOP_DISTANCE - START_INSET + offset_left * SCALE + BALL_DIAMETER * num
     set_horizontal_speed(HORIZONTAL_SPEED)
     LEFT_HORIZONTAL_STEPPER.startGoToPosition(p)
 
@@ -303,7 +308,7 @@ def scoop_right(num):
     if num == 0:
         return
 
-    p = START_POSITION_RIGHT + BALL_DIAMETER * num
+    p = STOP_DISTANCE - START_INSET + offset_right * SCALE + BALL_DIAMETER * num
     set_horizontal_speed(HORIZONTAL_SPEED)
     RIGHT_HORIZONTAL_STEPPER.startGoToPosition(p)
 
@@ -325,8 +330,8 @@ def scoop_both(num_left, num_right):
     :param num_right: Number of balls on the right side to be scooped
     :return: None
     """
-    p_r = START_POSITION_RIGHT + BALL_DIAMETER * num_right
-    p_l = START_POSITION_LEFT + BALL_DIAMETER * num_left
+    p_r = STOP_DISTANCE - START_INSET + offset_right * SCALE + BALL_DIAMETER * num_right
+    p_l = STOP_DISTANCE - START_INSET + offset_left * SCALE + BALL_DIAMETER * num_left
 
     set_horizontal_speed(HORIZONTAL_SPEED)
     if num_right > 0:
@@ -372,14 +377,16 @@ def stop_balls():
 
     # slowly move the horizontal steppers into the middle/stopping positions
     set_horizontal_speed(STOPPING_SPEED)
-    set_horizontal_poss(STOP_DISTANCE_LEFT, STOP_DISTANCE_RIGHT)
+    set_horizontal_poss(STOP_DISTANCE + offset_left * SCALE, STOP_DISTANCE + offset_right * SCALE)
+
+    time.sleep(1)
 
     # back away slowly
     set_horizontal_speed(STOPPING_SPEED / 10)
-    set_horizontal_pos_rel(-1)
+    set_horizontal_pos_rel(-1 * SCALE)
 
     set_horizontal_speed(STOPPING_SPEED / 5)
-    set_horizontal_pos_rel(-4)
+    set_horizontal_pos_rel(-4 * SCALE)
 
     # bring the vertical steppers down
     set_vertical_pos(0)
@@ -416,21 +423,21 @@ def transition_back(original_scene):
 
 
 def scoop_balls_thread(*largs):
-    if sm.current != "main":
-        return
-
     main = sm.get_screen('main')
 
     num_left = main.cradle.num_left()
     num_right = main.cradle.num_right()
-    
-    send_start_event(num_left, num_right)
-    
+
     if num_right == 0 and num_left == 0:
         return
 
     pause_time = 5 + 26 + 2 * max(num_left, num_right)
+
+    if main.is_paused:
+        return
     main.pause(pause_time)
+
+    send_start_event(num_left, num_right)
 
     Thread(target=new_scoop).start()
 
@@ -440,7 +447,7 @@ sm = ScreenManager()
 class Ball(Widget):
     interactive = True
     down_exists = False
-    down = kivy.properties.ObjectProperty((0, 0))
+    down = ObjectProperty((0, 0))
 
     def transform_point(self, v):
         v -= Vector(self.parent.pos)
@@ -455,7 +462,6 @@ class Ball(Widget):
     def pushed(self, touch):
         pos = touch.pos
         v = self.transform_point(Vector(pos))
-        print(Ball.interactive)
         if self.collide_point(v.x, v.y) and (not Ball.down_exists) and Ball.interactive:
             self.down = v
             Ball.down_exists = True
@@ -494,16 +500,16 @@ class Ball(Widget):
 
 
 class BallString(Widget):
-    rotation = kivy.properties.ObjectProperty(0)
-    ball = kivy.properties.ObjectProperty(None)
-    name = kivy.properties.ObjectProperty("middle")
+    rotation = ObjectProperty(0)
+    ball = ObjectProperty(None)
+    name = ObjectProperty("middle")
     ROT_LEFT = -35
     ROT_RIGHT = 35
     ROT_DOWN = 0
     a_down = Animation(rotation=ROT_DOWN, t="out_quad")
     a_left = Animation(rotation=ROT_LEFT, t="out_quad")
     a_right = Animation(rotation=ROT_RIGHT, t="out_quad")
-    r = kivy.properties.ObjectProperty(ROT_DOWN)
+    r = ObjectProperty(ROT_DOWN)
 
     def down(self):
         Animation.cancel_all(self)
@@ -615,12 +621,12 @@ Window.clearcolor = (1, 1, 1, 1)  # (WHITE)
 MainScreen Class
 """
 
-
 class MainScreen(Screen):
-    cradle = kivy.properties.ObjectProperty(None)
-    execute = kivy.properties.ObjectProperty(None)
-    hint = kivy.properties.ObjectProperty(None)
-    progress = kivy.properties.ObjectProperty(None)
+    cradle = ObjectProperty(None)
+    execute = ObjectProperty(None)
+    hint = ObjectProperty(None)
+    progress = ObjectProperty(None)
+    wait = ObjectProperty(None)
     
     is_paused = False
     
@@ -635,20 +641,25 @@ class MainScreen(Screen):
         Clock.schedule_once(scoop_balls_thread, 0)
 
     def set_visible(self, widget):
-        print("set_visible", widget)
         if self.is_paused:
             return
 
         Animation.cancel_all(self.hint)
         Animation.cancel_all(self.execute)
         Animation.cancel_all(self.progress)
+        Animation.cancel_all(self.wait)
 
         MainScreen.fade_out.start(self.hint)
         MainScreen.fade_out.start(self.execute)
         MainScreen.fade_out.start(self.progress)
+        MainScreen.fade_out.start(self.wait)
 
         Animation.cancel_all(widget)
         MainScreen.fade_in.start(widget)
+
+        if widget == self.progress:
+            Animation.cancel_all(self.wait)
+            MainScreen.fade_in.start(self.wait)
 
     def pause(self, delay):
         Ball.interactive = False
@@ -676,34 +687,45 @@ class MainScreen(Screen):
 
 
 class MyProgressBar(Widget):
-    def __init__(self, **kwargs):
-        self._value = 0.
-        super(MyProgressBar, self).__init__(**kwargs)
+    value = NumericProperty(0)
 
-    def _get_value(self):
-        return self._value
 
-    def _set_value(self, value):
-        value = max(0, min(self.max, value))
-        if value != self._value:
-            self._value = value
-            return True
+variables_dict = {}
+if os.path.exists("variables.json"):
+    with open("variables.json") as o:
+        variables_dict = json.loads(o.read())
 
-    value = kivy.properties.AliasProperty(_get_value, _set_value)
+    for v in variables_dict.keys():
+        globals()[v] = variables_dict[v]
 
-    def get_norm_value(self):
-        d = self.max
-        if d == 0:
-            return 0
-        return self.value / float(d)
 
-    def set_norm_value(self, value):
-        self.value = value * self.max
+class VariableChanger(Widget):
+    name = ObjectProperty(None)
+    label = ObjectProperty(None)
 
-    value_normalized = kivy.properties.AliasProperty(get_norm_value, set_norm_value,
-                                     bind=('value', 'max'))
+    def get_value(self):
+        return globals().get(self.name, None)
 
-    max = kivy.properties.NumericProperty(100.)
+    def inc_value(self):
+        self.set_value(self.get_value() + 1)
+
+    def dec_value(self):
+        self.set_value(self.get_value() - 1)
+
+    def set_value(self, value):
+        globals()[self.name] = value
+        variables_dict[self.name] = value
+        self.label.text = self.name + ": " + str(self.get_value())
+        self.save_value()
+
+    def save_value(self):
+        with open("variables.json", "w+") as o:
+            o.write(json.dumps(variables_dict))
+
+
+
+
+
 
 # ////////////////////////////////////////////////////////////////
 # //        PauseScene and Admin Scene Class                    //
