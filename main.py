@@ -4,6 +4,7 @@ import json
 import os
 os.environ["DISPLAY"] = ":0.0"
 
+
 import time
 from threading import Thread
 from kivy.properties import AliasProperty, ObjectProperty, NumericProperty
@@ -39,7 +40,8 @@ Globals
 
 MIXPANEL_TOKEN = "02f0373e5a3d6354fbc9d41d6b3a002a"
 
-SCALE = 7.77
+#SCALE = 7.77
+SCALE = 1
 
 STEPS_PER_INCH = 25.4 * SCALE
 BALL_DIAMETER = 2.25 * STEPS_PER_INCH
@@ -646,29 +648,25 @@ class MainScreen(Screen):
 
         Animation.cancel_all(self.hint)
         Animation.cancel_all(self.execute)
-        Animation.cancel_all(self.progress)
+        #Animation.cancel_all(self.progress)
         Animation.cancel_all(self.wait)
 
         MainScreen.fade_out.start(self.hint)
         MainScreen.fade_out.start(self.execute)
-        MainScreen.fade_out.start(self.progress)
+        #MainScreen.fade_out.start(self.progress)
         MainScreen.fade_out.start(self.wait)
 
         Animation.cancel_all(widget)
         MainScreen.fade_in.start(widget)
 
-        if widget == self.progress:
-            Animation.cancel_all(self.wait)
-            MainScreen.fade_in.start(self.wait)
 
     def pause(self, delay):
         Ball.interactive = False
-        # this is run in another thread so we can delay
-        self.set_visible(self.progress)
+        self.set_visible(self.wait)
         self.is_paused = True
-        self.progress.value = 0
-        a = Animation(value=100, duration=delay)
-        a.start(self.progress)
+        #self.progress.value = 0
+        #a = Animation(value=100, duration=delay)
+        #a.start(self.progress)
 
     def unpause(self):
         Ball.interactive = True
