@@ -60,4 +60,3 @@ class Stepper(Slush.Motor):
     def startGoToPosition(self, distance):
         numberOfSteps = distance * self.microSteps * self.stepsPerUnit
         self.goTo(int(numberOfSteps))
-
