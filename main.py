@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import json
 
 import os
@@ -16,12 +16,10 @@ from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.vector import Vector
-
+from kivy.config import Config
 
 import sys
-sys.path.insert(0, 'Kivy/')
-sys.path.insert(0, 'Kivy/Scenes/')
-sys.path.insert(0, 'Libraries')
+sys.path.insert(0, '/home/pi/repos/newtonsCradleContainer/NewtonsCradle')
 
 from Kivy.Scenes import AdminScreen
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -37,7 +35,6 @@ logging.getLogger().setLevel(logging.DEBUG)
 """
 Globals
 """
-
 MIXPANEL_TOKEN = "02f0373e5a3d6354fbc9d41d6b3a002a"
 
 #SCALE = 7.77
@@ -752,6 +749,12 @@ temperature_refresh.add_job(check_temperature, 'interval', minutes=5)
 
 if __name__ == "__main__":
     try:
+        # Configure display settings
+        Config.set('graphics', 'show_cursor', 0)
+        Config.write()
+        Window.size = (1280, 800)
+        Window.fullscreen = True
+
         home()
         mixpanel.setEventName("Project Initialized")
         mixpanel.sendEvent()
