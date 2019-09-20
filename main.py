@@ -736,7 +736,10 @@ class adminFunctionsScreen(Screen):
     def back_action():
         home()
         sm.current = 'main'
-
+    
+    @staticmethod
+    def shutdown_action():
+        os.system('sudo shutdown now')
 
 sm.add_widget(MainScreen(name='main'))
 sm.add_widget(AdminScreen.AdminScreen(name='admin'))

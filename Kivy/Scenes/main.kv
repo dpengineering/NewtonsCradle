@@ -222,8 +222,9 @@
             color: 1, 0, 0, 1
             background_color: 0, 0, 0, 0
             center_x: root.width * .50 
-			center_y: root.height * .50
+			center_y: root.height * .55
             on_release: root.quit_action()
+        
         DPEAButton:
             size_hint: None, None
             background_normal: '' 
@@ -232,5 +233,16 @@
             color: 0, 0, 1, 1
             background_color:0, 0, 0, 0
             center_x: root.width * .50 
-			center_y: root.height * .25
+			center_y: root.height * .35
             on_release: root.back_action()
+       
+        DPEAButton:
+            size_hint: None, None
+            background_normal: ''
+            text: 'Shutdown'
+            size: 400, 150
+            color: 0, 0, 1, 1
+            background_color:0, 0, 0, 0
+            center_x: root.width * .50
+            center_y: root.height * .15
+            on_release: root.shutdown_action()
